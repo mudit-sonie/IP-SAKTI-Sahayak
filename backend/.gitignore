@@ -5,5 +5,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 data/chroma/
-data/processed/
+data/processed/*
+!data/processed/.gitkeep
 *.log

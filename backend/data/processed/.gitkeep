@@ -1,0 +1,2 @@
+# Ingestion output lands here: documents.json, chunks.jsonl, metadata.json, validation_report.json
+# Generated artifacts are git-ignored (see backend/.gitignore); this file just keeps the dir.
