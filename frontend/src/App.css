@@ -1,0 +1,529 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f7f8f5;
+  color: #1d2a24;
+}
+
+.navbar {
+  height: 72px;
+  padding: 0 8%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border-bottom: 1px solid #e3e7e2;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.logo span {
+  font-weight: 500;
+}
+
+.nav-tag {
+  font-size: 14px;
+  color: #69736d;
+}
+
+.hero {
+  width: min(900px, 90%);
+  margin: 0 auto;
+  padding: 70px 0 50px;
+  text-align: center;
+}
+
+.badge {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: #e8f0e9;
+  color: #376447;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+h1 {
+  margin: 24px 0 18px;
+  font-size: clamp(42px, 6vw, 68px);
+  line-height: 1.05;
+  letter-spacing: -2px;
+}
+
+h1 span {
+  color: #376447;
+}
+
+.description {
+  max-width: 700px;
+  margin: 0 auto;
+  font-size: 18px;
+  line-height: 1.7;
+  color: #68716b;
+}
+
+.jurisdiction-card {
+  max-width: 600px;
+  margin: 42px auto 20px;
+  padding: 30px;
+  background: white;
+  border: 1px solid #e1e6e0;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.jurisdiction-card h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.jurisdiction-card p {
+  color: #707873;
+}
+
+.toggle-container {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.toggle {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid #d5dbd5;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.toggle.active {
+  background: #376447;
+  color: white;
+  border-color: #376447;
+}
+
+.selected-jurisdiction {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #68716b;
+}
+
+.disclaimer {
+  max-width: 600px;
+  margin: 18px auto;
+  padding: 16px 20px;
+  border-radius: 10px;
+  background: #fff8e6;
+  border: 1px solid #eadcae;
+  color: #685b32;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.start-button {
+  margin-top: 22px;
+  padding: 16px 26px;
+  border: none;
+  border-radius: 10px;
+  background: #1d2a24;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.start-button:hover {
+  transform: translateY(-1px);
+}
+
+.privacy-note {
+  margin-top: 18px;
+  font-size: 12px;
+  color: #8a928c;
+}
+
+footer {
+  margin-top: auto;
+  padding: 24px;
+  text-align: center;
+  color: #8a928c;
+  font-size: 12px;
+  border-top: 1px solid #e3e7e2;
+  background: white;
+}
+
+.classification-page {
+  min-height: 100vh;
+  padding: 48px 20px;
+  background: #f7f8f5;
+}
+
+.classification-container {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.text-back-button {
+  display: block;
+  margin: 0 0 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #376447;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.classification-container h1 {
+  margin: 22px 0 12px;
+  font-size: clamp(36px, 5vw, 52px);
+  line-height: 1.1;
+}
+
+.classification-container h1 span {
+  color: #376447;
+}
+
+.classification-intro {
+  max-width: 650px;
+  margin: 0 auto 32px;
+  color: #68716b;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.progress-section {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.progress-text {
+  margin-bottom: 8px;
+  color: #68716b;
+  font-size: 14px;
+}
+
+.progress-bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dfe5df;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #376447;
+  transition: width 0.25s ease;
+}
+
+.question-card,
+.result-card {
+  padding: 38px;
+  border: 1px solid #e1e6e0;
+  border-radius: 18px;
+  background: white;
+  text-align: left;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.question-card h2 {
+  margin-top: 0;
+  margin-bottom: 26px;
+  font-size: 24px;
+  line-height: 1.35;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option {
+  padding: 16px;
+  border: 1px solid #d5dbd5;
+  border-radius: 10px;
+  background: white;
+  color: #1d2a24;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.option:hover {
+  border-color: #376447;
+}
+
+.option.selected {
+  border-color: #376447;
+  background: #e8f0e9;
+  color: #376447;
+  font-weight: 700;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.back-button,
+.next-button {
+  padding: 13px 20px;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.back-button {
+  border: 1px solid #d5dbd5;
+  background: white;
+  color: #1d2a24;
+}
+
+.next-button {
+  border: none;
+  background: #1d2a24;
+  color: white;
+}
+
+.back-button:disabled,
+.next-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.result-card {
+  text-align: center;
+}
+
+.result-label {
+  margin: 0;
+  color: #68716b;
+  font-weight: 700;
+}
+
+.result-jurisdiction {
+  margin: 22px 0;
+  color: #68716b;
+}
+
+@media (max-width: 600px) {
+  .classification-page {
+    padding: 28px 16px;
+  }
+
+  .question-card,
+  .result-card {
+    padding: 24px;
+  }
+
+  .navigation-buttons {
+    flex-direction: column;
+  }
+
+  .back-button,
+  .next-button {
+    width: 100%;
+  }
+}
+
+.context-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.context-card div {
+  padding: 16px;
+  border: 1px solid #e1e6e0;
+  border-radius: 12px;
+  background: #edf4ee;
+}
+
+.context-card span {
+  display: block;
+  margin-bottom: 6px;
+  color: #68716b;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.context-card strong {
+  display: block;
+  color: #1d2a24;
+  line-height: 1.4;
+}
+
+.result-question {
+  max-width: 720px;
+  margin: 14px auto 20px;
+  color: #44524a;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.result-context {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.result-context span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #edf4ee;
+  color: #376447;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.answer-card,
+.sources-section,
+.abs-card,
+.escalation-card,
+.mismatch-card {
+  margin-bottom: 18px;
+  padding: 26px;
+  border: 1px solid #e1e6e0;
+  border-radius: 16px;
+  background: white;
+  text-align: left;
+}
+
+.answer-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.answer-heading h2,
+.sources-section h2,
+.abs-card h2,
+.escalation-card h2 {
+  margin: 4px 0 0;
+  color: #1d2a24;
+}
+
+.confidence-badge {
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: #e3f3e6;
+  color: #236436;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.answer-text {
+  margin: 22px 0 12px;
+  color: #3e4d44;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.mock-notice {
+  margin-bottom: 0;
+  color: #7b827d;
+  font-size: 13px;
+}
+
+.sources-section {
+  background: #fdfefd;
+}
+
+.citation-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.citation-card {
+  padding: 16px;
+  border-left: 4px solid #376447;
+  border-radius: 8px;
+  background: #eef5ef;
+}
+
+.citation-card p,
+.citation-card strong,
+.citation-card span {
+  display: block;
+}
+
+.citation-card p {
+  margin: 0 0 6px;
+  color: #376447;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.citation-card strong {
+  margin-bottom: 5px;
+  color: #1d2a24;
+}
+
+.citation-card span {
+  color: #68716b;
+  font-size: 14px;
+}
+
+.abs-card {
+  background: #f8f7ef;
+  border-color: #e7dfb5;
+}
+
+.abs-card.triggered {
+  background: #fff4d9;
+  border-color: #e5bd63;
+}
+
+.escalation-card {
+  background: #f5f7f6;
+}
+
+.mismatch-card {
+  border-color: #e5bd63;
+  background: #fff4d9;
+  color: #65501b;
+}
+
+.result-button {
+  width: 100%;
+  margin: 10px 0 30px;
+}
+
+@media (max-width: 600px) {
+  .answer-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .answer-card,
+  .sources-section,
+  .abs-card,
+  .escalation-card,
+  .mismatch-card {
+    padding: 20px;
+  }
+}

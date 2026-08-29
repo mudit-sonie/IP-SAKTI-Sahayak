@@ -23,7 +23,7 @@ backend/                FastAPI RAG backend — see backend/README.md
   scripts/build_index.py   build BM25+Chroma from processed corpus
   tests/                pytest suite
 .claude/skills/legal-corpus-ingestion/   deterministic PDF → chunks.jsonl pipeline skill
-frontend/               React app (not yet scaffolded as of Day 1)
+frontend/               React app (Vite + react-router) — see frontend/README.md; screens use mock data, not yet wired to the API
 ```
 
 ## Architecture (locked — see PRD §2)
@@ -91,13 +91,12 @@ See [`STATUS.md`](STATUS.md) for the live task board (updated by the lead).
 
 ## Known environment gotcha
 
-Several `corpus/` subdirectories were created on macOS with a `:` in the folder
-name (e.g. `01_patents_act_1970:/`). **`:` is illegal in Windows/NTFS paths**, so
-`git checkout` cannot materialise those files on Windows — they show as deleted in
-`git status` on a Windows clone. Do **not** `git add -A` / commit those deletions.
-Work on macOS/Linux/WSL for anything touching `corpus/`, or rename the dirs to drop
-the `:` (coordinate first — it rewrites paths for everyone). This repo sets
-`core.protectNTFS=false` locally as a stopgap so commits of other paths still work.
+The `corpus/` subdirectories were originally created on macOS with a `:` in the
+folder name (e.g. `01_patents_act_1970:/`), which is illegal in Windows/NTFS paths.
+**Fixed in `2a42196`** — dirs renamed to drop the `:`. If you cloned before that,
+re-clone or `git pull`. Historical note: a stale branch cut before the rename can
+still carry mass `git add -A` deletions of `corpus/` — never merge those; take only
+the intended paths (this is how PR `codex/frontend-mvp` was merged in `1d4a4d6`).
 
 ## Git
 
