@@ -1,0 +1,24 @@
+# IP-SAKTI Sahayak — backend dependencies
+# Pinned loosely for the 29 Aug – 1 Sep build window; tighten before demo day.
+
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+pydantic==2.8.2
+pydantic-settings==2.4.0
+python-dotenv==1.0.1
+
+# Retrieval infra
+chromadb==0.5.5
+rank-bm25==0.2.2
+sentence-transformers==3.0.1
+
+# LLM
+google-generativeai==0.7.2
+
+# Utilities
+httpx==0.27.0
+orjson==3.10.7
+
+# Dev / test
+pytest==8.3.2
+pytest-asyncio==0.23.8
