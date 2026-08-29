@@ -4,6 +4,8 @@
 """
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,12 +18,23 @@ configure_logging()
 logger = get_logger(__name__)
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Build indices once at boot rather than on the first request.
+    from app.retrieval import get_retriever
+
+    get_retriever()
+    logger.info("startup complete (env=%s)", get_settings().app_env)
+    yield
+
+
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(
         title="IP-SAKTI Sahayak API",
         version=__version__,
         description="Citation-grounded RAG assistant for Ayurveda IPR (SIH 2026 / PS 26045).",
+        lifespan=lifespan,
     )
     app.add_middleware(
         CORSMiddleware,
@@ -35,14 +48,6 @@ def create_app() -> FastAPI:
     @app.get("/")
     def root() -> dict:
         return {"name": "IP-SAKTI Sahayak API", "version": __version__, "docs": "/docs"}
-
-    @app.on_event("startup")
-    def _warm() -> None:
-        # Build indices once at boot rather than on the first request.
-        from app.retrieval import get_retriever
-
-        get_retriever()
-        logger.info("startup complete (env=%s)", settings.app_env)
 
     return app
 
