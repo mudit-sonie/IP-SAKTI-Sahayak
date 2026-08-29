@@ -11,7 +11,7 @@ backend skeleton runs; frontend renders static screens against mock data.
 
 | Workstream | Owner | Status | Notes |
 |---|---|---|---|
-| Corpus sourcing | Anuj | 🟡 mostly done | 10/11 PDFs committed (`23a7d07`). **Gaps:** GI Act 1999 (no PDF — scrape from ipindia.gov.in, see `corpus/india/06_geographical_indications:/readme.md`); confirm Biological Diversity Rules 2024 + BD (Amendment) Act 2023 are present and not just the 2002 Act. |
+| Corpus sourcing | Anuj | 🟡 nearly done | 10 PDFs (`23a7d07`) + GI Act 1999 as formatted markdown (`3074cc7`, TOC + full sectioned text — good for chunking). **Remaining:** confirm Biological Diversity Rules 2024 + BD (Amendment) Act 2023 are present, not just the 2002 Act. |
 | Corpus cleaning / OCR | Kavish | 🔴 not started in repo | Handed over per `23a7d07`. No cleaned text or `chunks.jsonl` committed yet. Highest lead-time item — needs to be visibly moving today. |
 | Ingestion pipeline (chunking + metadata → `chunks.jsonl`) | Kavish / TBD | 🔴 not started | Skill exists (`.claude/skills/legal-corpus-ingestion`). Output must land at `backend/data/processed/chunks.jsonl`. |
 | **Backend scaffolding** | **Dewashish (lead)** | 🟢 **done** | FastAPI app + `/health` `/classify` `/query` `/abs-check`, hybrid BM25+Chroma retrieval infra, Gemini multi-key rotation, rule-based classifier, confidence + ABS second pass, pipeline orchestration, pytest suite. Runs today; returns `escalate` until corpus chunks exist (by design). 14/14 pytest green, `uvicorn app.main:app` boots clean. |
@@ -21,10 +21,16 @@ backend skeleton runs; frontend renders static screens against mock data.
 ### Day 1 blockers / asks
 - **Cleaning + ingestion must start now** — the Day 2 milestone (real end-to-end
   loop) depends entirely on `chunks.jsonl` existing. This is the critical path.
-- Someone needs to own the **frontend scaffold** today.
+- Frontend scaffold merged (Mudit). Toolchain re-pinned to stable Vite 6 / ESLint 9
+  (`4ebbc6c`) — the PR's Vite 8 pins didn't build. `npm ci && npm run build` green.
 - Collect Gemini API keys.
-- Decide who renames the `:`-containing `corpus/` dirs (breaks Windows checkout —
-  see CLAUDE.md gotcha) or confirm we all work on macOS/Linux/WSL.
+- Frontend PR got merged twice (`1d4a4d6` by lead, `df1df86` by Anuj) — harmless, but
+  coordinate merges so it doesn't happen again.
+- `:` in `corpus/` dir names fixed by rename (`2a42196`) — re-clone if you pulled before that.
+- `.DS_Store` files keep getting committed (3 tracked). Add to `.gitignore` and
+  `git rm --cached` them.
+- `assets/BabySharks.png` is 2.2 MB for a README banner — fine, but compress if the
+  repo size becomes a concern.
 
 ---
 
