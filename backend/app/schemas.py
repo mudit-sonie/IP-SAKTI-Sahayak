@@ -56,6 +56,8 @@ class ClassifyResponse(BaseModel):
     formulation_category: Optional[FormulationCategory] = None
     next_question: Optional[NextQuestion] = None
     complete: bool = False
+    # Human-readable decision path once complete — one line per answered question.
+    rationale: list[str] = Field(default_factory=list)
 
 
 # --------------------------------------------------------------------------- #

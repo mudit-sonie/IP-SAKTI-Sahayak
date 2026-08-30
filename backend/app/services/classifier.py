@@ -88,6 +88,15 @@ def _pick(answer: str, options: list[str]) -> int | None:
     return None
 
 
+# Short label per question, for the decision-path explanation.
+_SHORT = {
+    "q1": "Intended use",
+    "q2": "Textual formulation, unchanged",
+    "q3": "All ingredients textual",
+    "q4": "Standardised botanical extract",
+}
+
+
 def _next(question: Question) -> ClassifyResponse:
     return ClassifyResponse(
         next_question=NextQuestion(
@@ -97,35 +106,48 @@ def _next(question: Question) -> ClassifyResponse:
     )
 
 
-def _done(category: FormulationCategory) -> ClassifyResponse:
-    return ClassifyResponse(formulation_category=category, complete=True)
+def _done(
+    category: FormulationCategory, trail: list[tuple[str, int, list[str]]]
+) -> ClassifyResponse:
+    rationale = [
+        f"{_SHORT[qid]}: {opts[idx]}" for qid, idx, opts in trail
+    ]
+    return ClassifyResponse(
+        formulation_category=category, complete=True, rationale=rationale
+    )
 
 
 def classify(answers: dict[str, str]) -> ClassifyResponse:
+    trail: list[tuple[str, int, list[str]]] = []
+
     a1 = _pick(answers.get("q1", ""), Q1.options)
     if a1 is None:
         return _next(Q1)
+    trail.append(("q1", a1, Q1.options))
     if a1 == 2:
-        return _done(FormulationCategory.cosmetic)
+        return _done(FormulationCategory.cosmetic, trail)
     if a1 == 1:
-        return _done(FormulationCategory.ayurveda_aahar)
+        return _done(FormulationCategory.ayurveda_aahar, trail)
 
     # a1 == 0: therapeutic branch
     a2 = _pick(answers.get("q2", ""), Q2.options)
     if a2 is None:
         return _next(Q2)
+    trail.append(("q2", a2, Q2.options))
     if a2 == 0:
-        return _done(FormulationCategory.classical)
+        return _done(FormulationCategory.classical, trail)
 
     a3 = _pick(answers.get("q3", ""), Q3.options)
     if a3 is None:
         return _next(Q3)
+    trail.append(("q3", a3, Q3.options))
     if a3 == 0:
-        return _done(FormulationCategory.proprietary)
+        return _done(FormulationCategory.proprietary, trail)
 
     a4 = _pick(answers.get("q4", ""), Q4.options)
     if a4 is None:
         return _next(Q4)
+    trail.append(("q4", a4, Q4.options))
     if a4 == 0:
-        return _done(FormulationCategory.phytopharmaceutical)
-    return _done(FormulationCategory.new_drug)
+        return _done(FormulationCategory.phytopharmaceutical, trail)
+    return _done(FormulationCategory.new_drug, trail)

@@ -58,3 +58,18 @@ def test_extract_vs_new_molecule(q4, expected):
 def test_numeric_answers_accepted():
     res = classify({"q1": "1", "q2": "1"})
     assert res.formulation_category.value == "classical"
+
+
+def test_rationale_traces_the_path():
+    res = classify(
+        {
+            "q1": "Therapeutic / medicinal",
+            "q2": "No - modified process, proportions or a new combination",
+            "q3": "Yes - all ingredients are textual",
+        }
+    )
+    assert res.formulation_category.value == "proprietary"
+    assert len(res.rationale) == 3
+    assert res.rationale[0].startswith("Intended use:")
+    # in-progress responses carry no rationale
+    assert classify({}).rationale == []
