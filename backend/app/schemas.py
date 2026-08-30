@@ -102,6 +102,7 @@ class QueryResponse(BaseModel):
     abs_flag: bool = False
     abs_note: Optional[str] = None
     cached: bool = False
+    jurisdiction_note: Optional[str] = None
 
 
 # --------------------------------------------------------------------------- #

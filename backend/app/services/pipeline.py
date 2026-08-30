@@ -13,6 +13,7 @@ from app.retrieval import get_retriever
 from app.retrieval.expansion import expand_query
 from app.schemas import AnswerStatus, QueryRequest, QueryResponse
 from app.services import abs_helper, confidence, generation, query_cache
+from app.services.jurisdiction import mismatch_note
 
 logger = get_logger(__name__)
 
@@ -71,4 +72,5 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
         confidence=conf,
         abs_flag=abs_result.triggered,
         abs_note=abs_note,
+        jurisdiction_note=mismatch_note(req.query, req.jurisdiction.value),
     )
