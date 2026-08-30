@@ -37,6 +37,14 @@ class Settings(BaseSettings):
     )
     hybrid_bm25_weight: float = Field(default=0.5, alias="HYBRID_BM25_WEIGHT")
 
+    # --- Query cache ---
+    # On-disk cache of /query responses, keyed by (query, jurisdiction, category).
+    # Lets a demo run gold questions for free and survive Gemini's daily quota.
+    query_cache_enabled: bool = Field(default=True, alias="QUERY_CACHE_ENABLED")
+    query_cache_dir: str = Field(
+        default="./data/cache/query", alias="QUERY_CACHE_DIR"
+    )
+
     # --- App ---
     app_env: str = Field(default="dev", alias="APP_ENV")
     cors_origins: str = Field(

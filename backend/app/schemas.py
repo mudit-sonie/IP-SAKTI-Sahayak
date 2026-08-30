@@ -101,6 +101,7 @@ class QueryResponse(BaseModel):
     confidence: Confidence
     abs_flag: bool = False
     abs_note: Optional[str] = None
+    cached: bool = False
 
 
 # --------------------------------------------------------------------------- #

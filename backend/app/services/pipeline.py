@@ -12,12 +12,24 @@ from app.core.logging import get_logger
 from app.retrieval import get_retriever
 from app.retrieval.expansion import expand_query
 from app.schemas import AnswerStatus, QueryRequest, QueryResponse
-from app.services import abs_helper, confidence, generation
+from app.services import abs_helper, confidence, generation, query_cache
 
 logger = get_logger(__name__)
 
 
-def run_query(req: QueryRequest) -> QueryResponse:
+def run_query(req: QueryRequest, *, use_cache: bool = True) -> QueryResponse:
+    if use_cache:
+        hit = query_cache.get(req)
+        if hit is not None:
+            logger.info("query cache hit: %r", req.query)
+            return hit
+
+    resp = _run_query_uncached(req)
+    query_cache.put(req, resp)
+    return resp
+
+
+def _run_query_uncached(req: QueryRequest) -> QueryResponse:
     retriever = get_retriever()
     retrieval_query = expand_query(req.query)
     if retrieval_query != req.query:
