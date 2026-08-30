@@ -11,7 +11,12 @@ from __future__ import annotations
 from app.core.logging import get_logger
 from app.retrieval import get_retriever
 from app.retrieval.expansion import expand_query
-from app.schemas import AnswerStatus, QueryRequest, QueryResponse
+from app.schemas import (
+    AnswerStatus,
+    QueryRequest,
+    QueryResponse,
+    RetrievalInfo,
+)
 from app.services import abs_helper, confidence, generation, query_cache
 from app.services.jurisdiction import mismatch_note
 
@@ -39,6 +44,19 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
         retrieval_query,
         jurisdiction=req.jurisdiction.value,
         top_k=6,
+    )
+
+    pool_n, pool_sources = retriever.jurisdiction_scope(req.jurisdiction.value)
+    retrieval_info = RetrievalInfo(
+        jurisdiction=req.jurisdiction.value,
+        expanded_query=retrieval_query if retrieval_query != req.query else None,
+        passages_searched=pool_n,
+        sources_searched=pool_sources,
+        top_sections=[
+            f"{rc.chunk.source.split(',')[0]} § {rc.chunk.section}".strip(" §")
+            for rc in chunks[:5]
+            if rc.chunk.section
+        ],
     )
 
     gen = generation.generate(req.query, chunks)
@@ -73,4 +91,5 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
         abs_flag=abs_result.triggered,
         abs_note=abs_note,
         jurisdiction_note=mismatch_note(req.query, req.jurisdiction.value),
+        retrieval=retrieval_info,
     )

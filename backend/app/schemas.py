@@ -97,6 +97,16 @@ class Confidence(BaseModel):
     status: AnswerStatus = AnswerStatus.escalate
 
 
+class RetrievalInfo(BaseModel):
+    """What the retrieval layer actually did — surfaced for transparency."""
+
+    jurisdiction: str
+    expanded_query: Optional[str] = None
+    passages_searched: int = 0
+    sources_searched: list[str] = Field(default_factory=list)
+    top_sections: list[str] = Field(default_factory=list)
+
+
 class QueryResponse(BaseModel):
     answer: str
     citations: list[Citation] = Field(default_factory=list)
@@ -105,6 +115,7 @@ class QueryResponse(BaseModel):
     abs_note: Optional[str] = None
     cached: bool = False
     jurisdiction_note: Optional[str] = None
+    retrieval: Optional[RetrievalInfo] = None
 
 
 # --------------------------------------------------------------------------- #

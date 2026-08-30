@@ -64,6 +64,11 @@ class HybridRetriever:
     def source_names(self) -> list[str]:
         return sorted({c.source for c in self._all_chunks})
 
+    def jurisdiction_scope(self, jurisdiction: str) -> tuple[int, list[str]]:
+        """(chunk count, sorted source names) the given jurisdiction searches over."""
+        pool = filter_by_jurisdiction(self._all_chunks, jurisdiction)
+        return len(pool), sorted({c.source for c in pool})
+
     def retrieve(
         self,
         query: str,

@@ -23,6 +23,11 @@ def test_query_returns_contract_shape(client):
     if not fully_wired:
         assert body["confidence"]["status"] == "escalate"
 
+    if health["corpus_loaded"]:
+        assert body["retrieval"]["jurisdiction"] == "india"
+        assert body["retrieval"]["passages_searched"] > 0
+        assert body["retrieval"]["sources_searched"]
+
 
 def test_abs_check_triggers_on_keyword(client):
     r = client.post(
