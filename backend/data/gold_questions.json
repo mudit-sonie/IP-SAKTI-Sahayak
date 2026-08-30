@@ -1,0 +1,65 @@
+{
+  "_comment": "Demo / spot-check question set. `scripts/warm_cache.py` runs each through the pipeline so it is cached (instant + no Gemini call) for the demo. `expect_sections` is what a correct answer should cite — used for the Day 4 spot-check.",
+  "questions": [
+    {
+      "query": "Can a classical Ayurvedic formulation be patented in India?",
+      "jurisdiction": "india",
+      "expect_sections": ["3(p)", "3(e)"]
+    },
+    {
+      "query": "What is the term of a patent in India?",
+      "jurisdiction": "india",
+      "expect_sections": ["53"]
+    },
+    {
+      "query": "Do I need National Biodiversity Authority approval before filing a patent that uses a biological resource?",
+      "jurisdiction": "india",
+      "expect_sections": ["6"]
+    },
+    {
+      "query": "How is fair and equitable benefit sharing determined for genetic resources?",
+      "jurisdiction": "india",
+      "expect_sections": ["21"]
+    },
+    {
+      "query": "Is it legal to advertise an Ayurvedic medicine as a cure for diabetes?",
+      "jurisdiction": "india",
+      "expect_sections": ["3", "5"]
+    },
+    {
+      "query": "What is a geographical indication and who may apply to register one?",
+      "jurisdiction": "india",
+      "expect_sections": ["2", "11"]
+    },
+    {
+      "query": "Can a registered geographical indication be assigned or transmitted?",
+      "jurisdiction": "india",
+      "expect_sections": ["24"]
+    },
+    {
+      "query": "Is a turmeric-based wound-healing formulation patentable in India?",
+      "jurisdiction": "india",
+      "expect_sections": ["3(p)", "3(e)"]
+    },
+    {
+      "query": "What are the absolute grounds for refusal of a trade mark registration?",
+      "jurisdiction": "india",
+      "expect_sections": ["9"]
+    },
+    {
+      "query": "Do I need prior intimation to the State Biodiversity Board to access a medicinal plant for research?",
+      "jurisdiction": "india",
+      "expect_sections": ["7"]
+    },
+    {
+      "query": "What licence is required to manufacture an Ayurvedic drug for sale?",
+      "jurisdiction": "india",
+      "expect_sections": ["33EEC", "33EEA"]
+    },
+    {
+      "query": "Can a patent be revoked because the invention was already traditional knowledge?",
+      "jurisdiction": "india",
+      "expect_sections": ["64", "25"]
+    }
+  ]
+}
