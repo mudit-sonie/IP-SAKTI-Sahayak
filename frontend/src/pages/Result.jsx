@@ -7,6 +7,7 @@ import Badge from "../components/Badge";
 import Card, { CardHeader } from "../components/Card";
 import ConfidenceMeter from "../components/ConfidenceMeter";
 import CitationCard from "../components/CitationCard";
+import PassageDrawer from "../components/PassageDrawer";
 import AnswerSkeleton from "../components/Skeleton";
 import styles from "./Result.module.css";
 
@@ -23,6 +24,7 @@ export default function Result() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [viewing, setViewing] = useState(null); // citation whose passage is open
 
   useEffect(() => {
     if (!question) {
@@ -148,6 +150,7 @@ export default function Result() {
                       key={c.excerpt_ref || `${c.source}-${c.section}-${i}`}
                       citation={c}
                       index={i}
+                      onView={() => setViewing(c)}
                     />
                   ))}
                 </div>
@@ -169,6 +172,8 @@ export default function Result() {
       >
         Start a new query
       </Button>
+
+      <PassageDrawer citation={viewing} onClose={() => setViewing(null)} />
     </AppShell>
   );
 }

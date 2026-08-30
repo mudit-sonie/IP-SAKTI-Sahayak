@@ -45,6 +45,21 @@ export function getHealth({ signal } = {}) {
   return fetch(`${BASE_URL}/health`, { signal }).then((r) => r.json());
 }
 
+// GET /chunk/{id} -> { chunk_id, text, source, section, citation, source_url, ... }
+// The exact statute passage behind a citation's excerpt_ref.
+export async function getChunk(chunkId, { signal } = {}) {
+  const res = await fetch(
+    `${BASE_URL}/chunk/${encodeURIComponent(chunkId)}`,
+    { signal },
+  );
+  if (!res.ok) {
+    throw new ApiError(`Could not load passage (${res.status})`, {
+      status: res.status,
+    });
+  }
+  return res.json();
+}
+
 // POST /classify — stateless. Send the full answers dict each call; the response
 // is either { next_question } or { formulation_category, complete: true }.
 export function classify(answers, opts) {
