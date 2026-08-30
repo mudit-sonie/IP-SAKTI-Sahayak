@@ -18,9 +18,11 @@ class Settings(BaseSettings):
 
     # --- Gemini ---
     gemini_api_keys: str = Field(default="", alias="GEMINI_API_KEYS")
-    # gemini-2.5-flash: current-gen GA, and its free tier allows ~250 req/day vs
-    # ~20/day for the gemini-3.x models — this project is free-tier only.
-    gemini_model: str = Field(default="gemini-2.5-flash", alias="GEMINI_MODEL")
+    # Free tier is ~20 requests/day PER MODEL PER KEY (Google tightened this).
+    # gemini-3.5-flash-lite is current, fast, and fine for grounded QA over
+    # supplied context. Real fix for demo volume: multiple keys in
+    # GEMINI_API_KEYS — the client rotates on 429. Each key/model is its own bucket.
+    gemini_model: str = Field(default="gemini-3.5-flash-lite", alias="GEMINI_MODEL")
 
     # --- Retrieval ---
     embedding_model: str = Field(
