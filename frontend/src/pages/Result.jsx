@@ -9,6 +9,7 @@ import ConfidenceMeter from "../components/ConfidenceMeter";
 import CitationCard from "../components/CitationCard";
 import PassageDrawer from "../components/PassageDrawer";
 import FeedbackWidget from "../components/FeedbackWidget";
+import RetrievalDetails from "../components/RetrievalDetails";
 import AnswerSkeleton from "../components/Skeleton";
 import styles from "./Result.module.css";
 
@@ -166,6 +167,8 @@ export default function Result() {
                   : "No biological-resource or traditional-knowledge trigger was detected in this question."}
               </p>
             </Card>
+
+            <RetrievalDetails info={data.retrieval} />
           </div>
 
           <aside className={styles.rail}>
