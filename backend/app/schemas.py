@@ -71,6 +71,22 @@ class Citation(BaseModel):
     source: str
     section: str
     excerpt_ref: Optional[str] = None
+    source_url: Optional[str] = None
+
+
+# --------------------------------------------------------------------------- #
+# /chunk/{chunk_id} — fetch the exact statute passage behind a citation
+# --------------------------------------------------------------------------- #
+class ChunkResponse(BaseModel):
+    chunk_id: str
+    text: str
+    source: str
+    section: str
+    citation: Optional[str] = None
+    source_url: Optional[str] = None
+    jurisdiction: Optional[str] = None
+    page_start: Optional[int] = None
+    page_end: Optional[int] = None
 
 
 class Confidence(BaseModel):

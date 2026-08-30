@@ -43,6 +43,7 @@ def _minmax(pairs: list[tuple[Chunk, float]]) -> dict[str, float]:
 class HybridRetriever:
     def __init__(self, chunks: list[Chunk] | None = None) -> None:
         self._all_chunks = chunks if chunks is not None else load_chunks()
+        self._by_id = {c.chunk_id: c for c in self._all_chunks}
         self._bm25 = BM25Index(self._all_chunks)
         self._vector = VectorIndex(self._all_chunks)
         logger.info(
@@ -55,6 +56,13 @@ class HybridRetriever:
     @property
     def has_corpus(self) -> bool:
         return bool(self._all_chunks)
+
+    def get_chunk(self, chunk_id: str) -> Chunk | None:
+        return self._by_id.get(chunk_id)
+
+    @property
+    def source_names(self) -> list[str]:
+        return sorted({c.source for c in self._all_chunks})
 
     def retrieve(
         self,

@@ -7,7 +7,7 @@
 """
 from __future__ import annotations
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.config import get_settings
 from app.llm.gemini_client import get_gemini_client
@@ -15,6 +15,7 @@ from app.retrieval import get_retriever
 from app.schemas import (
     AbsCheckRequest,
     AbsCheckResponse,
+    ChunkResponse,
     ClassifyRequest,
     ClassifyResponse,
     QueryRequest,
@@ -47,6 +48,26 @@ def post_classify(req: ClassifyRequest) -> ClassifyResponse:
 @router.post("/query", response_model=QueryResponse)
 def post_query(req: QueryRequest) -> QueryResponse:
     return pipeline.run_query(req)
+
+
+@router.get("/chunk/{chunk_id}", response_model=ChunkResponse)
+def get_chunk(chunk_id: str) -> ChunkResponse:
+    """The exact statute passage behind a citation's ``excerpt_ref``."""
+    chunk = get_retriever().get_chunk(chunk_id)
+    if chunk is None:
+        raise HTTPException(status_code=404, detail=f"unknown chunk id: {chunk_id}")
+    meta = chunk.metadata
+    return ChunkResponse(
+        chunk_id=chunk.chunk_id,
+        text=chunk.text,
+        source=chunk.source,
+        section=chunk.section,
+        citation=meta.get("citation"),
+        source_url=meta.get("source_url"),
+        jurisdiction=meta.get("jurisdiction"),
+        page_start=meta.get("page_start"),
+        page_end=meta.get("page_end"),
+    )
 
 
 @router.post("/abs-check", response_model=AbsCheckResponse)
