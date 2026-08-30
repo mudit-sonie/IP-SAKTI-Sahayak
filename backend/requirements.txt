@@ -14,6 +14,9 @@ sentence-transformers==3.0.1
 
 # LLM
 google-generativeai==0.7.2
+# NOTE: chromadb 0.5.5 resolves protobuf>=5 while google-ai-generativelanguage
+# declares <5 — pip prints a conflict warning but both import and run fine at the
+# installed protobuf 7.x. Revisit only if Gemini calls actually fail at runtime.
 
 # Utilities
 httpx==0.27.0

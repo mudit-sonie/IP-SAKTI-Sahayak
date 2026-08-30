@@ -28,12 +28,19 @@ class VectorIndex:
             logger.warning("vector index unavailable (%s); using BM25 only", exc)
 
     def _build(self, chunks: list[Chunk]) -> None:
+        import os
+
+        os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
         import chromadb
+        from chromadb.config import Settings as ChromaSettings
         from sentence_transformers import SentenceTransformer
 
         settings = get_settings()
         self._embedder = SentenceTransformer(settings.embedding_model)
-        client = chromadb.PersistentClient(path=settings.chroma_dir)
+        client = chromadb.PersistentClient(
+            path=settings.chroma_dir,
+            settings=ChromaSettings(anonymized_telemetry=False),
+        )
         self._collection = client.get_or_create_collection(
             _COLLECTION, metadata={"hnsw:space": "cosine"}
         )
