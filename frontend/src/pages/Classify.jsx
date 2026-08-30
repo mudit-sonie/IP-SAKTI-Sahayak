@@ -40,6 +40,7 @@ export default function Classify() {
   const [step, setStep] = useState(0);
   const [question, setQuestion] = useState(null);
   const [category, setCategory] = useState(null);
+  const [rationale, setRationale] = useState([]);
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,6 +53,7 @@ export default function Classify() {
       const res = await classify(nextAnswers);
       if (res.complete) {
         setCategory(res.formulation_category);
+        setRationale(res.rationale || []);
         setQuestion(null);
       } else {
         setQuestion(res.next_question);
@@ -87,6 +89,7 @@ export default function Classify() {
     setAnswers(prev);
     setStep((s) => Math.max(0, s - 1));
     setCategory(null);
+    setRationale([]);
     advance(prev);
   }
 
@@ -95,6 +98,7 @@ export default function Classify() {
     setAnswers({});
     setStep(0);
     setCategory(null);
+    setRationale([]);
     advance({});
   }
 
@@ -130,6 +134,16 @@ export default function Classify() {
             {CATEGORY_BLURB[category] ||
               "A preliminary guidance classification, not legal advice."}
           </p>
+          {rationale.length > 0 && (
+            <div className={styles.why}>
+              <p className={styles.whyTitle}>Why this category</p>
+              <ul className={styles.whyList}>
+                {rationale.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className={styles.actions}>
             <Button variant="secondary" onClick={restart}>
               Start again

@@ -53,6 +53,28 @@
   max-width: 55ch;
 }
 
+.why {
+  margin-top: var(--s-4);
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-sunken);
+}
+.whyTitle {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+.whyList {
+  margin: var(--s-2) 0 0;
+  padding-left: 1.1rem;
+  color: var(--ink-700);
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+}
+
 .error {
   display: flex;
   flex-wrap: wrap;
