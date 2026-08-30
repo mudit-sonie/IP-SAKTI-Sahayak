@@ -34,26 +34,32 @@ backend skeleton runs; frontend renders static screens against mock data.
 
 ---
 
-## Day 2 — 30 Aug  🟡 in progress
-Core loop end-to-end on real India-corpus data. Non-negotiable milestone.
+## Day 2 — 30 Aug  🟢 core loop landed
+Core loop end-to-end on real India-corpus data. **Milestone met**: classify →
+hybrid retrieval → Gemini generation → confidence → cited answer, live through the
+frontend.
 
 | Workstream | Owner | Status | Notes |
 |---|---|---|---|
 | Corpus preprocessing (PDF → cleaned text) | Kavish | 🟢 done | `44ffdaa` — 15 docs cleaned to per-document `.txt` under `corpus/preprocessing_corpus/cleaned_corpus/documents/`. |
-| Ingestion pipeline (cleaned text → `chunks.jsonl`) | Dewashish | 🟢 done | New `backend/scripts/ingest_corpus.py` — deterministic, no LLM. **532 India chunks** committed at `backend/data/processed/chunks.jsonl` (+ `documents.json`, `validation_report.json`). Section-aware: Patents Act (152), Trade Marks Act (163), Biological Diversity Act (60), Drugs & Cosmetics Act (52), Drugs & Magic Remedies Act (18), GI Act (87). Footnote/amendment marginalia stripped; legal text unchanged. |
-| Retrieval on real data | Dewashish | 🟢 hybrid live | `build_index` embeds all 533 chunks into Chroma (`bge-small-en-v1.5`, local CPU) + BM25. Hybrid smoke queries land correctly and now score meaningfully (0.45–1.0): NBA-approval-before-patent → BD Act §6 (0.98), benefit-sharing → BD Act §21 (1.0), term of a patent → Patents Act §53 (0.74), ayurvedic-cure ads → D&C Act §33C / Magic Remedies. `hybrid.py` leans fully on whichever index is ready (kept the BM25-only fallback path). Chroma + sentence-transformers + google-generativeai installed; requirements note added re: a harmless protobuf resolver warning. |
-| Full core loop (→ cited answer) | Dewashish | 🔴 blocked on Gemini keys | Pipeline runs end-to-end today: `/query` → real hybrid retrieval → confidence → response, `corpus_loaded: true`, `retrieval_score` is a real fused score, 14/14 pytest green. Returns `status: escalate` **only** because `GEMINI_API_KEYS` is unset. **Ask: someone provision ≥3 free-tier Gemini keys into `backend/.env`** — that's the last thing between us and cited answers. |
-| Frontend → real API on core flow | Mudit | 🔴 not started | Still on mock JSON. `/classify` + `/query` are live locally (`uvicorn app.main:app`, port 8000). Wire the Ask→Result path to `POST /query`; response shape unchanged from `schemas.py`. |
+| Ingestion pipeline (cleaned text → `chunks.jsonl`) | Dewashish | 🟢 done | `backend/scripts/ingest_corpus.py` — deterministic, no LLM. **902 India chunks** committed (+ `documents.json`, `validation_report.json`). Section-aware; `rebreak_jammed_lines()` fixes one-line chapter/section jams from the PDF cleanup; `clause_split()` emits an independently-citable chunk per lettered clause (Patents Act `3(p)`, `3(e)`, …). Footnote/amendment marginalia stripped; legal text unchanged. |
+| Retrieval on real data | Dewashish | 🟢 hybrid live | Chroma (`bge-small-en-v1.5`, local CPU) + BM25 over 902 chunks. Scores are meaningful (0.45–1.0): NBA-approval-before-patent → BD Act §6 (0.98), benefit-sharing → BD Act §21 (1.0), term of a patent → Patents Act §53, "traditional knowledge patent bar" → Patents Act §3(p) (0.84). `hybrid.py` degrades gracefully to whichever index is ready. |
+| Full core loop (→ cited answer) | Dewashish | 🟢 live | Gemini wired (`gemini-2.5-flash`, single key in `backend/.env`). `/query` returns `status: answered` with real citations + `excerpt_ref` for well-covered questions (patent term, NBA approval, turmeric/TK patentability) and cleanly escalates — no invented citation — when retrieval is thin. 14/14 pytest green. |
+| Frontend → real API on core flow | Dewashish (covering Mudit) | 🟢 done | `src/api/client.js` + `.env` (`VITE_API_BASE_URL`). Classify is now an API-driven wizard off `/classify`; Result calls `/query` on mount and renders real answer, citations, confidence badge (retrieval % + self-confidence), ABS panel, and the escalate state. Verified end-to-end through the browser (CORS preflight + 200s in the log). Build + lint green. |
 
 ### Day 2 blockers / asks
-- **Gemini keys** — critical path for the "cited answer" half of the milestone. Backend is ready; drop keys in `backend/.env` (`GEMINI_API_KEYS=k1,k2,k3`).
-- Vector index (Chroma) — ✅ done; hybrid BM25+vector live locally. `data/chroma/` is gitignored, rebuild with `python -m scripts.build_index` (first run downloads the ~130 MB embedding model).
-- TRIPS / CBD / Nagoya / Patents Rules 2003 not yet chunked — different source formatting, moved to Day 3 (international corpus day anyway). `ingest_corpus.py --stdout` lists them as 0 chunks / needs_review.
-- `corpus/preprocessing_corpus/` carries both the source PDFs again (~90 MB) and the cleaned text — repo is getting heavy; consider a shallow/LFS strategy before demo.
-- Ayurveda Aahar regulations 2022: cleaned text is Devanagari + garbled OCR, no usable English — needs a clean English source (FSSAI gazette) before it can be ingested.
+- **Gemini quota** — one free-tier key (`gemini-2.5-flash`, ~250 req/day). Fine for dev; **add 2–3 more keys to `GEMINI_API_KEYS`** (comma-separated) before demo day so the multi-key rotation has headroom during a live Q&A.
+- **Retrieval tuning (Day 4)** — some correct answers still escalate on phrasing the corpus doesn't lexically/semantically match (e.g. "classical Ayurvedic formulation" doesn't reach Patents Act §3(p) the way "traditional knowledge" or "turmeric" does). Candidates: lower `RETRIEVAL_ESCALATE_THRESHOLD`, tune `HYBRID_BM25_WEIGHT`, light query expansion. Budget real time for it.
+- Vector index — `data/chroma/` is gitignored; rebuild with `python -m scripts.build_index` (first run pulls the ~130 MB embedding model; ~3 min to embed 902 chunks on CPU).
+- TRIPS / CBD / Nagoya / Patents Rules 2003 not yet chunked — different source formatting, moved to Day 3 (international corpus day). `ingest_corpus.py --stdout` lists them at 0 chunks / needs_review.
+- `corpus/preprocessing_corpus/` carries the source PDFs again (~90 MB) plus cleaned text — repo is heavy; consider shallow/LFS before demo.
+- Ayurveda Aahar regulations 2022: cleaned text is Devanagari + garbled OCR — needs a clean English FSSAI source before it can be ingested.
+- chromadb posthog telemetry prints harmless `capture()` errors to the log; disabled in `vector.py` for new clients.
 
 ## Day 3 — 31 Aug  (not started)
-International thin corpus + ABS helper wired live; frontend polish.
+International thin corpus (TRIPS + CBD/Nagoya) + Patents Rules 2003 chunked and
+jurisdiction-routed; ABS helper polish; frontend polish (jurisdiction mismatch
+prompt, citation excerpt display, loading states).
 
 ## Day 4 — 1 Sep  (not started)
 Integration buffer; 10–15 Q&A spot-checks vs source text; demo rehearsal + deploy.
