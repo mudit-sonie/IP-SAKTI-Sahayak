@@ -84,4 +84,9 @@ export function query(
   );
 }
 
+// POST /feedback -> { ok: true }
+export function sendFeedback(payload, opts) {
+  return postJson("/feedback", payload, opts);
+}
+
 export { BASE_URL };

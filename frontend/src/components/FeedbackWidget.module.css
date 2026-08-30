@@ -1,0 +1,59 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--border);
+}
+.label {
+  font-size: var(--fs-sm);
+  color: var(--ink-500);
+  margin-right: var(--s-1);
+}
+.thumb {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  transition:
+    border-color 0.15s var(--ease),
+    background 0.15s var(--ease);
+}
+.thumb:hover {
+  border-color: var(--accent-500);
+}
+.thumb.on {
+  border-color: var(--accent-600);
+  background: var(--accent-50);
+}
+.noteRow {
+  display: flex;
+  gap: var(--s-2);
+  flex: 1;
+  min-width: 220px;
+}
+.note {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  font: inherit;
+  font-size: var(--fs-sm);
+}
+.note:focus {
+  outline: none;
+  border-color: var(--accent-500);
+}
+.thanks {
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-sm);
+  color: var(--accent-700);
+}

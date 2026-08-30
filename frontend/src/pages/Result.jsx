@@ -8,6 +8,7 @@ import Card, { CardHeader } from "../components/Card";
 import ConfidenceMeter from "../components/ConfidenceMeter";
 import CitationCard from "../components/CitationCard";
 import PassageDrawer from "../components/PassageDrawer";
+import FeedbackWidget from "../components/FeedbackWidget";
 import AnswerSkeleton from "../components/Skeleton";
 import styles from "./Result.module.css";
 
@@ -107,6 +108,15 @@ export default function Result() {
                   this from here.
                 </p>
               )}
+              <FeedbackWidget
+                meta={{
+                  query: question,
+                  jurisdiction,
+                  formulationCategory,
+                  answerStatus: data.confidence?.status,
+                  citedSections: (data.citations || []).map((c) => c.section),
+                }}
+              />
             </Card>
 
             <Card tone="muted">
