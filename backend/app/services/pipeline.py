@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from app.core.logging import get_logger
 from app.retrieval import get_retriever
+from app.retrieval.expansion import expand_query
 from app.schemas import AnswerStatus, QueryRequest, QueryResponse
 from app.services import abs_helper, confidence, generation
 
@@ -18,8 +19,11 @@ logger = get_logger(__name__)
 
 def run_query(req: QueryRequest) -> QueryResponse:
     retriever = get_retriever()
+    retrieval_query = expand_query(req.query)
+    if retrieval_query != req.query:
+        logger.info("query expanded for retrieval: %r", retrieval_query)
     chunks, top_score = retriever.retrieve(
-        req.query,
+        retrieval_query,
         jurisdiction=req.jurisdiction.value,
         top_k=6,
     )
