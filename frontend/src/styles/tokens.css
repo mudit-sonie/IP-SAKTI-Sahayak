@@ -1,0 +1,75 @@
+/* Design tokens — the single source of truth for colour, space, type, radius.
+   Change values here, not in component styles. */
+:root {
+  /* ---- brand / accent (Ayurveda green) ---- */
+  --accent-700: #1f6b4a;
+  --accent-600: #26805a;
+  --accent-500: #2f9a6d;
+  --accent-200: #b9e0cd;
+  --accent-100: #d9efe3;
+  --accent-50: #ecf6f0;
+
+  /* ---- ink / text ---- */
+  --ink-900: #12211b;
+  --ink-800: #1d3229;
+  --ink-600: #3f5249;
+  --ink-500: #5f6f66;
+  --ink-400: #889389;
+
+  /* ---- surfaces ---- */
+  --bg: #f5f7f4;
+  --surface: #ffffff;
+  --surface-sunken: #eef2ee;
+  --border: #e1e7e1;
+  --border-strong: #cfd8cf;
+
+  /* ---- semantic ---- */
+  --warn-700: #7c531a;
+  --warn-500: #d39a2f;
+  --warn-100: #f7e9c8;
+  --warn-50: #fdf5e3;
+  --danger-700: #8a2f2c;
+  --danger-500: #cf4b46;
+  --danger-50: #fdecea;
+  --info-700: #1f5673;
+  --info-50: #e9f2f7;
+
+  /* ---- radius ---- */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-pill: 999px;
+
+  /* ---- spacing scale (4pt) ---- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+
+  /* ---- elevation ---- */
+  --shadow-sm: 0 1px 2px rgba(18, 33, 27, 0.06);
+  --shadow-md: 0 10px 30px rgba(18, 33, 27, 0.08);
+  --shadow-lg: 0 24px 60px rgba(18, 33, 27, 0.12);
+
+  /* ---- type ---- */
+  --font-sans: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: 1.875rem;
+  --fs-3xl: 2.5rem;
+  --fs-4xl: 3.25rem;
+
+  /* ---- layout ---- */
+  --page-max: 820px;
+  --header-h: 64px;
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}

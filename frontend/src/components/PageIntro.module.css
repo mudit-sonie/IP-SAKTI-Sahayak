@@ -1,0 +1,21 @@
+.intro {
+  margin-bottom: var(--s-6);
+}
+.eyebrow {
+  margin-bottom: var(--s-3);
+  color: var(--accent-700);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.title {
+  font-size: clamp(var(--fs-2xl), 4vw, var(--fs-3xl));
+  font-weight: 700;
+}
+.sub {
+  margin-top: var(--s-3);
+  max-width: 60ch;
+  color: var(--ink-500);
+  font-size: var(--fs-lg);
+}

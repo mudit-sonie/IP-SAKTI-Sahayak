@@ -1,110 +1,88 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import AppShell from "../components/AppShell";
+import PageIntro from "../components/PageIntro";
+import Button from "../components/Button";
+import styles from "./Ask.module.css";
 
-const exampleQuestions = [
+const EXAMPLES = [
   "Can a classical Ayurvedic formulation be patented in India?",
   "Do I need NBA approval before filing a patent that uses a biological resource?",
   "What is the term of a patent in India?",
 ];
 
-function Ask() {
+export default function Ask() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const jurisdiction = location.state?.jurisdiction || "india";
   const formulationCategory = location.state?.formulationCategory || null;
   const formulationLabel =
-    location.state?.formulationLabel ||
-    (formulationCategory ? formulationCategory : "Not classified yet");
+    location.state?.formulationLabel || formulationCategory || "Not classified";
 
   const [query, setQuery] = useState("");
 
   function handleSubmit(event) {
     event.preventDefault();
-    const cleanQuery = query.trim();
-    if (!cleanQuery) return;
+    const clean = query.trim();
+    if (!clean) return;
     navigate("/result", {
       state: {
         jurisdiction,
         formulationCategory,
         formulationLabel,
-        query: cleanQuery,
+        query: clean,
       },
     });
   }
 
   return (
-    <div className="classification-page">
-      <div className="classification-container">
-        <button
-          className="text-back-button"
-          onClick={() => navigate("/classify", { state: { jurisdiction } })}
-        >
-          ← Back to Classification
-        </button>
+    <AppShell context={{ jurisdiction, formulationLabel }}>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate("/classify", { state: { jurisdiction } })}
+        className={styles.back}
+      >
+        ← Back to classification
+      </Button>
 
-        <div className="badge">ASK IP-SAKTI</div>
+      <PageIntro eyebrow="Step 2 · Your question" title="Ask an IP or regulatory question">
+        You&apos;ll get source-cited guidance grounded in the {formulationLabel}{" "}
+        pathway and your selected jurisdiction.
+      </PageIntro>
 
-        <h1>
-          Ask your <span>IP or regulatory question</span>
-        </h1>
+      <form className={styles.card} onSubmit={handleSubmit}>
+        <label htmlFor="query" className={styles.label}>
+          Your question
+        </label>
+        <textarea
+          id="query"
+          className={styles.textarea}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="e.g. Can I patent this formulation in India?"
+          rows={5}
+        />
 
-        <p className="classification-intro">
-          IP-SAKTI will provide source-cited guidance based on your selected
-          jurisdiction and formulation category.
-        </p>
-
-        <div className="context-card">
-          <div>
-            <span>Jurisdiction</span>
-            <strong>
-              {jurisdiction === "india" ? "🇮🇳 India" : "🌍 International"}
-            </strong>
-          </div>
-
-          <div>
-            <span>Formulation category</span>
-            <strong>{formulationLabel}</strong>
-          </div>
+        <p className={styles.exLabel}>Examples</p>
+        <div className={styles.examples}>
+          {EXAMPLES.map((ex) => (
+            <button
+              key={ex}
+              type="button"
+              className={styles.example}
+              onClick={() => setQuery(ex)}
+            >
+              {ex}
+            </button>
+          ))}
         </div>
 
-        <form className="ask-card" onSubmit={handleSubmit}>
-          <label htmlFor="query">Your question</label>
-
-          <textarea
-            id="query"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Example: Can I patent this formulation in India?"
-            rows="6"
-          />
-
-          <p className="example-label">Try an example question</p>
-
-          <div className="example-questions">
-            {exampleQuestions.map((question) => (
-              <button
-                type="button"
-                key={question}
-                className="example-question"
-                onClick={() => setQuery(question)}
-              >
-                {question}
-              </button>
-            ))}
-          </div>
-
-          <button
-            type="submit"
-            className="next-button ask-submit-button"
-            disabled={!query.trim()}
-          >
-            Get Source-Cited Guidance →
-          </button>
-        </form>
-      </div>
-    </div>
+        <Button type="submit" className={styles.submit} disabled={!query.trim()}>
+          Get source-cited guidance →
+        </Button>
+      </form>
+    </AppShell>
   );
 }
-
-export default Ask;

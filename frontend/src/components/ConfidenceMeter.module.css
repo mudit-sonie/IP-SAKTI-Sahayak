@@ -1,0 +1,49 @@
+.wrap {
+  min-width: 180px;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s-3);
+}
+.label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+.value {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--ink-900);
+  font-variant-numeric: tabular-nums;
+}
+.track {
+  margin-top: 6px;
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.5s var(--ease);
+}
+.ok {
+  background: var(--accent-500);
+}
+.weak {
+  background: var(--warn-500);
+}
+.meta {
+  margin-top: 8px;
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+}
+.meta strong {
+  color: var(--ink-700);
+  text-transform: capitalize;
+}

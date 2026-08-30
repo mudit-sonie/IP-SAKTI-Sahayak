@@ -1,0 +1,43 @@
+.card {
+  display: flex;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-500);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--r-pill);
+  background: var(--accent-100);
+  color: var(--accent-700);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+}
+.body {
+  min-width: 0;
+}
+.section {
+  font-weight: 700;
+  color: var(--ink-900);
+}
+.source {
+  margin-top: 2px;
+  font-size: var(--fs-sm);
+  color: var(--ink-500);
+}
+.ref {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--surface-sunken);
+  color: var(--ink-500);
+  font-size: 11px;
+  word-break: break-all;
+}
