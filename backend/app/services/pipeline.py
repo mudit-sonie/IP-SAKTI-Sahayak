@@ -53,7 +53,7 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
         passages_searched=pool_n,
         sources_searched=pool_sources,
         top_sections=[
-            f"{rc.chunk.source.split(',')[0]} § {rc.chunk.section}".strip(" §")
+            f"{rc.chunk.source.split(',')[0]} — Section {rc.chunk.section}"
             for rc in chunks[:5]
             if rc.chunk.section
         ],
