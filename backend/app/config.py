@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     # --- Gemini ---
     gemini_api_keys: str = Field(default="", alias="GEMINI_API_KEYS")
-    gemini_model: str = Field(default="gemini-1.5-flash", alias="GEMINI_MODEL")
+    gemini_model: str = Field(default="gemini-3.5-flash", alias="GEMINI_MODEL")
 
     # --- Retrieval ---
     embedding_model: str = Field(

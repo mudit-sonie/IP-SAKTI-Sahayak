@@ -10,6 +10,7 @@ is a feature, not an error.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from app.core.logging import get_logger
@@ -24,7 +25,14 @@ SYSTEM_INSTRUCTION = (
     "Answer ONLY from the numbered context passages provided. Every factual claim "
     "must trace to a passage. If the context is insufficient, say so plainly and "
     "set self_confidence to \"low\". Never cite a statute or section that is not in "
-    "the context. Respond as JSON: "
+    "the context.\n"
+    "CITATIONS ARE MANDATORY when you give a substantive answer: for every passage "
+    "you relied on, add one entry to \"citations\" copying its source name and "
+    "section EXACTLY as they appear in that passage's header line "
+    "(\"[n] <source>, Section <section>\"). Use the header's section value, not a "
+    "sub-clause you inferred. If you cannot ground the answer in any passage, return "
+    "an empty citations list and self_confidence \"low\".\n"
+    "Respond as JSON: "
     '{"answer": string, "citations": [{"source": string, "section": string}], '
     '"self_confidence": "high" | "medium" | "low"}.'
 )
@@ -85,30 +93,85 @@ def generate(query: str, chunks: list[RetrievedChunk]) -> Generation:
         self_conf = SelfConfidence(str(data.get("self_confidence", "low")).lower())
     except ValueError:
         self_conf = SelfConfidence.low
+
+    # Safety net: the model sometimes writes a well-grounded answer but leaves the
+    # citations array empty. If it was confident, recover citations from the
+    # retrieved passages it actually had in context (never invents a new source).
+    if not citations and answer != ESCALATE_ANSWER and self_conf != SelfConfidence.low:
+        citations = _recover_citations(answer, chunks)
+
     return Generation(answer=answer, citations=citations, self_confidence=self_conf)
+
+
+def _recover_citations(answer: str, chunks: list[RetrievedChunk]) -> list[Citation]:
+    """Derive citations from retrieved chunks whose section is named in the answer;
+    fall back to the single top-ranked passage so a confident answer is never
+    returned citation-less."""
+    lowered = answer.lower()
+    out: list[Citation] = []
+    seen: set[tuple[str, str]] = set()
+    for rc in chunks:
+        sec = rc.chunk.section
+        if not sec:
+            continue
+        pat = re.compile(rf"\bsection\s+{re.escape(sec.lower())}\b")
+        if pat.search(lowered) and (rc.chunk.source, sec) not in seen:
+            out.append(Citation(source=rc.chunk.source, section=sec, excerpt_ref=rc.chunk.chunk_id))
+            seen.add((rc.chunk.source, sec))
+    if not out and chunks:
+        top = chunks[0].chunk
+        out.append(Citation(source=top.source, section=top.section, excerpt_ref=top.chunk_id))
+    return out
+
+
+def _norm_section(section: str) -> str:
+    """'Section 6(1)' / 'sec. 6' / 'Article 27.1' -> '6(1)' / '6' / '27.1'."""
+    s = section.strip()
+    s = re.sub(r"^(section|sec\.?|article|art\.?)\s*", "", s, flags=re.IGNORECASE)
+    return s.strip()
 
 
 def _coerce_citations(
     raw: object, chunks: list[RetrievedChunk]
 ) -> list[Citation]:
-    """Keep only citations that correspond to a passage we actually retrieved."""
-    allowed = {
-        (rc.chunk.source.lower(), rc.chunk.section.lower()): rc.chunk for rc in chunks
-    }
-    allowed_sources = {rc.chunk.source.lower() for rc in chunks}
+    """Keep only citations that correspond to a passage we actually retrieved.
+
+    The model varies section formatting ('6' vs 'Section 6' vs '6(1)'); we
+    normalise, match on the retrieved section prefix, and de-duplicate.
+    """
+    by_source: dict[str, list[RetrievedChunk]] = {}
+    for rc in chunks:
+        by_source.setdefault(rc.chunk.source.lower(), []).append(rc)
+
     out: list[Citation] = []
+    seen: set[tuple[str, str]] = set()
     if not isinstance(raw, list):
         return out
     for item in raw:
         if not isinstance(item, dict):
             continue
         source = str(item.get("source") or "").strip()
-        section = str(item.get("section") or "").strip()
-        if source.lower() not in allowed_sources:
+        section = _norm_section(str(item.get("section") or ""))
+        candidates = by_source.get(source.lower())
+        if not candidates:
             continue
-        excerpt = None
-        hit = allowed.get((source.lower(), section.lower()))
-        if hit is not None:
-            excerpt = hit.chunk_id
-        out.append(Citation(source=source, section=section, excerpt_ref=excerpt))
+        # Prefer the retrieved chunk whose section the model's section starts with
+        # (so 'Section 6(1)' resolves to retrieved section '6'); else use as-is.
+        hit = next(
+            (rc for rc in candidates
+             if section == rc.chunk.section
+             or section.startswith(rc.chunk.section + "(")
+             or section.startswith(rc.chunk.section + ".")),
+            None,
+        )
+        resolved_section = hit.chunk.section if hit is not None else section
+        key = (source.lower(), resolved_section.lower())
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(Citation(
+            source=source,
+            section=resolved_section,
+            excerpt_ref=hit.chunk.chunk_id if hit is not None else None,
+        ))
     return out
