@@ -114,17 +114,25 @@ def _recover_citations(answer: str, chunks: list[RetrievedChunk]) -> list[Citati
     lowered = answer.lower()
     out: list[Citation] = []
     seen: set[tuple[str, str]] = set()
+
+    def _cite(chunk) -> Citation:
+        return Citation(
+            source=chunk.source,
+            section=chunk.section,
+            excerpt_ref=chunk.chunk_id,
+            source_url=chunk.metadata.get("source_url"),
+        )
+
     for rc in chunks:
         sec = rc.chunk.section
         if not sec:
             continue
         pat = re.compile(rf"\bsection\s+{re.escape(sec.lower())}\b")
         if pat.search(lowered) and (rc.chunk.source, sec) not in seen:
-            out.append(Citation(source=rc.chunk.source, section=sec, excerpt_ref=rc.chunk.chunk_id))
+            out.append(_cite(rc.chunk))
             seen.add((rc.chunk.source, sec))
     if not out and chunks:
-        top = chunks[0].chunk
-        out.append(Citation(source=top.source, section=top.section, excerpt_ref=top.chunk_id))
+        out.append(_cite(chunks[0].chunk))
     return out
 
 
@@ -177,5 +185,6 @@ def _coerce_citations(
             source=source,
             section=resolved_section,
             excerpt_ref=hit.chunk.chunk_id if hit is not None else None,
+            source_url=(hit.chunk.metadata.get("source_url") if hit is not None else None),
         ))
     return out
