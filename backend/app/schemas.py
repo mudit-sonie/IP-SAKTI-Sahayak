@@ -116,3 +116,20 @@ class AbsCheckResponse(BaseModel):
     triggered: bool
     answer: Optional[str] = None
     citations: list[Citation] = Field(default_factory=list)
+
+
+# --------------------------------------------------------------------------- #
+# /feedback — thumbs up/down on an answer (feeds the Day-4 spot-check)
+# --------------------------------------------------------------------------- #
+class FeedbackRequest(BaseModel):
+    query: str
+    rating: str  # "up" | "down"
+    note: Optional[str] = None
+    jurisdiction: Optional[str] = None
+    formulation_category: Optional[str] = None
+    answer_status: Optional[str] = None
+    cited_sections: list[str] = Field(default_factory=list)
+
+
+class FeedbackResponse(BaseModel):
+    ok: bool = True

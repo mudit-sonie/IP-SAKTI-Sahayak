@@ -18,10 +18,12 @@ from app.schemas import (
     ChunkResponse,
     ClassifyRequest,
     ClassifyResponse,
+    FeedbackRequest,
+    FeedbackResponse,
     QueryRequest,
     QueryResponse,
 )
-from app.services import abs_helper, pipeline
+from app.services import abs_helper, feedback, pipeline
 from app.services.classifier import classify
 
 router = APIRouter()
@@ -68,6 +70,14 @@ def get_chunk(chunk_id: str) -> ChunkResponse:
         page_start=meta.get("page_start"),
         page_end=meta.get("page_end"),
     )
+
+
+@router.post("/feedback", response_model=FeedbackResponse)
+def post_feedback(req: FeedbackRequest) -> FeedbackResponse:
+    if req.rating not in {"up", "down"}:
+        raise HTTPException(status_code=422, detail="rating must be 'up' or 'down'")
+    feedback.record(req)
+    return FeedbackResponse(ok=True)
 
 
 @router.post("/abs-check", response_model=AbsCheckResponse)
