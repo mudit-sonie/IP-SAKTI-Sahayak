@@ -1,51 +1,56 @@
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { query as runQuery } from "../api/client";
+
+function ConfidenceBadge({ confidence }) {
+  if (!confidence) return null;
+  const { status, retrieval_score, self_confidence } = confidence;
+  const answered = status === "answered";
+  return (
+    <span className={answered ? "confidence-badge" : "confidence-badge low"}>
+      {answered ? "Answered" : "Escalated"} · retrieval{" "}
+      {Math.round((retrieval_score ?? 0) * 100)}% · model {self_confidence}
+    </span>
+  );
+}
 
 function Result() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const jurisdiction = location.state?.jurisdiction || "india";
-  const formulationCategory =
-    location.state?.formulationCategory || "Not classified";
-  const query = location.state?.query || "No question was submitted.";
+  const formulationCategory = location.state?.formulationCategory || null;
+  const formulationLabel =
+    location.state?.formulationLabel || formulationCategory || "Not classified";
+  const question = location.state?.query || "";
 
-  const asksAboutIndia = /\bindia\b/i.test(query);
-  const jurisdictionMismatch =
-    jurisdiction === "international" && asksAboutIndia;
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const absTriggered = /biological|plant|herb|genetic|resource/i.test(query);
+  useEffect(() => {
+    if (!question) {
+      setError("No question was submitted.");
+      setLoading(false);
+      return;
+    }
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+    runQuery(
+      { query: question, jurisdiction, formulationCategory },
+      { signal: controller.signal },
+    )
+      .then((res) => setData(res))
+      .catch((err) => {
+        if (err.name === "AbortError") return;
+        setError(err.message || "The query failed.");
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [question, jurisdiction, formulationCategory]);
 
-  const sources =
-    jurisdiction === "india"
-      ? [
-          {
-            source: "Patents Act, 1970",
-            section: "Section 3(p)",
-            detail: "Traditional-knowledge patentability consideration",
-          },
-          {
-            source: "Biological Diversity Act, 2002",
-            section: "Section 3",
-            detail: "Access and benefit-sharing consideration",
-          },
-        ]
-      : [
-          {
-            source: "TRIPS Agreement",
-            section: "Article 27",
-            detail: "International patentability framework",
-          },
-          {
-            source: "Convention on Biological Diversity",
-            section: "Article 15",
-            detail: "Access to genetic resources framework",
-          },
-        ];
-
-  const answer =
-    jurisdiction === "india"
-      ? "This is a mock India-focused response. The production system will retrieve relevant statutory sections from the India corpus, then generate a source-cited explanation based only on those retrieved materials."
-      : "This is a mock international response. The production system will retrieve relevant treaty provisions from the international corpus, then generate a source-cited explanation based only on those retrieved materials.";
+  const escalated = data?.confidence?.status === "escalate";
 
   return (
     <div className="classification-page">
@@ -60,82 +65,108 @@ function Result() {
           Your <span>IP-SAKTI response</span>
         </h1>
 
-        <p className="result-question">“{query}”</p>
+        <p className="result-question">“{question}”</p>
 
         <div className="result-context">
-          <span>
-            {jurisdiction === "india" ? "🇮🇳 India" : "🌍 International"}
-          </span>
-          <span>{formulationCategory}</span>
+          <span>{jurisdiction === "india" ? "🇮🇳 India" : "🌍 International"}</span>
+          <span>{formulationLabel}</span>
         </div>
 
-        {jurisdictionMismatch && (
+        {loading && (
+          <section className="answer-card">
+            <p className="answer-text">
+              Retrieving statutory provisions and generating a source-cited
+              answer… this usually takes a few seconds.
+            </p>
+          </section>
+        )}
+
+        {error && !loading && (
           <div className="mismatch-card">
-            <strong>Jurisdiction check:</strong> You selected International,
-            but your question mentions India. In the production system, the
-            assistant would ask you to confirm the jurisdiction before giving
-            jurisdiction-specific guidance.
+            <strong>Something went wrong:</strong> {error}
+            <div style={{ marginTop: "0.75rem" }}>
+              <button
+                className="back-button"
+                onClick={() => navigate("/ask", { state: location.state })}
+              >
+                Try again
+              </button>
+            </div>
           </div>
         )}
 
-        <section className="answer-card">
-          <div className="answer-heading">
-            <div>
-              <p className="result-label">Mock response</p>
-              <h2>Guidance</h2>
-            </div>
+        {data && !loading && !error && (
+          <>
+            <section className="answer-card">
+              <div className="answer-heading">
+                <div>
+                  <p className="result-label">
+                    {escalated ? "Escalation" : "Guidance"}
+                  </p>
+                  <h2>{escalated ? "Routed to a human facilitator" : "Answer"}</h2>
+                </div>
+                <ConfidenceBadge confidence={data.confidence} />
+              </div>
 
-            <span className="confidence-badge">High confidence (demo)</span>
-          </div>
+              <p className="answer-text">{data.answer}</p>
+            </section>
 
-          <p className="answer-text">{answer}</p>
+            <section className="sources-section">
+              <h2>Sources used</h2>
+              {data.citations?.length ? (
+                <div className="citation-list">
+                  {data.citations.map((c, i) => (
+                    <article
+                      className="citation-card"
+                      key={c.excerpt_ref || `${c.source}-${c.section}-${i}`}
+                    >
+                      <p>{c.source}</p>
+                      <strong>
+                        {/^\s*(section|article)/i.test(c.section)
+                          ? c.section
+                          : `Section ${c.section}`}
+                      </strong>
+                      {c.excerpt_ref && <span>ref: {c.excerpt_ref}</span>}
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="mock-notice">
+                  No passage met the citation bar for this question — the
+                  assistant did not invent one.
+                </p>
+              )}
+            </section>
 
-          <p className="mock-notice">
-            This screen is using mock data. The backend will later return the
-            real answer, citations, retrieval score, and confidence status.
-          </p>
-        </section>
+            <section className={data.abs_flag ? "abs-card triggered" : "abs-card"}>
+              <h2>ABS consideration</h2>
+              {data.abs_flag ? (
+                <p>
+                  {data.abs_note ||
+                    "This query touches biological resources — an ABS-specific retrieval pass over the Biological Diversity Act was run."}
+                </p>
+              ) : (
+                <p>No access-and-benefit-sharing trigger was found in this question.</p>
+              )}
+            </section>
 
-        <section className="sources-section">
-          <h2>Sources used</h2>
+            {escalated && (
+              <section className="escalation-card">
+                <h2>Need specialist support?</h2>
+                <p>
+                  Retrieval support or model confidence was below threshold, so
+                  IP-SAKTI is recommending escalation to a human IP facilitator
+                  rather than guessing.
+                </p>
+              </section>
+            )}
+          </>
+        )}
 
-          <div className="citation-list">
-            {sources.map((citation) => (
-              <article className="citation-card" key={citation.source}>
-                <p>{citation.source}</p>
-                <strong>{citation.section}</strong>
-                <span>{citation.detail}</span>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section
-          className={absTriggered ? "abs-card triggered" : "abs-card"}
+        <button
+          className="next-button result-button"
+          onClick={() => navigate("/")}
         >
-          <h2>ABS consideration</h2>
-
-          {absTriggered ? (
-            <p>
-              This mock query may involve biological resources. The production
-              system will run an additional ABS-specific retrieval pass.
-            </p>
-          ) : (
-            <p>
-              No ABS-specific trigger was found in this mock question.
-            </p>
-          )}
-        </section>
-
-        <section className="escalation-card">
-          <h2>Need specialist support?</h2>
-          <p>
-            If source support is weak or confidence is low, IP-SAKTI will
-            recommend escalation to a human IP facilitator instead of guessing.
-          </p>
-        </section>
-
-        <button className="next-button result-button" onClick={() => navigate("/")}>
           Start a New Query →
         </button>
       </div>

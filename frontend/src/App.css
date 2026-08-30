@@ -433,6 +433,12 @@ footer {
   color: #236436;
   font-size: 12px;
   font-weight: 800;
+  white-space: nowrap;
+}
+
+.confidence-badge.low {
+  background: #fdeede;
+  color: #9a5b16;
 }
 
 .answer-text {
