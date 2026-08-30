@@ -64,6 +64,32 @@ export default function Result() {
 
       <p className={styles.question}>{question}</p>
 
+      {data?.jurisdiction_note && !loading && (
+        <div className={styles.mismatch}>
+          <p>{data.jurisdiction_note}</p>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() =>
+              navigate(
+                "/result",
+                {
+                  state: {
+                    ...location.state,
+                    jurisdiction:
+                      jurisdiction === "india" ? "international" : "india",
+                  },
+                  replace: true,
+                },
+              )
+            }
+          >
+            Switch to {jurisdiction === "india" ? "International" : "India"} &amp;
+            re-ask
+          </Button>
+        </div>
+      )}
+
       {loading && <AnswerSkeleton />}
 
       {error && !loading && (

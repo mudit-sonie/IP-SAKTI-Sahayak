@@ -87,6 +87,25 @@
   align-items: center;
 }
 
+.mismatch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-bottom: var(--s-4);
+  padding: var(--s-4);
+  border: 1px solid var(--warn-100);
+  border-radius: var(--r-md);
+  background: var(--warn-50);
+  color: var(--warn-700);
+  font-size: var(--fs-sm);
+}
+.mismatch p {
+  flex: 1;
+  min-width: 220px;
+}
+
 .retry {
   margin-top: var(--s-4);
 }
