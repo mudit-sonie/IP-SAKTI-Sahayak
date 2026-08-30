@@ -70,6 +70,14 @@ class HybridRetriever:
 
         settings = get_settings()
         w = settings.hybrid_bm25_weight
+        # Degrade gracefully: if one index is unavailable (e.g. Chroma /
+        # sentence-transformers not installed yet), lean fully on the other so
+        # the fused top_score stays a meaningful [0,1] signal for the confidence
+        # threshold instead of being capped at w.
+        if not self._vector.ready:
+            w = 1.0
+        elif not self._bm25.ready:
+            w = 0.0
 
         bm25_hits = self._bm25.search(query, candidate_k)
         vector_hits = self._vector.search(query, candidate_k)

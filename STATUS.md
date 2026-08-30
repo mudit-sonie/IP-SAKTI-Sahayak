@@ -34,8 +34,23 @@ backend skeleton runs; frontend renders static screens against mock data.
 
 ---
 
-## Day 2 — 30 Aug  (not started)
+## Day 2 — 30 Aug  🟡 in progress
 Core loop end-to-end on real India-corpus data. Non-negotiable milestone.
+
+| Workstream | Owner | Status | Notes |
+|---|---|---|---|
+| Corpus preprocessing (PDF → cleaned text) | Kavish | 🟢 done | `44ffdaa` — 15 docs cleaned to per-document `.txt` under `corpus/preprocessing_corpus/cleaned_corpus/documents/`. |
+| Ingestion pipeline (cleaned text → `chunks.jsonl`) | Dewashish | 🟢 done | New `backend/scripts/ingest_corpus.py` — deterministic, no LLM. **532 India chunks** committed at `backend/data/processed/chunks.jsonl` (+ `documents.json`, `validation_report.json`). Section-aware: Patents Act (152), Trade Marks Act (163), Biological Diversity Act (60), Drugs & Cosmetics Act (52), Drugs & Magic Remedies Act (18), GI Act (87). Footnote/amendment marginalia stripped; legal text unchanged. |
+| Retrieval on real data | Dewashish | 🟢 BM25 live / 🟡 vector pending | `build_index` loads 532 chunks; BM25 hybrid smoke queries land on the right Act + section (BD Act §6 for NBA-approval-before-patent, GI Act §2 for "what is a GI", Magic Remedies §5 for ayurvedic cure ads, BD Act §21 for benefit-sharing). `hybrid.py` now leans fully on whichever index is ready so `top_score` stays a meaningful [0,1] confidence signal in BM25-only mode. **Chroma + sentence-transformers install in progress** (large: torch). |
+| Full core loop (→ cited answer) | Dewashish | 🔴 blocked on Gemini keys | Pipeline runs end-to-end today: `/query` → real retrieval → confidence → response, `corpus_loaded: true`, 14/14 pytest green. Returns `status: escalate` **only** because `GEMINI_API_KEYS` is unset and `google-generativeai` isn't installed yet. **Ask: someone provision ≥3 free-tier Gemini keys into `backend/.env`** — that's the last thing between us and cited answers. |
+| Frontend → real API on core flow | Mudit | 🔴 not started | Still on mock JSON. `/classify` + `/query` are live locally (`uvicorn app.main:app`, port 8000). Wire the Ask→Result path to `POST /query`; response shape unchanged from `schemas.py`. |
+
+### Day 2 blockers / asks
+- **Gemini keys** — critical path for the "cited answer" half of the milestone. Backend is ready; drop keys in `backend/.env` (`GEMINI_API_KEYS=k1,k2,k3`).
+- Vector index (Chroma) — dependency install running; retrieval works BM25-only until then, quality already sane.
+- TRIPS / CBD / Nagoya / Patents Rules 2003 not yet chunked — different source formatting, moved to Day 3 (international corpus day anyway). `ingest_corpus.py --stdout` lists them as 0 chunks / needs_review.
+- `corpus/preprocessing_corpus/` carries both the source PDFs again (~90 MB) and the cleaned text — repo is getting heavy; consider a shallow/LFS strategy before demo.
+- Ayurveda Aahar regulations 2022: cleaned text is Devanagari + garbled OCR, no usable English — needs a clean English source (FSSAI gazette) before it can be ingested.
 
 ## Day 3 — 31 Aug  (not started)
 International thin corpus + ABS helper wired live; frontend polish.

@@ -64,13 +64,23 @@ tests/                    contract + classifier tests (run: pytest)
 ## Corpus dependency
 
 The retriever reads `CORPUS_CHUNKS_PATH` (default `data/processed/chunks.jsonl`),
-produced by the `legal-corpus-ingestion` skill. Until that file exists the backend
-runs fine but every `/query` returns `status: escalate` — this is intentional (no
-mocks on the core loop). Once ingestion ships chunks, run:
+produced by `scripts/ingest_corpus.py` (deterministic, no LLM — follows the
+`legal-corpus-ingestion` rulebook). Until that file exists the backend runs fine
+but every `/query` returns `status: escalate` — this is intentional (no mocks on
+the core loop).
 
 ```bash
-python -m scripts.build_index
+python -m scripts.ingest_corpus            # cleaned corpus -> data/processed/chunks.jsonl
+python -m scripts.ingest_corpus --stdout   # dry run: per-source chunk counts, writes nothing
+python -m scripts.build_index              # (re)build BM25 + Chroma from chunks.jsonl
 ```
+
+`chunks.jsonl` + `documents.json` + `validation_report.json` are committed so the
+rest of the team doesn't need the raw corpus to run retrieval. Current corpus:
+**532 India chunks** across the Patents Act, Trade Marks Act, Biological Diversity
+Act, Drugs & Cosmetics Act, Drugs & Magic Remedies Act, and the GI Act. TRIPS /
+CBD / Nagoya and the Patents Rules 2003 are staged for Day 3 (different source
+formatting — `--stdout` shows them at 0 chunks / `needs_review`).
 
 ## Tuning
 

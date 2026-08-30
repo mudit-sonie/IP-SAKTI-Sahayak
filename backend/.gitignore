@@ -7,4 +7,7 @@ __pycache__/
 data/chroma/
 data/processed/*
 !data/processed/.gitkeep
+!data/processed/chunks.jsonl
+!data/processed/documents.json
+!data/processed/validation_report.json
 *.log

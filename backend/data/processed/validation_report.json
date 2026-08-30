@@ -1,0 +1,138 @@
+{
+  "total_chunks": 533,
+  "india_chunks": 532,
+  "flagged_needs_review": 0,
+  "sources": [
+    {
+      "source_id": "patents_act_1970",
+      "title": "The Patents Act, 1970",
+      "parser": "act",
+      "sha256": "1daef7c9da0bde4e8e29dc7bd75d09e92b822b32ffeb6119ad0a021e8c9ef648",
+      "chunks": 152,
+      "empty_dropped": 0,
+      "short_flagged": 0,
+      "footnote_lines_dropped": 199,
+      "issues": [],
+      "status": "verified"
+    },
+    {
+      "source_id": "trade_marks_act_1999",
+      "title": "The Trade Marks Act, 1999",
+      "parser": "act",
+      "sha256": "e3a3246461269b6471c7c2729209d7f61f813cdf72523d390aa729f2a5e40401",
+      "chunks": 163,
+      "empty_dropped": 0,
+      "short_flagged": 0,
+      "footnote_lines_dropped": 11,
+      "issues": [],
+      "status": "verified"
+    },
+    {
+      "source_id": "biological_diversity_act_2002",
+      "title": "The Biological Diversity Act, 2002",
+      "parser": "act",
+      "sha256": "2a74a807a2919b6cc578af03389cc6c27ccff95ee70c498ac142c65b60a19a10",
+      "chunks": 60,
+      "empty_dropped": 0,
+      "short_flagged": 0,
+      "footnote_lines_dropped": 43,
+      "issues": [],
+      "status": "verified"
+    },
+    {
+      "source_id": "drugs_and_cosmetics_act_1940",
+      "title": "The Drugs and Cosmetics Act, 1940",
+      "parser": "act",
+      "sha256": "74fed0a24d4dbe436f4a282745ae6a8dc1d7dbbfa113f4257311320265d5059b",
+      "chunks": 52,
+      "empty_dropped": 0,
+      "short_flagged": 0,
+      "footnote_lines_dropped": 0,
+      "issues": [],
+      "status": "verified"
+    },
+    {
+      "source_id": "drugs_and_magic_remedies_act_1954",
+      "title": "The Drugs and Magic Remedies (Objectionable Advertisements) Act, 1954",
+      "parser": "act",
+      "sha256": "304f5a88e5d6bdbfba72f4c278f42b40738c39cf7d687911344505166d0fbbd7",
+      "chunks": 18,
+      "empty_dropped": 0,
+      "short_flagged": 0,
+      "footnote_lines_dropped": 11,
+      "issues": [],
+      "status": "verified"
+    },
+    {
+      "source_id": "patents_rules_2003",
+      "title": "The Patents Rules, 2003 (incorporating amendments till 15-03-2024)",
+      "parser": "act",
+      "sha256": "c7416ba0c699e5c4a06eb1bd56f3a7eb2c9b433b2c10048a7e67fa8a166afd62",
+      "chunks": 0,
+      "empty_dropped": 0,
+      "short_flagged": 0,
+      "footnote_lines_dropped": 0,
+      "issues": [
+        "could not locate section body; check source formatting",
+        "zero chunks produced"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "source_id": "gi_goods_act_1999",
+      "title": "The Geographical Indications of Goods (Registration and Protection) Act, 1999",
+      "parser": "gi_md",
+      "sha256": "d416ab78aff7824dee3f3e28cb4120f2f94ddee5a467a4a7974cb5f224852ede",
+      "chunks": 87,
+      "empty_dropped": 0,
+      "short_flagged": 0,
+      "footnote_lines_dropped": 0,
+      "issues": [],
+      "status": "verified"
+    },
+    {
+      "source_id": "trips_agreement",
+      "title": "TRIPS Agreement (as amended by the 2005 Protocol)",
+      "parser": "articles",
+      "sha256": "b134ff7e9a5c065e2a5e9693c7921db0d70dbe485e9d061740ec36da07897560",
+      "chunks": 1,
+      "empty_dropped": 0,
+      "short_flagged": 0,
+      "footnote_lines_dropped": 0,
+      "issues": [
+        "articles parser produced only 1 chunks; may need manual structuring"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "source_id": "cbd_1992",
+      "title": "Convention on Biological Diversity, 1992",
+      "parser": "articles",
+      "sha256": "c47b5a895c3dcb3bb6d46115b752d2cdc59ed5195346bdb0db4ec2b0e3476627",
+      "chunks": 0,
+      "empty_dropped": 0,
+      "short_flagged": 0,
+      "footnote_lines_dropped": 0,
+      "issues": [
+        "articles parser produced only 0 chunks; may need manual structuring",
+        "zero chunks produced"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "source_id": "nagoya_protocol_2010",
+      "title": "Nagoya Protocol on Access and Benefit-sharing, 2010",
+      "parser": "articles",
+      "sha256": "d8718a05cd5310f9bf64c87a5a848024d6d3d85cc23ee257add6f0d9517c6170",
+      "chunks": 0,
+      "empty_dropped": 0,
+      "short_flagged": 0,
+      "footnote_lines_dropped": 0,
+      "issues": [
+        "articles parser produced only 0 chunks; may need manual structuring",
+        "zero chunks produced"
+      ],
+      "status": "needs_review"
+    }
+  ]
+}
