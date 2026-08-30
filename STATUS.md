@@ -56,10 +56,37 @@ frontend.
 - Ayurveda Aahar regulations 2022: cleaned text is Devanagari + garbled OCR — needs a clean English FSSAI source before it can be ingested.
 - chromadb posthog telemetry prints harmless `capture()` errors to the log; disabled in `vector.py` for new clients.
 
-## Day 3 — 31 Aug  (not started)
-International thin corpus (TRIPS + CBD/Nagoya) + Patents Rules 2003 chunked and
-jurisdiction-routed; ABS helper polish; frontend polish (jurisdiction mismatch
-prompt, citation excerpt display, loading states).
+## Day 3 — 31 Aug  🟡 in progress
+
+**Frontend rebuilt** — design-token system, Inter (bundled), component library
+(CSS Modules), two-column Result layout, real loading skeleton, escalate as a
+designed state. `690f84c`.
+
+**Feature batch landed** (schema additions are all optional/additive):
+
+| Feature | Back | Front |
+|---|---|---|
+| Citation → verbatim statute passage | `GET /chunk/{id}` (`45f88a9`) | slide-over drawer (`bf911db`) |
+| "View on India Code" deep links | `Citation.source_url` from chunk metadata (`efa38b6`) | link on citation card + drawer |
+| Response cache (survives the 20/day Gemini quota) | disk cache keyed by query+jurisdiction+category (`e34c4a9`) | "cached" badge (`175dfaa`) |
+| Gold question set + spot-check harness | `scripts/warm_cache.py` + `data/gold_questions.json` (`f5af22f`) | — |
+| Answer feedback | `POST /feedback` → `data/feedback.jsonl` (`10390f5`) | 👍/👎 + note widget (`45c204c`) |
+| Jurisdiction mismatch guard | `QueryResponse.jurisdiction_note` (`053d24a`) | banner + one-click switch (`b72f934`) |
+| Classifier "why" | `ClassifyResponse.rationale[]` (`d37a4fb`) | decision-path list (`cc87430`) |
+| Retrieval transparency | `QueryResponse.retrieval` block (`acb4f3a`) | collapsible details (`3334cca`) |
+
+**Schema changes** (`backend/app/schemas.py`, all additive — no client break):
+`Citation.source_url`; `QueryResponse.cached / .jurisdiction_note / .retrieval`;
+`ClassifyResponse.rationale`; new `ChunkResponse`, `RetrievalInfo`,
+`FeedbackRequest/Response`.
+
+**Still open for Day 3:** TRIPS / CBD / Nagoya + Patents Rules 2003 chunking
+(international corpus); ABS-helper dedicated checklist output.
+
+### Day 3 blockers / asks
+- **Gemini free tier is ~20 req/day per key per model** (not 250 — Google tightened it; `gemini-2.5-flash` / `2.0-flash` are also being retired). Now on `gemini-3.5-flash-lite`. **Add 4–5 more keys to `GEMINI_API_KEYS`** before demo. Run `python -m scripts.warm_cache` once keys are in — caches the 12 gold answers so the demo is instant and quota-proof.
 
 ## Day 4 — 1 Sep  (not started)
-Integration buffer; 10–15 Q&A spot-checks vs source text; demo rehearsal + deploy.
+Integration buffer; run `scripts/warm_cache.py` as the 12-Q&A spot-check vs
+source text (extend `gold_questions.json` to 15); retrieval threshold + hybrid
+weight tuning; demo rehearsal + deploy.
