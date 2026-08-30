@@ -81,6 +81,12 @@
   line-height: 1.6;
 }
 
+.badges {
+  display: inline-flex;
+  gap: var(--s-2);
+  align-items: center;
+}
+
 .retry {
   margin-top: var(--s-4);
 }

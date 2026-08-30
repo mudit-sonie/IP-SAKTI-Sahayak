@@ -91,12 +91,12 @@ export default function Result() {
                     : "Answer"
                 }
                 aside={
-                  <Badge
-                    tone={escalated ? "warn" : "accent"}
-                    variant="solid"
-                  >
-                    {escalated ? "Escalated" : "Answered"}
-                  </Badge>
+                  <span className={styles.badges}>
+                    {data.cached && <Badge tone="neutral">cached</Badge>}
+                    <Badge tone={escalated ? "warn" : "accent"} variant="solid">
+                      {escalated ? "Escalated" : "Answered"}
+                    </Badge>
+                  </span>
                 }
               />
               <p className={styles.answer}>{data.answer}</p>
