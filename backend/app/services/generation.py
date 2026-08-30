@@ -32,6 +32,10 @@ SYSTEM_INSTRUCTION = (
     "(\"[n] <source>, Section <section>\"). Use the header's section value, not a "
     "sub-clause you inferred. If you cannot ground the answer in any passage, return "
     "an empty citations list and self_confidence \"low\".\n"
+    "Set self_confidence \"high\" when at least one passage directly and "
+    "unambiguously answers the question; \"medium\" when passages support a "
+    "partial or qualified answer; \"low\" only when no passage is on point. Do "
+    "not under-rate a clear, well-supported answer.\n"
     "Respond as JSON: "
     '{"answer": string, "citations": [{"source": string, "section": string}], '
     '"self_confidence": "high" | "medium" | "low"}.'

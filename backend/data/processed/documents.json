@@ -12,7 +12,7 @@
       "source_url": "https://www.indiacode.nic.in/handle/123456789/1392",
       "year": "1970",
       "sha256": "1daef7c9da0bde4e8e29dc7bd75d09e92b822b32ffeb6119ad0a021e8c9ef648",
-      "chunks": 152,
+      "chunks": 251,
       "parser": "act",
       "status": "verified"
     },
@@ -26,7 +26,7 @@
       "source_url": "https://www.indiacode.nic.in/handle/123456789/1993",
       "year": "1999",
       "sha256": "e3a3246461269b6471c7c2729209d7f61f813cdf72523d390aa729f2a5e40401",
-      "chunks": 163,
+      "chunks": 249,
       "parser": "act",
       "status": "verified"
     },
@@ -40,7 +40,7 @@
       "source_url": "https://www.indiacode.nic.in/handle/123456789/2046",
       "year": "2002",
       "sha256": "2a74a807a2919b6cc578af03389cc6c27ccff95ee70c498ac142c65b60a19a10",
-      "chunks": 60,
+      "chunks": 110,
       "parser": "act",
       "status": "verified"
     },
@@ -54,7 +54,7 @@
       "source_url": "https://www.indiacode.nic.in/handle/123456789/2318",
       "year": "1940",
       "sha256": "74fed0a24d4dbe436f4a282745ae6a8dc1d7dbbfa113f4257311320265d5059b",
-      "chunks": 52,
+      "chunks": 169,
       "parser": "act",
       "status": "verified"
     },
@@ -68,7 +68,7 @@
       "source_url": "https://www.indiacode.nic.in/handle/123456789/1391",
       "year": "1954",
       "sha256": "304f5a88e5d6bdbfba72f4c278f42b40738c39cf7d687911344505166d0fbbd7",
-      "chunks": 18,
+      "chunks": 34,
       "parser": "act",
       "status": "verified"
     },
@@ -82,9 +82,9 @@
       "source_url": "https://ipindia.gov.in/writereaddata/Portal/IPORule/1_70_1_The_Patents_Rules_2003_Updated_till_23_June_2017.pdf",
       "year": "2003",
       "sha256": "c7416ba0c699e5c4a06eb1bd56f3a7eb2c9b433b2c10048a7e67fa8a166afd62",
-      "chunks": 0,
+      "chunks": 1,
       "parser": "act",
-      "status": "needs_review"
+      "status": "verified"
     },
     {
       "source_id": "gi_goods_act_1999",

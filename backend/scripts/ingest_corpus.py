@@ -193,6 +193,45 @@ def clean_body(lines: list[str]) -> tuple[str, int]:
     return text, dropped
 
 
+# A top-level lettered clause opener: " (a) ", "] (c) ", "4[(b) " (amendment marker).
+_CLAUSE_RE = re.compile(r"(?:^|[\s\]])(?:\d+\[)?\(([a-z]{1,2})\)\s")
+
+
+def clause_split(body: str) -> tuple[str, list[tuple[str, str]]] | None:
+    """Split a section that is a lettered-clause list — e.g. Patents Act s.3
+    '(a) ... (b) ... (p) ...' — into (chapeau, [(letter, clause_text), ...]).
+
+    Conservative: fires only for a genuine top-level run starting at '(a)', 4-30
+    clauses, on a section long enough to be worth splitting, with no label
+    repeating (a repeat means a nested list restarted). Ordinary sections and
+    subsection-structured sections are left whole.
+    """
+    if len(body) < 800:
+        return None
+    marks = list(_CLAUSE_RE.finditer(body))
+    start_idx = next((i for i, m in enumerate(marks) if m.group(1) == "a"), None)
+    if start_idx is None:
+        return None
+    run = [marks[start_idx]]
+    seen = {"a"}
+    for m in marks[start_idx + 1:]:
+        label = m.group(1)
+        if label in seen:  # nested list restarted -> stop the top-level run
+            break
+        seen.add(label)
+        run.append(m)
+    if not (4 <= len(run) <= 30):
+        return None
+    chapeau = body[: run[0].start()].strip(" ,;:—–-")
+    if len(chapeau) > 400:
+        return None
+    clauses: list[tuple[str, str]] = []
+    for i, m in enumerate(run):
+        end = run[i + 1].start() if i + 1 < len(run) else len(body)
+        clauses.append((m.group(1), body[m.start():end].strip(" ,;")))
+    return chapeau, clauses
+
+
 def split_long(text: str, limit: int = 7000) -> list[str]:
     """Split an over-long section only at subsection ``(1) (2)`` boundaries."""
     if len(text) <= limit:
@@ -213,6 +252,23 @@ def split_long(text: str, limit: int = 7000) -> list[str]:
 # --------------------------------------------------------------------------- #
 # Parsers
 # --------------------------------------------------------------------------- #
+def rebreak_jammed_lines(raw: str) -> str:
+    """The cleaned PDF text often jams a chapter heading, its title and the first
+    section's whole body onto one physical line
+    (``CHAPTER VIII 2[GRANT OF ...] 3[43. Grant of patents.—(1) Where...``).
+    Put chapter headings and numbered section openers back on their own lines so
+    the structural parser can see them. Conservative: only splits before a
+    ``CHAPTER <roman>`` token or a ``N. Title.—`` opener (the em-dash makes false
+    positives on cross-references very unlikely)."""
+    raw = re.sub(r"(?<!\n)[ \t]+(CHAPTER\s+[IVXLCDM]+\b)", r"\n\1", raw)
+    raw = re.sub(
+        r"(?<!\n)[ \t]+((?:\d+\[)?\d{1,3}[A-Z]{0,3}\.\s+[A-Z\"“'\[][^\n]{2,140}?\.\s*[—–\-]{1,2})",
+        r"\n\1",
+        raw,
+    )
+    return raw
+
+
 def find_body_start(lines: list[str]) -> int:
     for i, ln in enumerate(lines):
         if re.match(r"^\s*(?:\d+\[)?1\.\s+Short title[^\n]{0,80}?[—–\-]{1,2}", ln, re.IGNORECASE):
@@ -224,7 +280,7 @@ def find_body_start(lines: list[str]) -> int:
 
 
 def parse_act(src: Source, raw: str, rep: DocReport) -> list[Chunk]:
-    lines = raw.splitlines()
+    lines = rebreak_jammed_lines(raw).splitlines()
     start = find_body_start(lines)
     if start == 0 and not SEC_RE.match(lines[0] if lines else ""):
         rep.issues.append("could not locate section body; check source formatting")
@@ -247,36 +303,48 @@ def parse_act(src: Source, raw: str, rep: DocReport) -> list[Chunk]:
         if not body:
             rep.empty_dropped += 1
             return
-        header = f"{src.title}"
+        ctx = f"{src.title}"
         if chapter:
-            header += f" — Chapter {chapter}"
+            ctx += f" — Chapter {chapter}"
             if chapter_title:
-                header += f": {chapter_title.title()}"
-        header += f"\n\nSection {cur_sec} — {cur_title}\n\n"
-        full = header + body
-        pieces = split_long(full)
-        for k, piece in enumerate(pieces):
-            suffix = "" if len(pieces) == 1 else f"_{k+1}"
-            cid = f"{src.source_id}_sec_{slugify_section(cur_sec)}{suffix}"
-            if len(piece) < 160:
-                rep.short_flagged += 1
-            chunks.append(Chunk(cid, piece, {
-                "source": src.title,
-                "source_id": src.source_id,
-                "document_type": src.document_type,
-                "jurisdiction": src.jurisdiction,
-                "source_organization": src.source_organization,
-                "source_url": src.source_url,
-                "year": src.year,
-                "chapter": chapter or None,
-                "section": cur_sec,
-                "citation": f"Section {cur_sec}",
-                "page_start": None,
-                "page_end": None,
-                "processing_version": PROCESSING_VERSION,
-                "ocr_used": False,
-                "quality_status": "needs_review" if len(piece) < 160 else "verified",
-            }))
+                ctx += f": {chapter_title.title()}"
+
+        def emit(section_label: str, text: str) -> None:
+            header = f"{ctx}\n\nSection {section_label} — {cur_title}\n\n"
+            for k, piece in enumerate(split_long(header + text)):
+                suffix = "" if k == 0 else f"_{k + 1}"
+                cid = f"{src.source_id}_sec_{slugify_section(section_label)}{suffix}"
+                if len(piece) < 160:
+                    rep.short_flagged += 1
+                chunks.append(Chunk(cid, piece, {
+                    "source": src.title,
+                    "source_id": src.source_id,
+                    "document_type": src.document_type,
+                    "jurisdiction": src.jurisdiction,
+                    "source_organization": src.source_organization,
+                    "source_url": src.source_url,
+                    "year": src.year,
+                    "chapter": chapter or None,
+                    "section": section_label,
+                    "citation": f"Section {section_label}",
+                    "page_start": None,
+                    "page_end": None,
+                    "processing_version": PROCESSING_VERSION,
+                    "ocr_used": False,
+                    "quality_status": "needs_review" if len(piece) < 160 else "verified",
+                }))
+
+        split = clause_split(body)
+        if split is not None:
+            chapeau, clauses = split
+            # keep the whole section as one chunk (context) ...
+            emit(cur_sec, body)
+            # ... plus one independently-citable chunk per clause, e.g. "3(p)"
+            for letter, clause_text in clauses:
+                lead = f"{chapeau}\n\n" if chapeau else ""
+                emit(f"{cur_sec}({letter})", lead + clause_text)
+        else:
+            emit(cur_sec, body)
 
     i = start
     while i < len(lines):
@@ -294,6 +362,8 @@ def parse_act(src: Source, raw: str, rep: DocReport) -> list[Chunk]:
                 title_lines.append(lines[j].strip())
                 j += 1
             chapter_title = " ".join(t for t in title_lines if t)
+            chapter_title = re.sub(r"\d+\[|\]", "", chapter_title)  # amendment markers
+            chapter_title = chapter_title[:140].strip(" [](){}*")
             i = j
             continue
         msec = SEC_RE.match(ln)

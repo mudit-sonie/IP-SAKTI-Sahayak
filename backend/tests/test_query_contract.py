@@ -1,11 +1,16 @@
 """Contract-shape tests for /query and /abs-check.
 
-No corpus and no Gemini key in CI, so /query must still return a well-formed
-response with status == "escalate" (the designed fallback), never a 500.
+/query must always return a well-formed response, never a 500. With no corpus and
+no Gemini key (CI) that means status == "escalate" (the designed fallback); with
+both wired it may legitimately be "answered", so we only assert the escalate
+fallback when /health reports the backend is not fully wired.
 """
 
 
-def test_query_returns_contract_shape_and_escalates(client):
+def test_query_returns_contract_shape(client):
+    health = client.get("/health").json()
+    fully_wired = health["corpus_loaded"] and health["gemini_configured"]
+
     r = client.post(
         "/query",
         json={"query": "Can a classical Ayurvedic formulation be patented?", "jurisdiction": "india"},
@@ -13,8 +18,10 @@ def test_query_returns_contract_shape_and_escalates(client):
     assert r.status_code == 200
     body = r.json()
     assert set(body) >= {"answer", "citations", "confidence", "abs_flag", "abs_note"}
-    assert body["confidence"]["status"] == "escalate"
+    assert body["confidence"]["status"] in {"answered", "escalate"}
     assert isinstance(body["citations"], list)
+    if not fully_wired:
+        assert body["confidence"]["status"] == "escalate"
 
 
 def test_abs_check_triggers_on_keyword(client):

@@ -1,6 +1,6 @@
 {
-  "total_chunks": 533,
-  "india_chunks": 532,
+  "total_chunks": 902,
+  "india_chunks": 901,
   "flagged_needs_review": 0,
   "sources": [
     {
@@ -8,10 +8,10 @@
       "title": "The Patents Act, 1970",
       "parser": "act",
       "sha256": "1daef7c9da0bde4e8e29dc7bd75d09e92b822b32ffeb6119ad0a021e8c9ef648",
-      "chunks": 152,
+      "chunks": 251,
       "empty_dropped": 0,
       "short_flagged": 0,
-      "footnote_lines_dropped": 199,
+      "footnote_lines_dropped": 211,
       "issues": [],
       "status": "verified"
     },
@@ -20,7 +20,7 @@
       "title": "The Trade Marks Act, 1999",
       "parser": "act",
       "sha256": "e3a3246461269b6471c7c2729209d7f61f813cdf72523d390aa729f2a5e40401",
-      "chunks": 163,
+      "chunks": 249,
       "empty_dropped": 0,
       "short_flagged": 0,
       "footnote_lines_dropped": 11,
@@ -32,7 +32,7 @@
       "title": "The Biological Diversity Act, 2002",
       "parser": "act",
       "sha256": "2a74a807a2919b6cc578af03389cc6c27ccff95ee70c498ac142c65b60a19a10",
-      "chunks": 60,
+      "chunks": 110,
       "empty_dropped": 0,
       "short_flagged": 0,
       "footnote_lines_dropped": 43,
@@ -44,7 +44,7 @@
       "title": "The Drugs and Cosmetics Act, 1940",
       "parser": "act",
       "sha256": "74fed0a24d4dbe436f4a282745ae6a8dc1d7dbbfa113f4257311320265d5059b",
-      "chunks": 52,
+      "chunks": 169,
       "empty_dropped": 0,
       "short_flagged": 0,
       "footnote_lines_dropped": 0,
@@ -56,7 +56,7 @@
       "title": "The Drugs and Magic Remedies (Objectionable Advertisements) Act, 1954",
       "parser": "act",
       "sha256": "304f5a88e5d6bdbfba72f4c278f42b40738c39cf7d687911344505166d0fbbd7",
-      "chunks": 18,
+      "chunks": 34,
       "empty_dropped": 0,
       "short_flagged": 0,
       "footnote_lines_dropped": 11,
@@ -68,15 +68,12 @@
       "title": "The Patents Rules, 2003 (incorporating amendments till 15-03-2024)",
       "parser": "act",
       "sha256": "c7416ba0c699e5c4a06eb1bd56f3a7eb2c9b433b2c10048a7e67fa8a166afd62",
-      "chunks": 0,
+      "chunks": 1,
       "empty_dropped": 0,
       "short_flagged": 0,
       "footnote_lines_dropped": 0,
-      "issues": [
-        "could not locate section body; check source formatting",
-        "zero chunks produced"
-      ],
-      "status": "needs_review"
+      "issues": [],
+      "status": "verified"
     },
     {
       "source_id": "gi_goods_act_1999",
