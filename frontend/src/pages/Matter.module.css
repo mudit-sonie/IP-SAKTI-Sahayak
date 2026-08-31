@@ -66,6 +66,35 @@
   min-width: 0;
 }
 
+.tabs {
+  display: flex;
+  gap: var(--s-1);
+  border-bottom: 1px solid var(--rule);
+}
+.tab,
+.tabOn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--s-3) var(--s-3);
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-500);
+  cursor: pointer;
+}
+.tab:hover {
+  color: var(--ink-900);
+}
+.tabOn {
+  color: var(--ink-900);
+  border-bottom-color: var(--accent-500);
+}
+
 .askBox {
   display: flex;
   flex-direction: column;

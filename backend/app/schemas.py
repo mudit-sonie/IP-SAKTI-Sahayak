@@ -272,3 +272,13 @@ class MatterQuestionResponse(BaseModel):
     matter: Matter
     question: MatterQuestion
     result: QueryResponse
+
+
+class ChecklistItemStatusRequest(BaseModel):
+    status: ChecklistStatus
+
+
+class ChecklistItemCreateRequest(BaseModel):
+    title: str
+    detail: Optional[str] = None
+    group: Optional[str] = None

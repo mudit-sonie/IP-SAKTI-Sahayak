@@ -98,3 +98,42 @@ def test_ask_records_question_and_updates_abs_status(client, stub_pipeline):
 def test_ask_empty_query_422(client, stub_pipeline):
     mid = client.post("/matters", json={"title": "m"}).json()["id"]
     assert client.post(f"/matters/{mid}/questions", json={"query": "   "}).status_code == 422
+
+
+@pytest.fixture()
+def stub_checklist_grounding(monkeypatch):
+    import app.services.checklist as cl
+
+    monkeypatch.setattr(cl, "_ground", lambda probe, jurisdiction: [])
+
+
+def test_checklist_generated_on_classified_matter(client, stub_checklist_grounding):
+    r = client.post(
+        "/matters",
+        json={
+            "title": "Proprietary blend",
+            "jurisdiction": "india",
+            "formulation_category": "proprietary",
+            "formulation_label": "Patent / Proprietary Ayurvedic Medicine",
+        },
+    )
+    body = r.json()
+    assert len(body["checklist"]) > 0
+    assert all(i["status"] == "todo" for i in body["checklist"])
+    # no ABS items until the matter is ABS-flagged
+    assert not any(i["group"] == "ABS" for i in body["checklist"])
+
+
+def test_checklist_status_patch_and_regenerate_preserves_it(client, stub_checklist_grounding):
+    mid = client.post(
+        "/matters",
+        json={"title": "m", "jurisdiction": "india", "formulation_category": "classical"},
+    ).json()["id"]
+    item = client.get(f"/matters/{mid}").json()["checklist"][0]
+
+    r = client.patch(f"/matters/{mid}/checklist/{item['id']}", json={"status": "done"})
+    assert r.status_code == 200
+
+    r = client.post(f"/matters/{mid}/checklist")
+    kept = next(i for i in r.json()["checklist"] if i["id"] == item["id"])
+    assert kept["status"] == "done"

@@ -134,6 +134,20 @@ export const matters = {
       body: payload,
       ...opts,
     }),
+  regenerateChecklist: (id, opts) =>
+    reqJson(`/matters/${id}/checklist`, { method: "POST", ...opts }),
+  addChecklistItem: (id, payload, opts) =>
+    reqJson(`/matters/${id}/checklist/items`, {
+      method: "POST",
+      body: payload,
+      ...opts,
+    }),
+  setChecklistStatus: (id, itemId, status, opts) =>
+    reqJson(`/matters/${id}/checklist/${itemId}`, {
+      method: "PATCH",
+      body: { status },
+      ...opts,
+    }),
 };
 
 export { BASE_URL };

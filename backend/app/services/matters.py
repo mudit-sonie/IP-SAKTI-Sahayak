@@ -12,6 +12,9 @@ from app.core.logging import get_logger
 from app.schemas import (
     AbsStatus,
     AuditEntry,
+    ChecklistItem,
+    ChecklistItemCreateRequest,
+    ChecklistStatus,
     Jurisdiction,
     Matter,
     MatterCreateRequest,
@@ -21,6 +24,7 @@ from app.schemas import (
     QueryRequest,
     QueryResponse,
 )
+from app.services import checklist as checklist_svc
 from app.services import pipeline
 from app.store.repos import get_matter_repo, new_id
 
@@ -51,6 +55,9 @@ def create(req: MatterCreateRequest) -> Matter:
         notes=req.notes,
     )
     _audit(matter, "matter.created", matter.title)
+    if matter.formulation_category:
+        matter.checklist = checklist_svc.generate(matter)
+        _audit(matter, "checklist.generated", f"{len(matter.checklist)} items")
     get_matter_repo().save(matter)
     logger.info("matter created: %s (%s)", matter.id, matter.title)
     return matter
@@ -111,6 +118,7 @@ def ask(matter_id: str, req: MatterQuestionRequest) -> tuple[Matter, MatterQuest
     )
 
     with repo.mutate(matter_id) as matter:
+        was = matter.abs_status
         matter.questions.append(question)
         _recompute_abs_status(matter)
         _audit(
@@ -118,6 +126,52 @@ def ask(matter_id: str, req: MatterQuestionRequest) -> tuple[Matter, MatterQuest
             "question.asked",
             f"{req.query[:80]} → {question.status.value}",
         )
+        # ABS just turned on, or the checklist exists — refresh it so ABS items
+        # appear / disappear in step with the matter's real state.
+        if matter.checklist or matter.formulation_category:
+            if matter.abs_status != was or matter.checklist:
+                matter.checklist = checklist_svc.generate(matter)
         saved = matter
 
     return saved, question, result
+
+
+# --------------------------------------------------------------------------- #
+# Compliance checklist
+# --------------------------------------------------------------------------- #
+def regenerate_checklist(matter_id: str) -> Matter:
+    repo = get_matter_repo()
+    with repo.mutate(matter_id) as matter:
+        matter.checklist = checklist_svc.generate(matter)
+        _audit(matter, "checklist.generated", f"{len(matter.checklist)} items")
+        return matter
+
+
+def set_checklist_status(
+    matter_id: str, item_id: str, status: ChecklistStatus
+) -> Matter:
+    repo = get_matter_repo()
+    with repo.mutate(matter_id) as matter:
+        for item in matter.checklist:
+            if item.id == item_id:
+                item.status = status
+                _audit(matter, "checklist.item", f"{item.title[:60]} → {status.value}")
+                return matter
+        raise KeyError(item_id)
+
+
+def add_checklist_item(
+    matter_id: str, req: ChecklistItemCreateRequest
+) -> Matter:
+    repo = get_matter_repo()
+    with repo.mutate(matter_id) as matter:
+        matter.checklist.append(
+            ChecklistItem(
+                id=new_id("c_"),
+                title=req.title.strip(),
+                detail=req.detail,
+                group=req.group or "Other",
+            )
+        )
+        _audit(matter, "checklist.item.added", req.title[:60])
+        return matter

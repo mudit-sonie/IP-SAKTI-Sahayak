@@ -7,6 +7,10 @@ __pycache__/
 data/chroma/
 data/cache/
 data/feedback.jsonl
+data/matters/
+data/escalations/
+data/faq/
+data/drafts/
 data/processed/*
 !data/processed/.gitkeep
 !data/processed/chunks.jsonl

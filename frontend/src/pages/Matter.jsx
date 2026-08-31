@@ -6,6 +6,7 @@ import Button from "../components/Button";
 import Badge from "../components/Badge";
 import Icon from "../components/Icon";
 import CitationCard from "../components/CitationCard";
+import Checklist from "../components/Checklist";
 import ConfidenceMeter from "../components/ConfidenceMeter";
 import PassageDrawer from "../components/PassageDrawer";
 import TextArea from "../components/TextArea";
@@ -25,6 +26,8 @@ export default function Matter() {
   const [viewing, setViewing] = useState(null);
   const [notes, setNotes] = useState("");
   const notesDirty = useRef(false);
+  const [tab, setTab] = useState("questions");
+  const [checklistBusy, setChecklistBusy] = useState(false);
 
   const load = useCallback(
     (signal) =>
@@ -77,6 +80,21 @@ export default function Matter() {
     if (!window.confirm("Delete this matter and its history?")) return;
     await mattersApi.remove(id);
     navigate("/matters");
+  }
+
+  async function regenerateChecklist() {
+    setChecklistBusy(true);
+    try {
+      setMatter(await mattersApi.regenerateChecklist(id));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setChecklistBusy(false);
+    }
+  }
+
+  async function setChecklistStatus(itemId, status) {
+    setMatter(await mattersApi.setChecklistStatus(id, itemId, status));
   }
 
   if (error && !matter) {
@@ -140,6 +158,43 @@ export default function Matter() {
 
       <div className={styles.grid}>
         <div className={styles.main}>
+          <div className={styles.tabs} role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "questions"}
+              className={tab === "questions" ? styles.tabOn : styles.tab}
+              onClick={() => setTab("questions")}
+            >
+              Questions{" "}
+              <span className="mono">{matter.questions.length}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "checklist"}
+              className={tab === "checklist" ? styles.tabOn : styles.tab}
+              onClick={() => setTab("checklist")}
+            >
+              Compliance checklist{" "}
+              <span className="mono">
+                {matter.checklist.filter((c) => c.status !== "done").length}
+              </span>
+            </button>
+          </div>
+
+          {tab === "checklist" && (
+            <Checklist
+              items={matter.checklist}
+              onSetStatus={setChecklistStatus}
+              onView={setViewing}
+              onRegenerate={regenerateChecklist}
+              busy={checklistBusy}
+            />
+          )}
+
+          {tab === "questions" && (
+            <>
           <form className={styles.askBox} onSubmit={ask}>
             <TextArea
               label="Ask a question about this formulation"
@@ -197,6 +252,8 @@ export default function Matter() {
               </article>
             );
           })}
+            </>
+          )}
         </div>
 
         <aside className={styles.rail}>

@@ -13,6 +13,8 @@ from fastapi import APIRouter, HTTPException
 
 from app.config import get_settings
 from app.schemas import (
+    ChecklistItemCreateRequest,
+    ChecklistItemStatusRequest,
     Matter,
     MatterCreateRequest,
     MatterQuestionRequest,
@@ -78,3 +80,34 @@ def ask_in_matter(matter_id: str, req: MatterQuestionRequest) -> MatterQuestionR
     except KeyError:
         raise HTTPException(status_code=404, detail="matter not found")
     return MatterQuestionResponse(matter=matter, question=question, result=result)
+
+
+@router.post("/{matter_id}/checklist", response_model=Matter)
+def regenerate_checklist(matter_id: str) -> Matter:
+    _require_enabled()
+    try:
+        return matters.regenerate_checklist(matter_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter not found")
+
+
+@router.post("/{matter_id}/checklist/items", response_model=Matter)
+def add_checklist_item(matter_id: str, req: ChecklistItemCreateRequest) -> Matter:
+    _require_enabled()
+    if not req.title.strip():
+        raise HTTPException(status_code=422, detail="title must not be empty")
+    try:
+        return matters.add_checklist_item(matter_id, req)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter not found")
+
+
+@router.patch("/{matter_id}/checklist/{item_id}", response_model=Matter)
+def set_checklist_status(
+    matter_id: str, item_id: str, req: ChecklistItemStatusRequest
+) -> Matter:
+    _require_enabled()
+    try:
+        return matters.set_checklist_status(matter_id, item_id, req.status)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter or item not found")
