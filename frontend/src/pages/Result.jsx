@@ -5,6 +5,8 @@ import AppShell from "../components/AppShell";
 import Button from "../components/Button";
 import Badge from "../components/Badge";
 import Card, { CardHeader } from "../components/Card";
+import StepIndicator from "../components/StepIndicator";
+import Icon from "../components/Icon";
 import ConfidenceMeter from "../components/ConfidenceMeter";
 import CitationCard from "../components/CitationCard";
 import PassageDrawer from "../components/PassageDrawer";
@@ -60,8 +62,11 @@ export default function Result() {
         onClick={() => navigate("/ask", { state: location.state })}
         className={styles.back}
       >
-        ← Edit question
+        <Icon name="arrowLeft" size={14} />
+        Edit question
       </Button>
+
+      <StepIndicator current={2} />
 
       <p className={styles.question}>{question}</p>
 

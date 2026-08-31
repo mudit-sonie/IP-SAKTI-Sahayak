@@ -1,0 +1,59 @@
+.list {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin: 0 0 var(--s-6);
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-sm);
+}
+.step {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.step:not(:last-child)::after {
+  content: "";
+  width: 28px;
+  height: 1px;
+  margin-left: var(--s-1);
+  background: var(--rule-strong);
+}
+.marker {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--rule-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+}
+.label {
+  color: var(--ink-500);
+}
+
+.active .marker {
+  border-color: var(--accent-600);
+  background: var(--accent-600);
+  color: var(--on-accent);
+}
+.active .label {
+  color: var(--ink-900);
+  font-weight: 600;
+}
+
+.done .marker {
+  border-color: var(--accent-500);
+  color: var(--accent-700);
+}
+.done .label {
+  color: var(--ink-700);
+}
+
+@media (max-width: 480px) {
+  .step:not(:last-child)::after {
+    width: 16px;
+  }
+}

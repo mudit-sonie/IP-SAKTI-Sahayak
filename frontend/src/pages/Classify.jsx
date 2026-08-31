@@ -3,8 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { classify } from "../api/client";
 import AppShell from "../components/AppShell";
 import PageIntro from "../components/PageIntro";
+import StepIndicator from "../components/StepIndicator";
 import Button from "../components/Button";
 import OptionList from "../components/OptionList";
+import Icon from "../components/Icon";
 import { SkeletonLine } from "../components/Skeleton";
 import styles from "./Classify.module.css";
 
@@ -105,10 +107,16 @@ export default function Classify() {
   return (
     <AppShell context={{ jurisdiction }}>
       <Button variant="ghost" size="sm" onClick={goBack} className={styles.back}>
-        ← Back
+        <Icon name="arrowLeft" size={14} />
+        Back
       </Button>
 
-      <PageIntro eyebrow="Step 1 · Formulation classification" title="Let's place your formulation">
+      <StepIndicator current={0} />
+
+      <PageIntro
+        eyebrow="Formulation classification"
+        title="Let's place your formulation"
+      >
         A few short questions identify the most relevant regulatory and IP
         pathway. This drives which ABS and patentability rules apply later.
       </PageIntro>
@@ -130,6 +138,7 @@ export default function Classify() {
           <h2 className={styles.resultTitle}>
             {CATEGORY_LABELS[category] || category}
           </h2>
+          <p className={styles.resultCode}>{category}</p>
           <p className={styles.resultBlurb}>
             {CATEGORY_BLURB[category] ||
               "A preliminary guidance classification, not legal advice."}
@@ -159,7 +168,8 @@ export default function Classify() {
                 })
               }
             >
-              Continue to ask a question →
+              Continue to ask a question
+              <Icon name="arrowRight" size={16} />
             </Button>
           </div>
         </div>
@@ -167,7 +177,9 @@ export default function Classify() {
 
       {!error && !category && (
         <div className={styles.questionCard}>
-          <p className={styles.qCount}>Question {step + 1}</p>
+          <p className={styles.qCount}>
+            Question <span className="mono">{step + 1}</span>
+          </p>
           {loading ? (
             <div className={styles.qLoading}>
               <SkeletonLine w="70%" />
@@ -186,10 +198,12 @@ export default function Classify() {
                 />
                 <div className={styles.actions}>
                   <Button variant="secondary" onClick={goBack}>
-                    ← Back
+                    <Icon name="arrowLeft" size={14} />
+                    Back
                   </Button>
                   <Button onClick={submitAnswer} disabled={!selected}>
-                    Next →
+                    Next
+                    <Icon name="arrowRight" size={16} />
                   </Button>
                 </div>
               </>

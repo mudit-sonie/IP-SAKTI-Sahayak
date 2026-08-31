@@ -1,28 +1,24 @@
 .back {
-  margin-bottom: var(--s-3);
+  margin-bottom: var(--s-4);
 }
 
 .question {
-  margin-bottom: var(--s-5);
+  margin-bottom: var(--s-6);
+  padding-left: var(--s-4);
+  border-left: 2px solid var(--accent-500);
+  font-family: var(--font-serif);
   font-size: var(--fs-xl);
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.35;
   color: var(--ink-900);
-}
-.question::before {
-  content: "“";
-  color: var(--accent-500);
-}
-.question::after {
-  content: "”";
-  color: var(--accent-500);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: var(--s-5);
+  grid-template-columns: minmax(0, 1fr) 288px;
+  gap: var(--s-6);
   align-items: start;
+  animation: rise var(--dur-3) var(--ease);
 }
 .main {
   display: flex;
@@ -33,16 +29,18 @@
 
 .answer {
   font-size: var(--fs-lg);
-  line-height: 1.7;
+  line-height: 1.75;
   color: var(--ink-800);
   white-space: pre-wrap;
+  max-width: 64ch;
 }
 .escalateNote {
   margin-top: var(--s-4);
   padding-top: var(--s-4);
-  border-top: 1px solid var(--warn-100);
-  color: var(--warn-700);
+  border-top: 1px solid var(--escalate-100);
+  color: var(--escalate-700);
   font-size: var(--fs-sm);
+  line-height: 1.6;
 }
 .absText {
   color: var(--ink-600);
@@ -54,18 +52,16 @@
   top: calc(var(--header-h) + var(--s-4));
   display: flex;
   flex-direction: column;
-  gap: var(--s-4);
+  gap: var(--s-5);
 }
 .railBlock {
-  padding: var(--s-4);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--surface);
+  padding-top: var(--s-3);
+  border-top: 2px solid var(--rule-strong);
 }
 .railTitle {
   margin-bottom: var(--s-3);
   font-size: var(--fs-xs);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-500);
@@ -95,10 +91,11 @@
   gap: var(--s-3);
   margin-bottom: var(--s-4);
   padding: var(--s-4);
-  border: 1px solid var(--warn-100);
+  border: 1px solid var(--escalate-100);
+  border-left: 3px solid var(--escalate-500);
   border-radius: var(--r-md);
-  background: var(--warn-50);
-  color: var(--warn-700);
+  background: var(--escalate-50);
+  color: var(--escalate-700);
   font-size: var(--fs-sm);
 }
 .mismatch p {
@@ -110,7 +107,7 @@
   margin-top: var(--s-4);
 }
 .newQuery {
-  margin: var(--s-6) 0 var(--s-4);
+  margin: var(--s-7) 0 var(--s-4);
 }
 
 @media (max-width: 860px) {
