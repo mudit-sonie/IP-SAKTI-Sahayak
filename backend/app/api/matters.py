@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import PlainTextResponse
 
 from app.config import get_settings
 from app.schemas import (
@@ -80,6 +81,23 @@ def ask_in_matter(matter_id: str, req: MatterQuestionRequest) -> MatterQuestionR
     except KeyError:
         raise HTTPException(status_code=404, detail="matter not found")
     return MatterQuestionResponse(matter=matter, question=question, result=result)
+
+
+@router.get(
+    "/{matter_id}/questions/{question_id}/export",
+    response_class=PlainTextResponse,
+)
+def export_question(matter_id: str, question_id: str) -> PlainTextResponse:
+    _require_enabled()
+    try:
+        fname, md = matters.export_question_markdown(matter_id, question_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter or question not found")
+    return PlainTextResponse(
+        md,
+        media_type="text/markdown",
+        headers={"Content-Disposition": f'attachment; filename="{fname}"'},
+    )
 
 
 @router.post("/{matter_id}/checklist", response_model=Matter)

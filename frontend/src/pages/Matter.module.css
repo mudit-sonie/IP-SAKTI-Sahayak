@@ -150,6 +150,41 @@
   gap: var(--s-2);
   margin-top: var(--s-4);
 }
+.export {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--s-3);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-500);
+}
+.export:hover {
+  color: var(--accent-700);
+}
+
+.audit {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+.auditItem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  padding: var(--s-2) 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--fs-sm);
+}
+.auditWhen {
+  color: var(--ink-400);
+  font-variant-numeric: tabular-nums;
+  min-width: 150px;
+}
+.auditWhat {
+  color: var(--ink-700);
+}
 
 .rail {
   position: sticky;

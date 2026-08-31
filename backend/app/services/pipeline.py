@@ -13,11 +13,13 @@ from app.retrieval import get_retriever
 from app.retrieval.expansion import expand_query
 from app.schemas import (
     AnswerStatus,
+    Confidence,
     QueryRequest,
     QueryResponse,
     RetrievalInfo,
+    SelfConfidence,
 )
-from app.services import abs_helper, confidence, generation, query_cache
+from app.services import abs_helper, confidence, generation, query_cache, safety
 from app.services.jurisdiction import mismatch_note
 
 logger = get_logger(__name__)
@@ -58,6 +60,22 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
             if rc.chunk.section
         ],
     )
+
+    # High-stakes questions (FTO / infringement / "is my product legal") never
+    # get a retrieval answer, however good the retrieval looks — they escalate.
+    if safety.is_high_stakes(req.query):
+        logger.info("high-stakes question — forced escalate: %r", req.query)
+        return QueryResponse(
+            answer=safety.ESCALATE_NOTE,
+            citations=[],
+            confidence=Confidence(
+                retrieval_score=top_score,
+                self_confidence=SelfConfidence.low,
+                status=AnswerStatus.escalate,
+            ),
+            jurisdiction_note=mismatch_note(req.query, req.jurisdiction.value),
+            retrieval=retrieval_info,
+        )
 
     gen = generation.generate(req.query, chunks)
     conf = confidence.score(

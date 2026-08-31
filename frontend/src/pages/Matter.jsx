@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { matters as mattersApi } from "../api/client";
+import { matters as mattersApi, BASE_URL } from "../api/client";
 import AppShell from "../components/AppShell";
 import Button from "../components/Button";
 import Badge from "../components/Badge";
@@ -181,7 +181,32 @@ export default function Matter() {
                 {matter.checklist.filter((c) => c.status !== "done").length}
               </span>
             </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "activity"}
+              className={tab === "activity" ? styles.tabOn : styles.tab}
+              onClick={() => setTab("activity")}
+            >
+              Activity
+            </button>
           </div>
+
+          {tab === "activity" && (
+            <ol className={styles.audit}>
+              {[...matter.audit].reverse().map((a, i) => (
+                <li key={i} className={styles.auditItem}>
+                  <span className={styles.auditWhen}>
+                    {new Date(a.at).toLocaleString()}
+                  </span>
+                  <span className={styles.auditWhat}>
+                    <span className="mono">{a.action}</span>
+                    {a.detail ? ` — ${a.detail}` : ""}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )}
 
           {tab === "checklist" && (
             <Checklist
@@ -237,6 +262,15 @@ export default function Matter() {
                   </span>
                 </div>
                 <p className={styles.a}>{q.answer}</p>
+                <a
+                  className={styles.export}
+                  href={`${BASE_URL}/matters/${id}/questions/${q.id}/export`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <Icon name="external" size={12} />
+                  Export for records (.md)
+                </a>
                 {q.citations.length > 0 && (
                   <div className={styles.cites}>
                     {q.citations.map((c, i) => (
