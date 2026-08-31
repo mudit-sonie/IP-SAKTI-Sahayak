@@ -38,8 +38,8 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
 ### Foundation
 - [x] **S0 — store layer**: `app/store/json_store.py` (atomic + locked), config
       (`DATA_DIR`, `*_enabled`), `MatterRepo`.
-- [ ] **S1 — matters**: `Matter` aggregate, CRUD API (`/matters`), Matters list
-      + Matter detail screens, thread classify→ask→result into a matter.
+- [x] **S1 — matters**: `Matter` aggregate, CRUD API (`/matters`), Matters list
+      + Matter detail screens, "Save as a matter" from the classifier.
 
 ### Grounding moat (near-term)
 - [ ] **S2 — per-claim citations**: generation returns `claims[]` with inline
@@ -56,9 +56,9 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       `as_of`; Result shows "as of <date>" and a stale-provision warning.
 
 ### Workflow layer (retention)
-- [ ] **S7 — compliance checklist**: rule-driven generator keyed on category +
-      jurisdiction + ABS flag; tracked items with status + citations; on the
-      Matter screen.
+- [x] **S7 — compliance checklist**: rule-driven generator keyed on category +
+      jurisdiction + ABS flag; tracked items with status + real citations
+      (retrieval-grounded, score-gated); Checklist tab on the Matter screen.
 - [ ] **S8 — cited document drafts**: templates (Form 1 skeleton, NBA ABS
       application, disclosure-of-source, §3(p) rebuttal); filled from the matter;
       every clause traceable to a section.
@@ -83,13 +83,14 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       `/analytics` summary (no PII); a lightweight dashboard.
 
 ### Trust & safety (non-negotiable before public)
-- [ ] **S17 — FTO / infringement always-escalate**: a classifier for
-      high-stakes question types that forces `status: escalate` regardless of
-      retrieval score.
-- [ ] **S18 — answer export**: timestamped PDF of an answer with citations, for
-      the user's filing records.
-- [ ] **S19 — audit log**: append-only trail per matter (every question, answer,
-      status, checklist change, draft render).
+- [x] **S17 — FTO / infringement always-escalate**: `services/safety.py` forces
+      `status: escalate` in the pipeline before generation for high-stakes
+      question types, regardless of retrieval score.
+- [x] **S18 — answer export**: timestamped Markdown of an answer with citations
+      + source URLs, as a file download (`GET .../questions/{qid}/export`).
+      PDF rendering can layer on later.
+- [x] **S19 — audit log**: append-only trail per matter, surfaced on the
+      Activity tab.
 
 ## Non-goals for this branch
 
