@@ -68,7 +68,7 @@
 }
 .solid.warn {
   background: var(--escalate-500);
-  color: #fff;
+  color: #26190a;
 }
 .solid.danger {
   background: var(--flag-500);
