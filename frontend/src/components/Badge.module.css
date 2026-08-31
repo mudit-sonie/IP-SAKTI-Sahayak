@@ -1,46 +1,80 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 11px;
-  border-radius: var(--r-pill);
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
   font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
   white-space: nowrap;
 }
+.badge svg {
+  margin-left: -1px;
+}
 
+.mono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+/* soft */
 .soft.accent {
-  background: var(--accent-100);
+  background: var(--accent-50);
   color: var(--accent-700);
+  border-color: var(--accent-100);
 }
 .soft.warn {
-  background: var(--warn-50);
-  color: var(--warn-700);
+  background: var(--escalate-50);
+  color: var(--escalate-700);
+  border-color: var(--escalate-100);
 }
 .soft.danger {
-  background: var(--danger-50);
-  color: var(--danger-700);
+  background: var(--flag-50);
+  color: var(--flag-700);
+  border-color: var(--flag-100);
+}
+.soft.info {
+  background: var(--info-50);
+  color: var(--info-700);
 }
 .soft.neutral {
   background: var(--surface-sunken);
   color: var(--ink-600);
+  border-color: var(--rule);
 }
 
+/* outline */
+.outline {
+  background: transparent;
+}
+.outline.accent {
+  color: var(--accent-700);
+  border-color: var(--accent-500);
+}
+.outline.neutral {
+  color: var(--ink-600);
+  border-color: var(--rule-strong);
+}
+
+/* solid */
 .solid.accent {
   background: var(--accent-700);
-  color: #fff;
+  color: var(--on-accent);
 }
 .solid.warn {
-  background: var(--warn-500);
+  background: var(--escalate-500);
   color: #fff;
 }
 .solid.danger {
-  background: var(--danger-500);
+  background: var(--flag-500);
   color: #fff;
 }
 .solid.neutral {
   background: var(--ink-600);
-  color: #fff;
+  color: var(--surface);
 }

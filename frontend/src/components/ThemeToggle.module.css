@@ -1,0 +1,19 @@
+.toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-600);
+  cursor: pointer;
+  transition:
+    color var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease);
+}
+.toggle:hover {
+  color: var(--accent-700);
+  border-color: var(--accent-500);
+}

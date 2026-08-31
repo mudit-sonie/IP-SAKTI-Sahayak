@@ -2,20 +2,25 @@
   margin-bottom: var(--s-6);
 }
 .eyebrow {
+  display: inline-flex;
   margin-bottom: var(--s-3);
-  color: var(--accent-700);
+  padding-bottom: var(--s-2);
+  border-bottom: 2px solid var(--accent-500);
+  color: var(--ink-600);
+  font-family: var(--font-mono);
   font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .title {
   font-size: clamp(var(--fs-2xl), 4vw, var(--fs-3xl));
-  font-weight: 700;
+  font-weight: 500;
 }
 .sub {
-  margin-top: var(--s-3);
+  margin-top: var(--s-4);
   max-width: 60ch;
-  color: var(--ink-500);
+  color: var(--ink-600);
   font-size: var(--fs-lg);
+  line-height: 1.6;
 }
