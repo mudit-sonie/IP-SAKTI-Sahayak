@@ -3,9 +3,9 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--s-2);
-  margin-top: var(--s-4);
+  margin-top: var(--s-5);
   padding-top: var(--s-4);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--rule);
 }
 .label {
   font-size: var(--fs-sm);
@@ -13,24 +13,28 @@
   margin-right: var(--s-1);
 }
 .thumb {
+  display: grid;
+  place-items: center;
   width: 34px;
   height: 34px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-sm);
   background: var(--surface);
+  color: var(--ink-600);
   cursor: pointer;
-  font-size: 15px;
-  line-height: 1;
   transition:
-    border-color 0.15s var(--ease),
-    background 0.15s var(--ease);
+    border-color var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
 }
 .thumb:hover {
   border-color: var(--accent-500);
+  color: var(--accent-700);
 }
 .thumb.on {
   border-color: var(--accent-600);
   background: var(--accent-50);
+  color: var(--accent-700);
 }
 .noteRow {
   display: flex;
@@ -41,19 +45,22 @@
 .note {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface-sunken);
   font: inherit;
   font-size: var(--fs-sm);
+  color: var(--ink-900);
 }
 .note:focus {
   outline: none;
   border-color: var(--accent-500);
+  background: var(--surface);
 }
 .thanks {
-  margin-top: var(--s-4);
+  margin-top: var(--s-5);
   padding-top: var(--s-4);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--rule);
   font-size: var(--fs-sm);
   color: var(--accent-700);
 }

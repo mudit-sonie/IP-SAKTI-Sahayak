@@ -3,8 +3,7 @@
   gap: var(--s-3);
   width: 100%;
   padding: var(--s-3) var(--s-4);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent-500);
+  border: 1px solid var(--rule);
   border-radius: var(--r-md);
   background: var(--surface);
   text-align: left;
@@ -13,12 +12,12 @@
 .clickable {
   cursor: pointer;
   transition:
-    border-color 0.15s var(--ease),
-    box-shadow 0.15s var(--ease);
+    border-color var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease);
 }
 .clickable:hover {
   border-color: var(--accent-500);
-  box-shadow: var(--shadow-sm);
+  background: var(--accent-50);
 }
 .num {
   flex: none;
@@ -26,11 +25,12 @@
   place-items: center;
   width: 22px;
   height: 22px;
-  border-radius: var(--r-pill);
-  background: var(--accent-100);
-  color: var(--accent-700);
+  border-radius: var(--r-sm);
+  background: var(--surface-sunken);
+  color: var(--ink-600);
+  font-family: var(--font-mono);
   font-size: var(--fs-xs);
-  font-weight: 800;
+  font-weight: 600;
 }
 .body {
   min-width: 0;
@@ -38,7 +38,9 @@
 }
 .section {
   display: block;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: 500;
   color: var(--ink-900);
 }
 .source {
@@ -50,15 +52,18 @@
 .links {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--s-3);
   margin-top: var(--s-2);
 }
-.view {
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  color: var(--accent-700);
-}
+.view,
 .ext {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: var(--fs-xs);
   font-weight: 600;
+}
+.view {
+  color: var(--accent-700);
 }

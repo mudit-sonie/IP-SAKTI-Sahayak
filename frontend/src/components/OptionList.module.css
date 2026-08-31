@@ -8,7 +8,7 @@
   align-items: center;
   gap: var(--s-3);
   padding: var(--s-4);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--rule-strong);
   border-radius: var(--r-md);
   background: var(--surface);
   color: var(--ink-800);
@@ -16,8 +16,8 @@
   font: inherit;
   cursor: pointer;
   transition:
-    border-color 0.15s var(--ease),
-    background 0.15s var(--ease);
+    border-color var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease);
 }
 .option:hover {
   border-color: var(--accent-500);
@@ -27,8 +27,8 @@
   width: 18px;
   height: 18px;
   border-radius: var(--r-pill);
-  border: 2px solid var(--border-strong);
-  transition: border-color 0.15s var(--ease);
+  border: 2px solid var(--rule-strong);
+  transition: border-color var(--dur-1) var(--ease);
 }
 .selected {
   border-color: var(--accent-600);
@@ -38,6 +38,9 @@
 }
 .selected .dot {
   border-color: var(--accent-600);
-  background:
-    radial-gradient(circle at center, var(--accent-600) 0 5px, transparent 6px);
+  background: radial-gradient(
+    circle at center,
+    var(--accent-600) 0 5px,
+    transparent 6px
+  );
 }

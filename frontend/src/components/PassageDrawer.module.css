@@ -2,10 +2,10 @@
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(18, 33, 27, 0.35);
+  background: var(--overlay);
   display: flex;
   justify-content: flex-end;
-  animation: fade 0.15s var(--ease);
+  animation: fade var(--dur-2) var(--ease);
 }
 @keyframes fade {
   from {
@@ -13,17 +13,19 @@
   }
 }
 .panel {
-  width: min(520px, 100%);
+  width: min(540px, 100%);
   height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--surface);
+  border-left: 1px solid var(--rule-strong);
   box-shadow: var(--shadow-lg);
-  animation: slide 0.2s var(--ease);
+  animation: slide var(--dur-3) var(--ease);
 }
 @keyframes slide {
   from {
-    transform: translateX(24px);
+    transform: translateX(32px);
+    opacity: 0;
   }
 }
 
@@ -33,29 +35,33 @@
   justify-content: space-between;
   gap: var(--s-3);
   padding: var(--s-5);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--rule);
 }
 .src {
   color: var(--ink-500);
   font-size: var(--fs-sm);
 }
 .heading {
-  margin-top: 2px;
-  font-size: var(--fs-xl);
+  margin-top: var(--s-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-lg);
+  font-weight: 500;
 }
 .close {
   flex: none;
+  display: grid;
+  place-items: center;
   width: 32px;
   height: 32px;
-  border: none;
-  border-radius: var(--r-pill);
-  background: var(--surface-sunken);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  background: var(--surface);
   color: var(--ink-600);
   cursor: pointer;
-  font-size: 14px;
 }
 .close:hover {
-  background: var(--border);
+  border-color: var(--rule-strong);
+  color: var(--ink-900);
 }
 
 .body {
@@ -65,7 +71,7 @@
 }
 .text {
   white-space: pre-wrap;
-  line-height: 1.75;
+  line-height: 1.8;
   color: var(--ink-800);
   font-size: var(--fs-base);
 }
@@ -79,7 +85,7 @@
   justify-content: space-between;
   gap: var(--s-3);
   padding: var(--s-4) var(--s-5);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--rule);
   background: var(--surface-sunken);
 }
 .verbatim {
@@ -87,6 +93,9 @@
   color: var(--ink-500);
 }
 .link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: var(--fs-sm);
   font-weight: 600;
   white-space: nowrap;

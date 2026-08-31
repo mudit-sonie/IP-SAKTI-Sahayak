@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { sendFeedback } from "../api/client";
 import Button from "./Button";
+import Icon from "./Icon";
 import styles from "./FeedbackWidget.module.css";
 
 /** meta: { query, jurisdiction, formulationCategory, answerStatus, citedSections } */
@@ -47,7 +48,7 @@ export default function FeedbackWidget({ meta }) {
           submit("up", false);
         }}
       >
-        👍
+        <Icon name="thumbUp" size={16} />
       </button>
       <button
         type="button"
@@ -56,7 +57,7 @@ export default function FeedbackWidget({ meta }) {
         disabled={busy}
         onClick={() => setRating("down")}
       >
-        👎
+        <Icon name="thumbDown" size={16} />
       </button>
 
       {rating === "down" && (

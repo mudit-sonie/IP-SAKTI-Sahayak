@@ -1,3 +1,4 @@
+import Icon from "./Icon";
 import styles from "./CitationCard.module.css";
 
 /** citation: { source, section, excerpt_ref, source_url }; onView?: () => void */
@@ -20,7 +21,11 @@ export default function CitationCard({ citation, index, onView }) {
         <span className={styles.section}>{label}</span>
         <span className={styles.source}>{source}</span>
         <span className={styles.links}>
-          {clickable && <span className={styles.view}>View passage →</span>}
+          {clickable && (
+            <span className={styles.view}>
+              View passage <Icon name="arrowRight" size={13} />
+            </span>
+          )}
           {source_url && (
             <a
               href={source_url}
@@ -29,7 +34,7 @@ export default function CitationCard({ citation, index, onView }) {
               className={styles.ext}
               onClick={(e) => e.stopPropagation()}
             >
-              India Code ↗
+              Official source <Icon name="external" size={12} />
             </a>
           )}
         </span>

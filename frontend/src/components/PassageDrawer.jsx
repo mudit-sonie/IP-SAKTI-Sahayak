@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getChunk } from "../api/client";
+import Icon from "./Icon";
 import styles from "./PassageDrawer.module.css";
 
 /**
@@ -59,7 +60,7 @@ export default function PassageDrawer({ citation, onClose }) {
             <h3 className={styles.heading}>{heading}</h3>
           </div>
           <button className={styles.close} onClick={onClose} aria-label="Close">
-            ✕
+            <Icon name="close" size={16} />
           </button>
         </header>
 
@@ -80,7 +81,7 @@ export default function PassageDrawer({ citation, onClose }) {
               target="_blank"
               rel="noreferrer noopener"
             >
-              Open official source ↗
+              Open official source <Icon name="external" size={13} />
             </a>
           )}
         </footer>

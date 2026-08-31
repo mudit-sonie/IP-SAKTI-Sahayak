@@ -1,10 +1,13 @@
 .wrap {
-  border: 1px solid var(--border);
+  border: 1px solid var(--rule);
   border-radius: var(--r-md);
-  background: var(--surface);
+  background: var(--surface-sunken);
   font-size: var(--fs-sm);
 }
 .summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
   padding: var(--s-3) var(--s-4);
   cursor: pointer;
   color: var(--ink-600);
@@ -14,28 +17,27 @@
 .summary::-webkit-details-marker {
   display: none;
 }
-.summary::before {
-  content: "▸";
-  margin-right: var(--s-2);
+.chev {
   color: var(--ink-400);
+  transition: transform var(--dur-1) var(--ease);
 }
-.wrap[open] .summary::before {
-  content: "▾";
+.wrap[open] .chev {
+  transform: rotate(90deg);
 }
 .body {
   padding: 0 var(--s-4) var(--s-4);
   display: flex;
   flex-direction: column;
-  gap: var(--s-3);
+  gap: var(--s-4);
 }
 .group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--s-1);
 }
 .k {
   font-size: var(--fs-xs);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-400);
@@ -48,5 +50,5 @@
   margin: 0;
   padding-left: 1.1rem;
   color: var(--ink-600);
-  line-height: 1.6;
+  line-height: 1.7;
 }

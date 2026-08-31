@@ -1,8 +1,9 @@
 .wrap {
   padding: var(--s-5);
-  border: 1px solid var(--border);
+  border: 1px solid var(--rule-strong);
   border-radius: var(--r-lg);
   background: var(--surface);
+  animation: rise var(--dur-3) var(--ease);
 }
 .head {
   display: flex;
@@ -29,7 +30,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.6),
+    var(--shimmer),
     transparent
   );
   animation: shimmer 1.4s infinite;

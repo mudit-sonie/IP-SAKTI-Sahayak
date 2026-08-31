@@ -9,19 +9,20 @@
 }
 .label {
   font-size: var(--fs-xs);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--ink-500);
 }
 .value {
+  font-family: var(--font-mono);
   font-size: var(--fs-lg);
-  font-weight: 700;
+  font-weight: 500;
   color: var(--ink-900);
   font-variant-numeric: tabular-nums;
 }
 .track {
-  margin-top: 6px;
+  margin-top: var(--s-2);
   height: 6px;
   border-radius: var(--r-pill);
   background: var(--surface-sunken);
@@ -30,16 +31,16 @@
 .fill {
   height: 100%;
   border-radius: inherit;
-  transition: width 0.5s var(--ease);
+  transition: width var(--dur-3) var(--ease);
 }
 .ok {
   background: var(--accent-500);
 }
 .weak {
-  background: var(--warn-500);
+  background: var(--escalate-500);
 }
 .meta {
-  margin-top: 8px;
+  margin-top: var(--s-2);
   font-size: var(--fs-xs);
   color: var(--ink-500);
 }

@@ -1,3 +1,4 @@
+import Icon from "./Icon";
 import styles from "./RetrievalDetails.module.css";
 
 /** info: QueryResponse.retrieval */
@@ -14,7 +15,9 @@ export default function RetrievalDetails({ info }) {
   return (
     <details className={styles.wrap}>
       <summary className={styles.summary}>
-        Searched {passages_searched} passages across {sources_searched.length}{" "}
+        <Icon name="chevron" size={14} className={styles.chev} />
+        Searched <span className="mono">{passages_searched}</span> passages across{" "}
+        <span className="mono">{sources_searched.length}</span>{" "}
         {jurisdiction === "international" ? "instruments" : "Acts"}
       </summary>
       <div className={styles.body}>
