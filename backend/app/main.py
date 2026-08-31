@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
+from app.api.matters import router as matters_router
 from app.api.routes import router
 from app.config import get_settings
 from app.core.logging import configure_logging, get_logger
@@ -44,6 +45,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(router)
+    app.include_router(matters_router)
 
     @app.get("/")
     def root() -> dict:

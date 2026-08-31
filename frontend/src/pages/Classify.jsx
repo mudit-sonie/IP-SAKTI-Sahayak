@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { classify } from "../api/client";
+import { classify, matters as mattersApi } from "../api/client";
 import AppShell from "../components/AppShell";
 import PageIntro from "../components/PageIntro";
 import StepIndicator from "../components/StepIndicator";
@@ -46,7 +46,27 @@ export default function Classify() {
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [saving, setSaving] = useState(false);
   const history = useRef([]);
+
+  async function saveAsMatter() {
+    if (saving) return;
+    setSaving(true);
+    try {
+      const label = CATEGORY_LABELS[category] || category;
+      const m = await mattersApi.create({
+        title: label,
+        jurisdiction,
+        formulation_category: category,
+        formulation_label: label,
+        classification_rationale: rationale,
+      });
+      navigate(`/matters/${m.id}`);
+    } catch (err) {
+      setError(err.message || "Could not save the matter.");
+      setSaving(false);
+    }
+  }
 
   const advance = useCallback(async (nextAnswers) => {
     setLoading(true);
@@ -156,6 +176,9 @@ export default function Classify() {
           <div className={styles.actions}>
             <Button variant="secondary" onClick={restart}>
               Start again
+            </Button>
+            <Button variant="secondary" onClick={saveAsMatter} disabled={saving}>
+              {saving ? "Saving…" : "Save as a matter"}
             </Button>
             <Button
               onClick={() =>

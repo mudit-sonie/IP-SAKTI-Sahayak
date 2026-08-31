@@ -89,4 +89,51 @@ export function sendFeedback(payload, opts) {
   return postJson("/feedback", payload, opts);
 }
 
+// --------------------------------------------------------------------------- //
+// Matters — the persistent workspace (see PRODUCT_ROADMAP.md)
+// --------------------------------------------------------------------------- //
+async function reqJson(path, { method = "GET", body, signal } = {}) {
+  let res;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      method,
+      headers: body ? { "Content-Type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+      signal,
+    });
+  } catch (err) {
+    if (err.name === "AbortError") throw err;
+    throw new ApiError(
+      `Could not reach the IP-SAKTI backend at ${BASE_URL}. Is it running?`,
+      { cause: err },
+    );
+  }
+  if (res.status === 204) return null;
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new ApiError(
+      `Backend returned ${res.status}${detail ? `: ${detail.slice(0, 300)}` : ""}`,
+      { status: res.status },
+    );
+  }
+  return res.json();
+}
+
+export const matters = {
+  list: (opts) => reqJson("/matters", opts),
+  get: (id, opts) => reqJson(`/matters/${id}`, opts),
+  create: (payload, opts) =>
+    reqJson("/matters", { method: "POST", body: payload, ...opts }),
+  update: (id, payload, opts) =>
+    reqJson(`/matters/${id}`, { method: "PATCH", body: payload, ...opts }),
+  remove: (id, opts) =>
+    reqJson(`/matters/${id}`, { method: "DELETE", ...opts }),
+  ask: (id, payload, opts) =>
+    reqJson(`/matters/${id}/questions`, {
+      method: "POST",
+      body: payload,
+      ...opts,
+    }),
+};
+
 export { BASE_URL };

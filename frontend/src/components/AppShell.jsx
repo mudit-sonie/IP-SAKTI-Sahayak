@@ -22,9 +22,14 @@ export default function AppShell({ context, width = "narrow", children }) {
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
-        <Link to="/" className={styles.brand}>
-          IP&#8209;SAKTI <span>Sahayak</span>
-        </Link>
+        <div className={styles.left}>
+          <Link to="/" className={styles.brand}>
+            IP&#8209;SAKTI <span>Sahayak</span>
+          </Link>
+          <Link to="/matters" className={styles.navLink}>
+            Matters
+          </Link>
+        </div>
 
         <div className={styles.right}>
           {context ? (

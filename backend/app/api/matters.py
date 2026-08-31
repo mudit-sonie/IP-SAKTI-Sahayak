@@ -1,0 +1,80 @@
+"""Routes for the matter workspace (PRODUCT_ROADMAP.md).
+
+    POST   /matters                 create
+    GET    /matters                 list summaries
+    GET    /matters/{id}            full aggregate
+    PATCH  /matters/{id}            update profile fields
+    DELETE /matters/{id}            remove
+    POST   /matters/{id}/questions  run a grounded question, record it on the matter
+"""
+from __future__ import annotations
+
+from fastapi import APIRouter, HTTPException
+
+from app.config import get_settings
+from app.schemas import (
+    Matter,
+    MatterCreateRequest,
+    MatterQuestionRequest,
+    MatterQuestionResponse,
+    MatterSummary,
+    MatterUpdateRequest,
+)
+from app.services import matters
+from app.store.repos import get_matter_repo
+
+router = APIRouter(prefix="/matters", tags=["matters"])
+
+
+def _require_enabled() -> None:
+    if not get_settings().matters_enabled:
+        raise HTTPException(status_code=404, detail="matters are disabled")
+
+
+@router.post("", response_model=Matter, status_code=201)
+def create_matter(req: MatterCreateRequest) -> Matter:
+    _require_enabled()
+    return matters.create(req)
+
+
+@router.get("", response_model=list[MatterSummary])
+def list_matters() -> list[MatterSummary]:
+    _require_enabled()
+    return get_matter_repo().list_summaries(owner=get_settings().local_owner)
+
+
+@router.get("/{matter_id}", response_model=Matter)
+def get_matter(matter_id: str) -> Matter:
+    _require_enabled()
+    matter = get_matter_repo().get(matter_id)
+    if matter is None:
+        raise HTTPException(status_code=404, detail="matter not found")
+    return matter
+
+
+@router.patch("/{matter_id}", response_model=Matter)
+def update_matter(matter_id: str, req: MatterUpdateRequest) -> Matter:
+    _require_enabled()
+    try:
+        return matters.update(matter_id, req)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter not found")
+
+
+@router.delete("/{matter_id}", status_code=204)
+def delete_matter(matter_id: str) -> None:
+    _require_enabled()
+    if not matters.delete(matter_id):
+        raise HTTPException(status_code=404, detail="matter not found")
+
+
+@router.post("/{matter_id}/questions", response_model=MatterQuestionResponse)
+def ask_in_matter(matter_id: str, req: MatterQuestionRequest) -> MatterQuestionResponse:
+    _require_enabled()
+    if not req.query.strip():
+        raise HTTPException(status_code=422, detail="query must not be empty")
+    try:
+        matter, question, result = matters.ask(matter_id, req)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter not found")
+    return MatterQuestionResponse(matter=matter, question=question, result=result)

@@ -147,3 +147,128 @@ class FeedbackRequest(BaseModel):
 
 class FeedbackResponse(BaseModel):
     ok: bool = True
+
+
+# --------------------------------------------------------------------------- #
+# Matters — the persistent workspace layer (PRODUCT_ROADMAP.md)
+# --------------------------------------------------------------------------- #
+class AbsStatus(str, Enum):
+    unknown = "unknown"
+    flagged = "flagged"
+    clear = "clear"
+
+
+class ChecklistStatus(str, Enum):
+    todo = "todo"
+    in_progress = "in_progress"
+    done = "done"
+    not_applicable = "not_applicable"
+
+
+class MatterQuestion(BaseModel):
+    """One query run inside a matter, with its grounded answer frozen in."""
+
+    id: str
+    query: str
+    jurisdiction: Jurisdiction = Jurisdiction.india
+    formulation_category: Optional[str] = None
+    asked_at: str
+    answer: str = ""
+    status: AnswerStatus = AnswerStatus.escalate
+    self_confidence: SelfConfidence = SelfConfidence.low
+    retrieval_score: float = 0.0
+    citations: list[Citation] = Field(default_factory=list)
+    abs_flag: bool = False
+
+
+class ChecklistItem(BaseModel):
+    id: str
+    title: str
+    detail: Optional[str] = None
+    group: Optional[str] = None  # "Licensing" | "ABS" | "Labelling" | ...
+    status: ChecklistStatus = ChecklistStatus.todo
+    citations: list[Citation] = Field(default_factory=list)
+    source_rule: Optional[str] = None  # which generator rule produced this
+
+
+class Deadline(BaseModel):
+    id: str
+    title: str
+    due_date: str  # ISO date
+    kind: str = "manual"  # "manual" | "derived"
+    detail: Optional[str] = None
+    done: bool = False
+
+
+class DraftRef(BaseModel):
+    id: str
+    kind: str  # "form1" | "nba_abs" | "disclosure_of_source" | "s3p_rebuttal"
+    title: str
+    created_at: str
+    rel_path: Optional[str] = None  # under data/drafts/
+
+
+class AuditEntry(BaseModel):
+    at: str
+    action: str
+    detail: Optional[str] = None
+
+
+class Matter(BaseModel):
+    id: str
+    owner: str = "local"
+    title: str
+    created_at: str
+    updated_at: str
+    jurisdiction: Jurisdiction = Jurisdiction.india
+    formulation_category: Optional[str] = None
+    formulation_label: Optional[str] = None
+    classification_rationale: list[str] = Field(default_factory=list)
+    abs_status: AbsStatus = AbsStatus.unknown
+    notes: Optional[str] = None
+    questions: list[MatterQuestion] = Field(default_factory=list)
+    checklist: list[ChecklistItem] = Field(default_factory=list)
+    deadlines: list[Deadline] = Field(default_factory=list)
+    drafts: list[DraftRef] = Field(default_factory=list)
+    audit: list[AuditEntry] = Field(default_factory=list)
+
+
+class MatterSummary(BaseModel):
+    id: str
+    title: str
+    jurisdiction: Jurisdiction
+    formulation_label: Optional[str] = None
+    abs_status: AbsStatus = AbsStatus.unknown
+    question_count: int = 0
+    open_checklist_items: int = 0
+    updated_at: str
+
+
+class MatterCreateRequest(BaseModel):
+    title: str
+    jurisdiction: Jurisdiction = Jurisdiction.india
+    formulation_category: Optional[str] = None
+    formulation_label: Optional[str] = None
+    classification_rationale: list[str] = Field(default_factory=list)
+    notes: Optional[str] = None
+
+
+class MatterUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    jurisdiction: Optional[Jurisdiction] = None
+    formulation_category: Optional[str] = None
+    formulation_label: Optional[str] = None
+    notes: Optional[str] = None
+
+
+class MatterQuestionRequest(BaseModel):
+    query: str
+    # falls back to the matter's own jurisdiction / category when omitted
+    jurisdiction: Optional[Jurisdiction] = None
+    formulation_category: Optional[str] = None
+
+
+class MatterQuestionResponse(BaseModel):
+    matter: Matter
+    question: MatterQuestion
+    result: QueryResponse

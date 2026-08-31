@@ -48,6 +48,15 @@ class Settings(BaseSettings):
         default="./data/cache/query", alias="QUERY_CACHE_DIR"
     )
 
+    # --- Workspace persistence (JSON documents on disk — see PRODUCT_ROADMAP.md) ---
+    # Root for the matter / escalation / faq stores. One JSON file per aggregate,
+    # written atomically. No DB by design: the app must run on any laptop.
+    data_dir: str = Field(default="./data", alias="DATA_DIR")
+    matters_enabled: bool = Field(default=True, alias="MATTERS_ENABLED")
+    # Local single-user mode: every record is stamped with this owner id. When
+    # real auth arrives it becomes the authenticated user id.
+    local_owner: str = Field(default="local", alias="LOCAL_OWNER")
+
     # --- App ---
     app_env: str = Field(default="dev", alias="APP_ENV")
     cors_origins: str = Field(

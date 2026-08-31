@@ -1,0 +1,87 @@
+.create {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  align-items: center;
+  margin-bottom: var(--s-6);
+  padding: var(--s-4);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.titleInput {
+  flex: 1;
+  min-width: 240px;
+  padding: 10px var(--s-4);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-sunken);
+  font: inherit;
+  color: var(--ink-900);
+}
+.titleInput::placeholder {
+  color: var(--ink-400);
+}
+.titleInput:focus {
+  outline: none;
+  border-color: var(--accent-500);
+  background: var(--surface);
+}
+
+.error {
+  margin-bottom: var(--s-4);
+  color: var(--flag-700);
+  font-size: var(--fs-sm);
+}
+.empty {
+  color: var(--ink-500);
+  font-size: var(--fs-sm);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    border-color var(--dur-1) var(--ease),
+    background var(--dur-1) var(--ease);
+}
+a.card:hover {
+  border-color: var(--accent-500);
+  background: var(--accent-50);
+}
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+.cardTitle {
+  font-size: var(--fs-lg);
+  font-weight: 500;
+}
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: var(--fs-sm);
+  color: var(--ink-500);
+}
+.dot {
+  color: var(--ink-400);
+}
