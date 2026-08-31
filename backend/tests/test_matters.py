@@ -29,9 +29,13 @@ def client() -> TestClient:
     return TestClient(create_app())
 
 
+_captured = {}
+
+
 @pytest.fixture()
 def stub_pipeline(monkeypatch):
     def fake_run_query(req):
+        _captured["context"] = req.context
         return QueryResponse(
             answer=f"Grounded answer to: {req.query}",
             citations=[],
@@ -98,6 +102,34 @@ def test_ask_records_question_and_updates_abs_status(client, stub_pipeline):
 def test_ask_empty_query_422(client, stub_pipeline):
     mid = client.post("/matters", json={"title": "m"}).json()["id"]
     assert client.post(f"/matters/{mid}/questions", json={"query": "   "}).status_code == 422
+
+
+def test_profile_is_injected_as_question_context(client, stub_pipeline):
+    mid = client.post("/matters", json={"title": "m"}).json()["id"]
+    client.patch(
+        f"/matters/{mid}",
+        json={
+            "profile": {
+                "dosage_form": "churna",
+                "key_ingredients": ["amalaki", "haritaki"],
+                "intended_use": "digestive",
+            }
+        },
+    )
+    client.post(f"/matters/{mid}/questions", json={"query": "is this classical?"})
+    assert "churna" in _captured["context"]
+    assert "amalaki" in _captured["context"]
+
+
+def test_classifying_via_patch_generates_checklist(client, stub_checklist_grounding):
+    mid = client.post("/matters", json={"title": "m", "jurisdiction": "india"}).json()["id"]
+    assert client.get(f"/matters/{mid}").json()["checklist"] == []
+
+    r = client.patch(
+        f"/matters/{mid}",
+        json={"formulation_category": "classical", "formulation_label": "Classical"},
+    )
+    assert len(r.json()["checklist"]) > 0
 
 
 @pytest.fixture()

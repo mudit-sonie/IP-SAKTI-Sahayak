@@ -27,6 +27,7 @@ def _key(req: QueryRequest) -> str:
             (req.query or "").strip().lower(),
             req.jurisdiction.value,
             (req.formulation_category or "").strip().lower(),
+            (req.context or "").strip().lower(),
         ]
     )
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]

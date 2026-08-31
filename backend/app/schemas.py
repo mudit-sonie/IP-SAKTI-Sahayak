@@ -67,6 +67,10 @@ class QueryRequest(BaseModel):
     query: str
     jurisdiction: Jurisdiction = Jurisdiction.india
     formulation_category: Optional[str] = None
+    # Background on the specific product (from a matter's formulation profile).
+    # Used to inform generation only — never mixed into retrieval, and the
+    # answer must still come from the corpus passages.
+    context: Optional[str] = None
 
 
 class Citation(BaseModel):
@@ -158,6 +162,31 @@ class AbsStatus(str, Enum):
     clear = "clear"
 
 
+class MatterProfile(BaseModel):
+    """A short description of the actual product. Fed as background into every
+    question asked inside the matter (not into retrieval)."""
+
+    dosage_form: Optional[str] = None  # "tablet" | "churna" | "oil" | ...
+    key_ingredients: list[str] = Field(default_factory=list)
+    intended_use: Optional[str] = None  # what it's marketed / used for
+    process_novelty: Optional[str] = None  # new combination / extract / indication?
+    source_notes: Optional[str] = None  # biological-resource / origin details
+
+    def as_context(self) -> str:
+        parts: list[str] = []
+        if self.dosage_form:
+            parts.append(f"Dosage form: {self.dosage_form}.")
+        if self.key_ingredients:
+            parts.append("Key ingredients: " + ", ".join(self.key_ingredients) + ".")
+        if self.intended_use:
+            parts.append(f"Intended use / claims: {self.intended_use}.")
+        if self.process_novelty:
+            parts.append(f"Novelty: {self.process_novelty}.")
+        if self.source_notes:
+            parts.append(f"Biological source: {self.source_notes}.")
+        return " ".join(parts)
+
+
 class ChecklistStatus(str, Enum):
     todo = "todo"
     in_progress = "in_progress"
@@ -224,6 +253,7 @@ class Matter(BaseModel):
     formulation_category: Optional[str] = None
     formulation_label: Optional[str] = None
     classification_rationale: list[str] = Field(default_factory=list)
+    profile: MatterProfile = Field(default_factory=MatterProfile)
     abs_status: AbsStatus = AbsStatus.unknown
     notes: Optional[str] = None
     questions: list[MatterQuestion] = Field(default_factory=list)
@@ -250,6 +280,7 @@ class MatterCreateRequest(BaseModel):
     formulation_category: Optional[str] = None
     formulation_label: Optional[str] = None
     classification_rationale: list[str] = Field(default_factory=list)
+    profile: Optional[MatterProfile] = None
     notes: Optional[str] = None
 
 
@@ -258,6 +289,8 @@ class MatterUpdateRequest(BaseModel):
     jurisdiction: Optional[Jurisdiction] = None
     formulation_category: Optional[str] = None
     formulation_label: Optional[str] = None
+    classification_rationale: Optional[list[str]] = None
+    profile: Optional[MatterProfile] = None
     notes: Optional[str] = None
 
 

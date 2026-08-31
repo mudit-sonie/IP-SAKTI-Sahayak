@@ -77,7 +77,7 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
             retrieval=retrieval_info,
         )
 
-    gen = generation.generate(req.query, chunks)
+    gen = generation.generate(req.query, chunks, context=req.context)
     conf = confidence.score(
         top_score, gen.self_confidence, has_citations=bool(gen.citations)
     )

@@ -18,6 +18,7 @@ from app.schemas import (
     Jurisdiction,
     Matter,
     MatterCreateRequest,
+    MatterProfile,
     MatterQuestion,
     MatterQuestionRequest,
     MatterUpdateRequest,
@@ -52,6 +53,7 @@ def create(req: MatterCreateRequest) -> Matter:
         formulation_category=req.formulation_category,
         formulation_label=req.formulation_label,
         classification_rationale=req.classification_rationale,
+        profile=req.profile or MatterProfile(),
         notes=req.notes,
     )
     _audit(matter, "matter.created", matter.title)
@@ -66,12 +68,22 @@ def create(req: MatterCreateRequest) -> Matter:
 def update(matter_id: str, req: MatterUpdateRequest) -> Matter:
     repo = get_matter_repo()
     with repo.mutate(matter_id) as matter:
+        before_cat = matter.formulation_category
         for field in ("title", "jurisdiction", "formulation_category",
-                      "formulation_label", "notes"):
+                      "formulation_label", "classification_rationale",
+                      "profile", "notes"):
             val = getattr(req, field)
             if val is not None:
                 setattr(matter, field, val)
         _audit(matter, "matter.updated")
+        # A new / changed classification changes which checklist rules apply.
+        if matter.formulation_category and matter.formulation_category != before_cat:
+            matter.checklist = checklist_svc.generate(matter)
+            _audit(
+                matter,
+                "checklist.generated",
+                f"{len(matter.checklist)} items (classification changed)",
+            )
         return matter
 
 
@@ -95,11 +107,13 @@ def ask(matter_id: str, req: MatterQuestionRequest) -> tuple[Matter, MatterQuest
     with repo.mutate(matter_id) as matter:
         jurisdiction = req.jurisdiction or matter.jurisdiction
         category = req.formulation_category or matter.formulation_category
+        product_context = matter.profile.as_context()
 
     query_req = QueryRequest(
         query=req.query,
         jurisdiction=Jurisdiction(jurisdiction),
         formulation_category=category,
+        context=product_context or None,
     )
     result = pipeline.run_query(query_req)
 

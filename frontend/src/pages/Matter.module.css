@@ -53,9 +53,29 @@
   text-decoration: underline;
 }
 
+.classifyBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+  padding: var(--s-4);
+  border: 1px solid var(--escalate-100);
+  border-left: 3px solid var(--escalate-500);
+  border-radius: var(--r-md);
+  background: var(--escalate-50);
+  color: var(--escalate-700);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+.classifyBanner strong {
+  color: var(--ink-900);
+}
+
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: var(--s-6);
   align-items: start;
 }

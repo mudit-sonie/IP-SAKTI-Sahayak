@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { classify, matters as mattersApi } from "../api/client";
 import AppShell from "../components/AppShell";
 import PageIntro from "../components/PageIntro";
@@ -36,6 +36,8 @@ const CATEGORY_BLURB = {
 export default function Classify() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const matterId = searchParams.get("matter");
   const jurisdiction = location.state?.jurisdiction || "india";
 
   const [answers, setAnswers] = useState({});
@@ -54,14 +56,18 @@ export default function Classify() {
     setSaving(true);
     try {
       const label = CATEGORY_LABELS[category] || category;
-      const m = await mattersApi.create({
-        title: label,
-        jurisdiction,
+      const payload = {
         formulation_category: category,
         formulation_label: label,
         classification_rationale: rationale,
-      });
-      navigate(`/matters/${m.id}`);
+      };
+      if (matterId) {
+        await mattersApi.update(matterId, payload);
+        navigate(`/matters/${matterId}`);
+      } else {
+        const m = await mattersApi.create({ title: label, jurisdiction, ...payload });
+        navigate(`/matters/${m.id}`);
+      }
     } catch (err) {
       setError(err.message || "Could not save the matter.");
       setSaving(false);
@@ -177,23 +183,36 @@ export default function Classify() {
             <Button variant="secondary" onClick={restart}>
               Start again
             </Button>
-            <Button variant="secondary" onClick={saveAsMatter} disabled={saving}>
-              {saving ? "Saving…" : "Save as a matter"}
-            </Button>
-            <Button
-              onClick={() =>
-                navigate("/ask", {
-                  state: {
-                    jurisdiction,
-                    formulationCategory: category,
-                    formulationLabel: CATEGORY_LABELS[category] || category,
-                  },
-                })
-              }
-            >
-              Continue to ask a question
-              <Icon name="arrowRight" size={16} />
-            </Button>
+            {matterId ? (
+              <Button onClick={saveAsMatter} disabled={saving}>
+                {saving ? "Saving…" : "Save classification to matter"}
+                {!saving && <Icon name="arrowRight" size={16} />}
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="secondary"
+                  onClick={saveAsMatter}
+                  disabled={saving}
+                >
+                  {saving ? "Saving…" : "Save as a matter"}
+                </Button>
+                <Button
+                  onClick={() =>
+                    navigate("/ask", {
+                      state: {
+                        jurisdiction,
+                        formulationCategory: category,
+                        formulationLabel: CATEGORY_LABELS[category] || category,
+                      },
+                    })
+                  }
+                >
+                  Continue to ask a question
+                  <Icon name="arrowRight" size={16} />
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -69,7 +69,12 @@ def _escalation() -> Generation:
     return Generation(ESCALATE_ANSWER, [], SelfConfidence.low)
 
 
-def generate(query: str, chunks: list[RetrievedChunk]) -> Generation:
+def generate(
+    query: str,
+    chunks: list[RetrievedChunk],
+    *,
+    context: str | None = None,
+) -> Generation:
     if not chunks:
         return _escalation()
 
@@ -78,7 +83,16 @@ def generate(query: str, chunks: list[RetrievedChunk]) -> Generation:
         logger.warning("Gemini not configured; returning escalation stub")
         return _escalation()
 
+    background = ""
+    if context:
+        background = (
+            "Background on the product this question is about (supplied by the "
+            "user; NOT a source of law — the legal answer must still come only "
+            f"from the numbered passages):\n{context}\n\n"
+        )
+
     prompt = (
+        f"{background}"
         f"Question:\n{query}\n\n"
         f"Context passages:\n{_context_block(chunks)}\n\n"
         "Answer the question using only these passages."

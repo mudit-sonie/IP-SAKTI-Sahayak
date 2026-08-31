@@ -10,6 +10,7 @@ import Checklist from "../components/Checklist";
 import ConfidenceMeter from "../components/ConfidenceMeter";
 import PassageDrawer from "../components/PassageDrawer";
 import TextArea from "../components/TextArea";
+import FormulationProfile from "../components/FormulationProfile";
 import AnswerSkeleton from "../components/Skeleton";
 import styles from "./Matter.module.css";
 
@@ -97,6 +98,10 @@ export default function Matter() {
     setMatter(await mattersApi.setChecklistStatus(id, itemId, status));
   }
 
+  async function saveProfile(profile) {
+    setMatter(await mattersApi.update(id, { profile }));
+  }
+
   if (error && !matter) {
     return (
       <AppShell>
@@ -155,6 +160,26 @@ export default function Matter() {
           </button>
         </div>
       </header>
+
+      {!matter.formulation_category && (
+        <div className={styles.classifyBanner}>
+          <div>
+            <strong>This matter isn&apos;t classified.</strong> Classifying it
+            picks the right compliance rules and sharpens every answer.
+          </div>
+          <Button
+            size="sm"
+            onClick={() =>
+              navigate(`/classify?matter=${matter.id}`, {
+                state: { jurisdiction: matter.jurisdiction },
+              })
+            }
+          >
+            Classify this formulation
+            <Icon name="arrowRight" size={14} />
+          </Button>
+        </div>
+      )}
 
       <div className={styles.grid}>
         <div className={styles.main}>
@@ -291,6 +316,14 @@ export default function Matter() {
         </div>
 
         <aside className={styles.rail}>
+          <section className={styles.railBlock}>
+            <h2 className={styles.railTitle}>Formulation profile</h2>
+            <FormulationProfile
+              profile={matter.profile || {}}
+              onSave={saveProfile}
+            />
+          </section>
+
           <section className={styles.railBlock}>
             <h2 className={styles.railTitle}>Confidence — latest</h2>
             {questions[0] ? (
