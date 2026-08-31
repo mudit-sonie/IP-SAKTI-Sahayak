@@ -2,76 +2,57 @@
   margin-bottom: var(--s-4);
 }
 
-.card {
-  padding: var(--s-6);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
 }
 
-.label {
-  display: block;
-  margin-bottom: var(--s-2);
-  font-weight: 600;
-  color: var(--ink-800);
-}
-.textarea {
-  width: 100%;
-  padding: var(--s-4);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
-  background: var(--bg);
-  font: inherit;
-  color: var(--ink-900);
-  resize: vertical;
-  transition: border-color 0.15s var(--ease);
-}
-.textarea:focus {
-  outline: none;
-  border-color: var(--accent-500);
-  background: var(--surface);
-}
-
-.exLabel {
-  margin: var(--s-5) 0 var(--s-3);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-500);
-}
 .examples {
   display: flex;
   flex-direction: column;
-  gap: var(--s-2);
+  gap: var(--s-3);
+}
+.exLabel {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+.exList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+.exList li {
+  border-bottom: 1px solid var(--rule);
 }
 .example {
-  padding: var(--s-3) var(--s-4);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  background: var(--surface-sunken);
+  width: 100%;
+  padding: var(--s-3) 0;
+  border: none;
+  background: none;
   color: var(--ink-700);
   text-align: left;
   font: inherit;
   font-size: var(--fs-sm);
   cursor: pointer;
-  transition:
-    border-color 0.15s var(--ease),
-    color 0.15s var(--ease);
+  transition: color var(--dur-1) var(--ease);
+}
+.example::before {
+  content: "→";
+  margin-right: var(--s-3);
+  color: var(--ink-400);
 }
 .example:hover {
-  border-color: var(--accent-500);
   color: var(--accent-700);
+}
+.example:hover::before {
+  color: var(--accent-500);
 }
 
 .submit {
-  width: 100%;
-  margin-top: var(--s-5);
-}
-
-@media (max-width: 560px) {
-  .card {
-    padding: var(--s-5);
-  }
+  align-self: stretch;
 }
