@@ -1,0 +1,19 @@
+# Optional: NVIDIA GPU acceleration for the local embedding model
+# (sentence-transformers). Everything else in the stack is CPU / API and
+# unaffected.
+#
+# sentence-transformers installs a CPU-only torch by default. To run the
+# embedder on CUDA, install THIS file FIRST, then requirements.txt:
+#
+#   pip install -r requirements-gpu.txt
+#   pip install -r requirements.txt
+#
+# cu121 works with reasonably recent NVIDIA drivers. If torch fails to see the
+# GPU, check `nvidia-smi` and pick the matching CUDA tag from
+# https://pytorch.org/get-started/locally/ (e.g. cu118).
+#
+# With this installed, EMBEDDING_DEVICE=auto (the default) selects cuda. The
+# backend logs "embedding model ... on device=cuda" on index build / startup.
+
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch==2.3.1+cu121

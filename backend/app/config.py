@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     embedding_model: str = Field(
         default="BAAI/bge-small-en-v1.5", alias="EMBEDDING_MODEL"
     )
+    # "auto" picks cuda when a CUDA-enabled torch sees a GPU, else cpu. Force with
+    # "cuda" / "cpu". CUDA needs a GPU torch build — see backend/requirements-gpu.txt.
+    embedding_device: str = Field(default="auto", alias="EMBEDDING_DEVICE")
     chroma_dir: str = Field(default="./data/chroma", alias="CHROMA_DIR")
     corpus_chunks_path: str = Field(
         default="./data/processed/chunks.jsonl", alias="CORPUS_CHUNKS_PATH"

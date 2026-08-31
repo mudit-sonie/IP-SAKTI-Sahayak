@@ -23,6 +23,11 @@ uvicorn app.main:app --reload --port 8000
 
 Or just `./run.sh` (POSIX) / `.\run.ps1` (Windows).
 
+**NVIDIA GPU (optional):** to run the embedding model on CUDA, install
+`requirements-gpu.txt` *before* `requirements.txt` (see the comments in that file).
+`EMBEDDING_DEVICE=auto` (default) then picks `cuda`; the log line at index build /
+startup shows the resolved device.
+
 Open http://localhost:8000/docs for the live contract.
 
 ## Endpoints (PRD §4)

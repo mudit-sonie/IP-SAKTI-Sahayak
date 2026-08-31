@@ -36,7 +36,16 @@ class VectorIndex:
         from sentence_transformers import SentenceTransformer
 
         settings = get_settings()
-        self._embedder = SentenceTransformer(settings.embedding_model)
+        device = settings.embedding_device
+        if device == "auto":
+            try:
+                import torch
+
+                device = "cuda" if torch.cuda.is_available() else "cpu"
+            except Exception:  # pragma: no cover - torch always present via ST
+                device = "cpu"
+        self._embedder = SentenceTransformer(settings.embedding_model, device=device)
+        logger.info("embedding model %s on device=%s", settings.embedding_model, device)
         client = chromadb.PersistentClient(
             path=settings.chroma_dir,
             settings=ChromaSettings(anonymized_telemetry=False),
