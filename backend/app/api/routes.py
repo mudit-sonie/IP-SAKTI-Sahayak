@@ -18,8 +18,11 @@ from app.schemas import (
     ChunkResponse,
     ClassifyRequest,
     ClassifyResponse,
+    CompareRequest,
+    CompareResponse,
     CorpusCoverage,
     DraftKindInfo,
+    Jurisdiction,
     FeedbackRequest,
     FeedbackResponse,
     QueryRequest,
@@ -52,6 +55,26 @@ def post_classify(req: ClassifyRequest) -> ClassifyResponse:
 @router.post("/query", response_model=QueryResponse)
 def post_query(req: QueryRequest) -> QueryResponse:
     return pipeline.run_query(req)
+
+
+@router.post("/compare", response_model=CompareResponse)
+def post_compare(req: CompareRequest) -> CompareResponse:
+    """Run one question against both jurisdictions for a side-by-side view (S10)."""
+    def _run(j: Jurisdiction) -> QueryResponse:
+        return pipeline.run_query(
+            QueryRequest(
+                query=req.query,
+                jurisdiction=j,
+                formulation_category=req.formulation_category,
+                context=req.context,
+            )
+        )
+
+    return CompareResponse(
+        query=req.query,
+        india=_run(Jurisdiction.india),
+        international=_run(Jurisdiction.international),
+    )
 
 
 @router.get("/chunk/{chunk_id}", response_model=ChunkResponse)

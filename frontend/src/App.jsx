@@ -6,6 +6,7 @@ import Result from "./pages/Result";
 import Matters from "./pages/Matters";
 import Matter from "./pages/Matter";
 import Coverage from "./pages/Coverage";
+import Compare from "./pages/Compare";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/matters" element={<Matters />} />
         <Route path="/matters/:id" element={<Matter />} />
         <Route path="/coverage" element={<Coverage />} />
+        <Route path="/compare" element={<Compare />} />
       </Routes>
     </BrowserRouter>
   );

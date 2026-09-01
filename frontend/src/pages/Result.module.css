@@ -116,8 +116,14 @@
 .retry {
   margin-top: var(--s-4);
 }
-.newQuery {
+.footActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
   margin: var(--s-7) 0 var(--s-4);
+}
+.newQuery {
+  margin: 0;
 }
 
 @media (max-width: 860px) {

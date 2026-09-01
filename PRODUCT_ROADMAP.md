@@ -90,8 +90,9 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       /matters/{id}/deadlines/derive`, `POST/PATCH/DELETE
       /matters/{id}/deadlines[/{id}]`. Deadlines tab with overdue / due-soon
       flagging; re-derivation preserves the done flag per rule.
-- [ ] **S10 — comparison mode**: run two jurisdictions for one question,
-      rendered side by side.
+- [x] **S10 — comparison mode**: `POST /compare` runs the pipeline for both
+      jurisdictions; a Compare screen renders India / International side by side
+      (answer, confidence, ABS flag, citations), reached from any answer.
 - [ ] **S11 — fee calculators**: patent fees by entity size, GI fees — a small
       rules table + a calculator widget.
 

@@ -98,6 +98,18 @@ export async function getCorpus({ signal } = {}) {
   return res.json();
 }
 
+// POST /compare -> { query, india: QueryResponse, international: QueryResponse }
+export function compare(
+  { query: q, formulationCategory = null, context = null },
+  opts,
+) {
+  return postJson(
+    "/compare",
+    { query: q, formulation_category: formulationCategory, context },
+    opts,
+  );
+}
+
 // POST /feedback -> { ok: true }
 export function sendFeedback(payload, opts) {
   return postJson("/feedback", payload, opts);

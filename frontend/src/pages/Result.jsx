@@ -264,13 +264,28 @@ export default function Result() {
         </div>
       )}
 
-      <Button
-        className={styles.newQuery}
-        variant="secondary"
-        onClick={() => navigate("/")}
-      >
-        Start a new query
-      </Button>
+      <div className={styles.footActions}>
+        {question && (
+          <Button
+            variant="secondary"
+            onClick={() =>
+              navigate("/compare", {
+                state: { query: question, formulationCategory },
+              })
+            }
+          >
+            <Icon name="globe" size={15} />
+            Compare India &amp; International
+          </Button>
+        )}
+        <Button
+          className={styles.newQuery}
+          variant="secondary"
+          onClick={() => navigate("/")}
+        >
+          Start a new query
+        </Button>
+      </div>
 
       <PassageDrawer citation={viewing} onClose={() => setViewing(null)} />
     </AppShell>

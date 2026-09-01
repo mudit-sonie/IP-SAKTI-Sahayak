@@ -174,6 +174,12 @@ class RetrievalInfo(BaseModel):
     top_sections: list[str] = Field(default_factory=list)
 
 
+class CompareRequest(BaseModel):
+    query: str
+    formulation_category: Optional[str] = None
+    context: Optional[str] = None
+
+
 class QueryResponse(BaseModel):
     answer: str
     citations: list[Citation] = Field(default_factory=list)
@@ -188,6 +194,14 @@ class QueryResponse(BaseModel):
     cached: bool = False
     jurisdiction_note: Optional[str] = None
     retrieval: Optional[RetrievalInfo] = None
+
+
+class CompareResponse(BaseModel):
+    """One question run against both jurisdictions, for side-by-side rendering."""
+
+    query: str
+    india: QueryResponse
+    international: QueryResponse
 
 
 # --------------------------------------------------------------------------- #
