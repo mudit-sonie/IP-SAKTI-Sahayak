@@ -3,6 +3,8 @@ import styles from "./AppShell.module.css";
 import Badge from "./Badge";
 import Icon from "./Icon";
 import ThemeToggle from "./ThemeToggle";
+import { LANGS, t } from "../i18n/strings";
+import { useUiLang, setUiLang } from "../i18n/useUiLang";
 
 const cx = (...c) => c.filter(Boolean).join(" ");
 
@@ -19,6 +21,7 @@ const JurisdictionChip = ({ value }) => (
  * chip row. `width` = "narrow" (default) | "wide".
  */
 export default function AppShell({ context, width = "narrow", children }) {
+  const lang = useUiLang();
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
@@ -27,16 +30,16 @@ export default function AppShell({ context, width = "narrow", children }) {
             IP&#8209;SAKTI <span>Sahayak</span>
           </Link>
           <Link to="/matters" className={styles.navLink}>
-            Matters
+            {t(lang, "nav.matters")}
           </Link>
           <Link to="/coverage" className={styles.navLink}>
-            Coverage
+            {t(lang, "nav.coverage")}
           </Link>
           <Link to="/fees" className={styles.navLink}>
-            Fees
+            {t(lang, "nav.fees")}
           </Link>
           <Link to="/facilitator" className={styles.navLink}>
-            Facilitator
+            {t(lang, "nav.facilitator")}
           </Link>
         </div>
 
@@ -49,8 +52,20 @@ export default function AppShell({ context, width = "narrow", children }) {
               )}
             </div>
           ) : (
-            <span className={styles.tagline}>Ayurveda · IPR · Regulatory</span>
+            <span className={styles.tagline}>{t(lang, "app.tagline")}</span>
           )}
+          <select
+            className={styles.langSelect}
+            value={lang}
+            onChange={(e) => setUiLang(e.target.value)}
+            aria-label="Language"
+          >
+            {LANGS.map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.name}
+              </option>
+            ))}
+          </select>
           <ThemeToggle />
         </div>
       </header>

@@ -26,8 +26,11 @@ from app.schemas import (
     FeeEstimateResponse,
     FeesResponse,
     Jurisdiction,
+    LanguageOption,
     StateAuthority,
     StateRulesResponse,
+    TranslateRequest,
+    TranslateResponse,
     FeedbackRequest,
     FeedbackResponse,
     QueryRequest,
@@ -128,6 +131,25 @@ def estimate_fees(req: FeeEstimateRequest) -> FeeEstimateResponse:
         return fees.estimate(req)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+
+
+@router.get("/languages", response_model=list[LanguageOption])
+def get_languages() -> list[LanguageOption]:
+    """Languages an answer can be translated into post-generation (S15)."""
+    from app.services import translate
+
+    return [LanguageOption(**o) for o in translate.languages()]
+
+
+@router.post("/translate", response_model=TranslateResponse)
+def post_translate(req: TranslateRequest) -> TranslateResponse:
+    """Translate a generated answer. Citations/quoted law stay English."""
+    from app.services import translate
+
+    out = translate.translate(req.text, req.lang)
+    if out is None:
+        return TranslateResponse(lang="en", text=req.text, translated=False)
+    return TranslateResponse(lang=req.lang, text=out, translated=True)
 
 
 @router.get("/state-rules", response_model=StateRulesResponse)

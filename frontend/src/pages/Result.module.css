@@ -44,6 +44,16 @@
   line-height: 1.6;
   color: var(--ink-900);
 }
+.linkBtn {
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--accent-700);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
 .reviewedNote {
   margin-top: var(--s-4);
   padding-top: var(--s-4);

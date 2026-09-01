@@ -98,6 +98,11 @@ export async function getCorpus({ signal } = {}) {
   return res.json();
 }
 
+// POST /translate -> { lang, text, translated }  (S15)
+export function translate({ text, lang }, opts) {
+  return postJson("/translate", { text, lang }, opts);
+}
+
 // GET /state-rules -> { as_of, note, authorities: [{ key, state, authority,
 //   portal_url, note }] }
 export async function getStateRules({ signal } = {}) {

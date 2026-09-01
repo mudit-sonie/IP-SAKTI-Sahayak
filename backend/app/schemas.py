@@ -240,6 +240,22 @@ class RetrievalInfo(BaseModel):
     top_sections: list[str] = Field(default_factory=list)
 
 
+class LanguageOption(BaseModel):
+    code: str
+    name: str
+
+
+class TranslateRequest(BaseModel):
+    text: str
+    lang: str
+
+
+class TranslateResponse(BaseModel):
+    lang: str
+    text: str
+    translated: bool  # False -> `text` is the untranslated original (fallback)
+
+
 class CompareRequest(BaseModel):
     query: str
     formulation_category: Optional[str] = None

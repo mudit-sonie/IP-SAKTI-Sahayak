@@ -120,9 +120,12 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       `case_notes[]` (`services/caselaw.py`); a "How courts have applied this"
       block on Result. Corpus README documents the case metadata shape. Empty
       until cases are ingested.
-- [ ] **S15 — multi-language**: i18n scaffold (frontend string catalog + a
-      `lang` param that translates the *answer* post-generation, citations stay
-      verbatim English source text).
+- [x] **S15 — multi-language**: `services/translate.py` + `POST /translate`
+      (`GET /languages`) translates a generated answer post-hoc via Gemini,
+      preserving `[n]` markers and leaving statute names / citations in English;
+      honest English fallback when unavailable. Frontend: `i18n/` string catalog
+      (en + hi, rest fall back), `useUiLang` hook, language selector in the
+      shell, auto-translated answer on Result with a "Show English" toggle.
 - [ ] **S16 — anonymized analytics**: aggregate question/topic counts to a
       `/analytics` summary (no PII); a lightweight dashboard.
 - [ ] **S20 — matter documents as context**: user attaches their own documents

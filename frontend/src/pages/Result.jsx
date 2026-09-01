@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { query as runQuery } from "../api/client";
+import { query as runQuery, translate as runTranslate } from "../api/client";
+import { useUiLang } from "../i18n/useUiLang";
+import { LANGS } from "../i18n/strings";
 import AppShell from "../components/AppShell";
 import Button from "../components/Button";
 import Badge from "../components/Badge";
@@ -32,6 +34,9 @@ export default function Result() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [viewing, setViewing] = useState(null); // citation whose passage is open
+  const uiLang = useUiLang();
+  const [xlate, setXlate] = useState(null); // { text } translated answer
+  const [showEnglish, setShowEnglish] = useState(false);
 
   useEffect(() => {
     if (!question) {
@@ -56,6 +61,22 @@ export default function Result() {
   }, [question, jurisdiction, formulationCategory]);
 
   const escalated = data?.confidence?.status === "escalate";
+
+  useEffect(() => {
+    setXlate(null);
+    setShowEnglish(false);
+    if (!data || escalated || uiLang === "en" || !data.answer) return;
+    const ac = new AbortController();
+    runTranslate({ text: data.answer, lang: uiLang }, { signal: ac.signal })
+      .then((res) => {
+        if (res.translated) setXlate({ text: res.text });
+      })
+      .catch(() => {});
+    return () => ac.abort();
+  }, [data, escalated, uiLang]);
+
+  const langName =
+    LANGS.find((l) => l.code === uiLang)?.name || uiLang;
   const outsideCorpus =
     escalated && !(data?.retrieval?.top_sections?.length);
   const staleCitations = (data?.citations || []).filter((c) => c.amended_by);
@@ -143,7 +164,22 @@ export default function Result() {
                   </span>
                 }
               />
-              {!escalated && data.claims?.length ? (
+              {xlate && !showEnglish ? (
+                <>
+                  <p className={styles.answer}>{xlate.text}</p>
+                  <p className={styles.escalateNote}>
+                    Machine translation into {langName}. Citations and quoted law
+                    stay in English.{" "}
+                    <button
+                      type="button"
+                      className={styles.linkBtn}
+                      onClick={() => setShowEnglish(true)}
+                    >
+                      Show English
+                    </button>
+                  </p>
+                </>
+              ) : !escalated && data.claims?.length ? (
                 <ClaimList
                   claims={data.claims}
                   citations={data.citations}
@@ -151,6 +187,15 @@ export default function Result() {
                 />
               ) : (
                 <p className={styles.answer}>{data.answer}</p>
+              )}
+              {xlate && showEnglish && (
+                <button
+                  type="button"
+                  className={styles.linkBtn}
+                  onClick={() => setShowEnglish(false)}
+                >
+                  Show {langName} translation
+                </button>
               )}
               {escalated && (
                 <p className={styles.escalateNote}>
