@@ -93,8 +93,11 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
 - [x] **S10 — comparison mode**: `POST /compare` runs the pipeline for both
       jurisdictions; a Compare screen renders India / International side by side
       (answer, confidence, ABS flag, citations), reached from any answer.
-- [ ] **S11 — fee calculators**: patent fees by entity size, GI fees — a small
-      rules table + a calculator widget.
+- [x] **S11 — fee calculators**: `services/fees.py` — static First-Schedule
+      tables (patent e-filing by entity class incl. renewal bands; GI) with
+      `as_of` + source. `GET /fees`, `POST /fees/estimate`. Fees screen + nav
+      link with a live calculator. Figures need a verification pass before
+      relied on (loud disclaimer in the UI).
 
 ### AYUSH-scale (scaffold now)
 - [ ] **S12 — TKDL / prior-art cross-check**: `tkdl_check` service with a clearly

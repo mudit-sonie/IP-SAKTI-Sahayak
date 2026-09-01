@@ -158,6 +158,70 @@ class CorpusCoverage(BaseModel):
     known_gaps: list[str] = Field(default_factory=list)
 
 
+# --------------------------------------------------------------------------- #
+# /fees — patent & GI fee calculators (S11)
+# --------------------------------------------------------------------------- #
+class FeeEntity(BaseModel):
+    key: str
+    label: str
+
+
+class FeeItem(BaseModel):
+    code: str
+    label: str
+    category: str
+    amounts: dict[str, int]  # entity key -> amount
+    note: Optional[str] = None
+
+
+class FeeRenewalBand(BaseModel):
+    from_year: int
+    to_year: int
+    amounts: dict[str, int]  # entity key -> per-year amount
+
+
+class FeeSchedule(BaseModel):
+    track: str  # "patent" | "gi"
+    title: str
+    currency: str = "INR"
+    as_of: str
+    source: str
+    source_url: Optional[str] = None
+    entities: list[FeeEntity] = Field(default_factory=list)
+    items: list[FeeItem] = Field(default_factory=list)
+    renewal_bands: list[FeeRenewalBand] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+
+class FeesResponse(BaseModel):
+    disclaimer: str
+    schedules: list[FeeSchedule] = Field(default_factory=list)
+
+
+class FeeEstimateRequest(BaseModel):
+    track: str
+    entity: str
+    item_codes: list[str] = Field(default_factory=list)
+    renewal_from_year: Optional[int] = None
+    renewal_to_year: Optional[int] = None
+
+
+class FeeEstimateLine(BaseModel):
+    code: str
+    label: str
+    amount: int
+    detail: Optional[str] = None
+
+
+class FeeEstimateResponse(BaseModel):
+    track: str
+    entity: str
+    currency: str
+    lines: list[FeeEstimateLine] = Field(default_factory=list)
+    total: int = 0
+    disclaimer: str
+
+
 class Confidence(BaseModel):
     retrieval_score: float = 0.0
     self_confidence: SelfConfidence = SelfConfidence.low

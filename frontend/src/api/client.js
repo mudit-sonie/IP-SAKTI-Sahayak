@@ -98,6 +98,14 @@ export async function getCorpus({ signal } = {}) {
   return res.json();
 }
 
+// GET /fees -> { disclaimer, schedules: [{ track, title, as_of, source, source_url,
+//   entities[], items[], renewal_bands[], notes[] }] }
+export async function getFees({ signal } = {}) {
+  const res = await fetch(`${BASE_URL}/fees`, { signal });
+  if (!res.ok) throw new ApiError(`Could not load fee schedules (${res.status})`);
+  return res.json();
+}
+
 // POST /compare -> { query, india: QueryResponse, international: QueryResponse }
 export function compare(
   { query: q, formulationCategory = null, context = null },

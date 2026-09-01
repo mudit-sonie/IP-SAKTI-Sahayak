@@ -22,6 +22,9 @@ from app.schemas import (
     CompareResponse,
     CorpusCoverage,
     DraftKindInfo,
+    FeeEstimateRequest,
+    FeeEstimateResponse,
+    FeesResponse,
     Jurisdiction,
     FeedbackRequest,
     FeedbackResponse,
@@ -105,6 +108,24 @@ def get_corpus() -> CorpusCoverage:
     """Coverage map: which instruments/sections the assistant answers from, plus
     known gaps. Backs the Coverage screen and the 'outside our corpus' banner."""
     return coverage.build_coverage()
+
+
+@router.get("/fees", response_model=FeesResponse)
+def get_fees() -> FeesResponse:
+    """The patent & GI fee schedules backing the calculator (S11)."""
+    from app.services import fees
+
+    return fees.get_schedules()
+
+
+@router.post("/fees/estimate", response_model=FeeEstimateResponse)
+def estimate_fees(req: FeeEstimateRequest) -> FeeEstimateResponse:
+    from app.services import fees
+
+    try:
+        return fees.estimate(req)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
 
 
 @router.get("/draft-kinds", response_model=list[DraftKindInfo])
