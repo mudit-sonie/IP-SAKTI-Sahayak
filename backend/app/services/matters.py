@@ -6,6 +6,7 @@ Storage is a single JSON document per matter (app/store).
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 
 from app.config import get_settings
 from app.core.logging import get_logger
@@ -15,6 +16,8 @@ from app.schemas import (
     ChecklistItem,
     ChecklistItemCreateRequest,
     ChecklistStatus,
+    DraftKind,
+    DraftRef,
     Jurisdiction,
     Matter,
     MatterCreateRequest,
@@ -26,6 +29,7 @@ from app.schemas import (
     QueryResponse,
 )
 from app.services import checklist as checklist_svc
+from app.services import drafts as drafts_svc
 from app.services import pipeline
 from app.store.repos import get_matter_repo, new_id
 
@@ -230,6 +234,65 @@ def export_question_markdown(matter_id: str, question_id: str) -> tuple[str, str
     ]
     fname = f"ip-sakti-{matter_id}-{question_id}.md"
     return fname, "\n".join(lines)
+
+
+def _drafts_root() -> Path:
+    return Path(get_settings().drafts_dir)
+
+
+def create_draft(matter_id: str, kind: DraftKind) -> tuple[Matter, DraftRef]:
+    """Render a document draft from the matter and persist it under data/drafts/."""
+    matter = get_matter_repo().get(matter_id)
+    if matter is None:
+        raise KeyError(matter_id)
+
+    rendered = drafts_svc.render(matter, kind)
+    draft_id = new_id("d_")
+    rel_path = f"{matter_id}/{draft_id}.md"
+    out = _drafts_root() / rel_path
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(rendered.markdown, encoding="utf-8")
+
+    ref = DraftRef(
+        id=draft_id,
+        kind=kind.value,
+        title=rendered.title,
+        created_at=_now(),
+        rel_path=rel_path,
+    )
+    with get_matter_repo().mutate(matter_id) as m:
+        m.drafts.append(ref)
+        _audit(m, "draft.generated", f"{rendered.title} ({len(rendered.citations)} cited)")
+        saved = m
+    return saved, ref
+
+
+def get_draft_markdown(matter_id: str, draft_id: str) -> tuple[str, str]:
+    matter = get_matter_repo().get(matter_id)
+    if matter is None:
+        raise KeyError(matter_id)
+    ref = next((d for d in matter.drafts if d.id == draft_id), None)
+    if ref is None:
+        raise KeyError(draft_id)
+    path = _drafts_root() / (ref.rel_path or f"{matter_id}/{draft_id}.md")
+    if path.exists():
+        md = path.read_text(encoding="utf-8")
+    else:  # file lost (e.g. data/ cleaned) — re-render from the matter
+        md = drafts_svc.render(matter, DraftKind(ref.kind)).markdown
+    fname = f"ip-sakti-{ref.kind}-{matter_id}-{draft_id}.md"
+    return fname, md
+
+
+def delete_draft(matter_id: str, draft_id: str) -> Matter:
+    with get_matter_repo().mutate(matter_id) as m:
+        ref = next((d for d in m.drafts if d.id == draft_id), None)
+        if ref is None:
+            raise KeyError(draft_id)
+        m.drafts = [d for d in m.drafts if d.id != draft_id]
+        _audit(m, "draft.deleted", ref.title)
+        if ref.rel_path:
+            (_drafts_root() / ref.rel_path).unlink(missing_ok=True)
+        return m
 
 
 def add_checklist_item(

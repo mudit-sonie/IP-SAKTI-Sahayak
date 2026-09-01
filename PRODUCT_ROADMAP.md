@@ -75,9 +75,14 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
 - [x] **S7 — compliance checklist**: rule-driven generator keyed on category +
       jurisdiction + ABS flag; tracked items with status + real citations
       (retrieval-grounded, score-gated); Checklist tab on the Matter screen.
-- [ ] **S8 — cited document drafts**: templates (Form 1 skeleton, NBA ABS
-      application, disclosure-of-source, §3(p) rebuttal); filled from the matter;
-      every clause traceable to a section.
+- [x] **S8 — cited document drafts**: `services/drafts.py` — deterministic
+      templates (Form 1 skeleton, NBA ABS application, disclosure-of-source,
+      §3(p)/(e) argument), filled from the matter profile; every legal assertion
+      carries a `[Legal basis: …]` marker grounded (score-gated) to a retrieved
+      section, listed under "Traceability". `POST/GET/DELETE
+      /matters/{id}/drafts[/{draft_id}]`, `GET /draft-kinds`; md persisted under
+      `data/drafts/<matter>/`, re-rendered if the file is lost. Documents tab on
+      the Matter screen.
 - [ ] **S9 — deadlines**: derived (renewal schedules, filing windows) + manual;
       on the Matter screen; simple due-soon flagging.
 - [ ] **S10 — comparison mode**: run two jurisdictions for one question,

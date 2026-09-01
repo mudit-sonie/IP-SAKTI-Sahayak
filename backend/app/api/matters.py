@@ -16,6 +16,7 @@ from app.config import get_settings
 from app.schemas import (
     ChecklistItemCreateRequest,
     ChecklistItemStatusRequest,
+    DraftCreateRequest,
     Matter,
     MatterCreateRequest,
     MatterQuestionRequest,
@@ -98,6 +99,39 @@ def export_question(matter_id: str, question_id: str) -> PlainTextResponse:
         media_type="text/markdown",
         headers={"Content-Disposition": f'attachment; filename="{fname}"'},
     )
+
+
+@router.post("/{matter_id}/drafts", response_model=Matter, status_code=201)
+def create_draft(matter_id: str, req: DraftCreateRequest) -> Matter:
+    _require_enabled()
+    try:
+        matter, _ref = matters.create_draft(matter_id, req.kind)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter not found")
+    return matter
+
+
+@router.get("/{matter_id}/drafts/{draft_id}", response_class=PlainTextResponse)
+def get_draft(matter_id: str, draft_id: str) -> PlainTextResponse:
+    _require_enabled()
+    try:
+        fname, md = matters.get_draft_markdown(matter_id, draft_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter or draft not found")
+    return PlainTextResponse(
+        md,
+        media_type="text/markdown",
+        headers={"Content-Disposition": f'attachment; filename="{fname}"'},
+    )
+
+
+@router.delete("/{matter_id}/drafts/{draft_id}", response_model=Matter)
+def delete_draft(matter_id: str, draft_id: str) -> Matter:
+    _require_enabled()
+    try:
+        return matters.delete_draft(matter_id, draft_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter or draft not found")
 
 
 @router.post("/{matter_id}/checklist", response_model=Matter)

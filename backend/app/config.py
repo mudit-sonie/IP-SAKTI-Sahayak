@@ -82,6 +82,8 @@ class Settings(BaseSettings):
     # written atomically. No DB by design: the app must run on any laptop.
     data_dir: str = Field(default="./data", alias="DATA_DIR")
     matters_enabled: bool = Field(default=True, alias="MATTERS_ENABLED")
+    # Rendered document drafts (S8): data/drafts/<matter_id>/<draft_id>.md
+    drafts_dir: str = Field(default="./data/drafts", alias="DRAFTS_DIR")
     # Local single-user mode: every record is stamped with this owner id. When
     # real auth arrives it becomes the authenticated user id.
     local_owner: str = Field(default="local", alias="LOCAL_OWNER")

@@ -19,6 +19,7 @@ from app.schemas import (
     ClassifyRequest,
     ClassifyResponse,
     CorpusCoverage,
+    DraftKindInfo,
     FeedbackRequest,
     FeedbackResponse,
     QueryRequest,
@@ -81,6 +82,14 @@ def get_corpus() -> CorpusCoverage:
     """Coverage map: which instruments/sections the assistant answers from, plus
     known gaps. Backs the Coverage screen and the 'outside our corpus' banner."""
     return coverage.build_coverage()
+
+
+@router.get("/draft-kinds", response_model=list[DraftKindInfo])
+def draft_kinds() -> list[DraftKindInfo]:
+    """The document-draft templates a matter can generate (S8)."""
+    from app.services.drafts import KIND_INFO
+
+    return list(KIND_INFO.values())
 
 
 @router.post("/feedback", response_model=FeedbackResponse)

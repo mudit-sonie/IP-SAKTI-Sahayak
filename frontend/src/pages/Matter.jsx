@@ -7,6 +7,7 @@ import Badge from "../components/Badge";
 import Icon from "../components/Icon";
 import CitationCard from "../components/CitationCard";
 import Checklist from "../components/Checklist";
+import Drafts from "../components/Drafts";
 import ConfidenceMeter from "../components/ConfidenceMeter";
 import PassageDrawer from "../components/PassageDrawer";
 import TextArea from "../components/TextArea";
@@ -29,6 +30,8 @@ export default function Matter() {
   const notesDirty = useRef(false);
   const [tab, setTab] = useState("questions");
   const [checklistBusy, setChecklistBusy] = useState(false);
+  const [draftKinds, setDraftKinds] = useState([]);
+  const [draftBusy, setDraftBusy] = useState(false);
 
   const load = useCallback(
     (signal) =>
@@ -49,6 +52,35 @@ export default function Matter() {
     load(ac.signal);
     return () => ac.abort();
   }, [load]);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    mattersApi
+      .draftKinds({ signal: ac.signal })
+      .then(setDraftKinds)
+      .catch(() => {});
+    return () => ac.abort();
+  }, []);
+
+  async function generateDraft(kind) {
+    setDraftBusy(true);
+    setError(null);
+    try {
+      setMatter(await mattersApi.createDraft(id, kind));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDraftBusy(false);
+    }
+  }
+
+  async function deleteDraft(draftId) {
+    try {
+      setMatter(await mattersApi.deleteDraft(id, draftId));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
 
   async function ask(e) {
     e.preventDefault();
@@ -209,6 +241,15 @@ export default function Matter() {
             <button
               type="button"
               role="tab"
+              aria-selected={tab === "documents"}
+              className={tab === "documents" ? styles.tabOn : styles.tab}
+              onClick={() => setTab("documents")}
+            >
+              Documents <span className="mono">{matter.drafts.length}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
               aria-selected={tab === "activity"}
               className={tab === "activity" ? styles.tabOn : styles.tab}
               onClick={() => setTab("activity")}
@@ -231,6 +272,18 @@ export default function Matter() {
                 </li>
               ))}
             </ol>
+          )}
+
+          {tab === "documents" && (
+            <Drafts
+              kinds={draftKinds}
+              drafts={matter.drafts}
+              absStatus={matter.abs_status}
+              onGenerate={generateDraft}
+              onDelete={deleteDraft}
+              draftUrl={(draftId) => mattersApi.draftUrl(id, draftId)}
+              busy={draftBusy}
+            />
           )}
 
           {tab === "checklist" && (

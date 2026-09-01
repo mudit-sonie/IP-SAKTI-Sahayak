@@ -385,3 +385,24 @@ class ChecklistItemCreateRequest(BaseModel):
     title: str
     detail: Optional[str] = None
     group: Optional[str] = None
+
+
+# --------------------------------------------------------------------------- #
+# Document drafts (S8)
+# --------------------------------------------------------------------------- #
+class DraftKind(str, Enum):
+    form1 = "form1"
+    nba_abs = "nba_abs"
+    disclosure_of_source = "disclosure_of_source"
+    s3p_rebuttal = "s3p_rebuttal"
+
+
+class DraftKindInfo(BaseModel):
+    kind: DraftKind
+    title: str
+    description: str
+    requires_abs: bool = False
+
+
+class DraftCreateRequest(BaseModel):
+    kind: DraftKind

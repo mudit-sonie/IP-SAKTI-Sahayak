@@ -162,6 +162,13 @@ export const matters = {
       body: { status },
       ...opts,
     }),
+  // Document drafts (S8)
+  draftKinds: (opts) => reqJson("/draft-kinds", opts),
+  createDraft: (id, kind, opts) =>
+    reqJson(`/matters/${id}/drafts`, { method: "POST", body: { kind }, ...opts }),
+  deleteDraft: (id, draftId, opts) =>
+    reqJson(`/matters/${id}/drafts/${draftId}`, { method: "DELETE", ...opts }),
+  draftUrl: (id, draftId) => `${BASE_URL}/matters/${id}/drafts/${draftId}`,
 };
 
 export { BASE_URL };
