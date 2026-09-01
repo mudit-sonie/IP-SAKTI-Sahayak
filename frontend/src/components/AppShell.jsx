@@ -35,6 +35,9 @@ export default function AppShell({ context, width = "narrow", children }) {
           <Link to="/fees" className={styles.navLink}>
             Fees
           </Link>
+          <Link to="/facilitator" className={styles.navLink}>
+            Facilitator
+          </Link>
         </div>
 
         <div className={styles.right}>

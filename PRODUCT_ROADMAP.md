@@ -58,9 +58,14 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       `services/coverage.py`; a Coverage screen + nav link; "outside our corpus"
       note on Result when an escalation retrieved nothing on point. `as_of`
       lands with S6.
-- [ ] **S5 — facilitator queue + reviewed FAQ**: escalations persist to a queue;
-      a facilitator view answers them; reviewed answers land in `faq/` and are
-      retrieved ahead of the model on matching questions.
+- [x] **S5 — facilitator queue + reviewed FAQ**: every escalate response
+      persists to `escalations/` (deduped per open query+jurisdiction, with the
+      reason + matter context); `services/escalations.py` + `services/faq.py`;
+      answering optionally publishes a `FaqEntry` to `faq/`. On a later query a
+      token-Jaccard FAQ match (≥ `FAQ_MATCH_THRESHOLD`, jurisdiction-scoped) is
+      served ahead of retrieval/generation with `from_faq: true`. Facilitator
+      screen (queue + published FAQ) + nav link; "Human-reviewed answer" badge
+      on Result. `GET/POST /escalations…`, `GET/POST/DELETE /faq…`.
 - [x] **S6 — amendment awareness (scaffold)**: `as_of` / `amended_by` /
       `in_force` + `is_stale` on `Chunk`, merged from a curated overlay
       (`data/amendments.json`, `AMENDMENT_OVERLAY_PATH`) at corpus load — the

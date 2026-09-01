@@ -82,6 +82,13 @@ class Settings(BaseSettings):
     # written atomically. No DB by design: the app must run on any laptop.
     data_dir: str = Field(default="./data", alias="DATA_DIR")
     matters_enabled: bool = Field(default=True, alias="MATTERS_ENABLED")
+    # Facilitator queue + reviewed FAQ (S5). When escalations_enabled, every
+    # escalate response is persisted for a human to answer; a published FAQ
+    # answer is served ahead of the model on a matching question.
+    escalations_enabled: bool = Field(default=True, alias="ESCALATIONS_ENABLED")
+    faq_enabled: bool = Field(default=True, alias="FAQ_ENABLED")
+    # Min token-overlap (Jaccard) for a FAQ entry to short-circuit a query.
+    faq_match_threshold: float = Field(default=0.6, alias="FAQ_MATCH_THRESHOLD")
     # Rendered document drafts (S8): data/drafts/<matter_id>/<draft_id>.md
     drafts_dir: str = Field(default="./data/drafts", alias="DRAFTS_DIR")
     # Local single-user mode: every record is stamped with this owner id. When

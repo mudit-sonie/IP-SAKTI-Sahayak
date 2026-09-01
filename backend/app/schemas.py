@@ -71,6 +71,8 @@ class QueryRequest(BaseModel):
     # Used to inform generation only — never mixed into retrieval, and the
     # answer must still come from the corpus passages.
     context: Optional[str] = None
+    # Set when the question was asked inside a matter — carried onto an escalation.
+    matter_id: Optional[str] = None
 
 
 class Citation(BaseModel):
@@ -258,6 +260,8 @@ class QueryResponse(BaseModel):
     cached: bool = False
     jurisdiction_note: Optional[str] = None
     retrieval: Optional[RetrievalInfo] = None
+    # True when this answer came from a human-reviewed FAQ entry, not the model.
+    from_faq: bool = False
 
 
 class CompareResponse(BaseModel):
@@ -476,6 +480,61 @@ class ChecklistItemCreateRequest(BaseModel):
     title: str
     detail: Optional[str] = None
     group: Optional[str] = None
+
+
+# --------------------------------------------------------------------------- #
+# Facilitator queue + reviewed FAQ (S5)
+# --------------------------------------------------------------------------- #
+class EscalationStatus(str, Enum):
+    open = "open"
+    answered = "answered"
+    dismissed = "dismissed"
+
+
+class Escalation(BaseModel):
+    id: str
+    created_at: str
+    query: str
+    jurisdiction: Jurisdiction = Jurisdiction.india
+    formulation_category: Optional[str] = None
+    context: Optional[str] = None  # matter background, if the ask came from a matter
+    retrieval_score: float = 0.0
+    self_confidence: SelfConfidence = SelfConfidence.low
+    reason: Optional[str] = None  # "low_retrieval" | "high_stakes" | "no_gemini" ...
+    source: str = "query"  # "query" | "matter"
+    matter_id: Optional[str] = None
+    status: EscalationStatus = EscalationStatus.open
+    answer: Optional[str] = None
+    answer_citations: list[Citation] = Field(default_factory=list)
+    answered_at: Optional[str] = None
+    faq_id: Optional[str] = None
+
+
+class FaqEntry(BaseModel):
+    id: str
+    question: str
+    jurisdiction: Jurisdiction = Jurisdiction.india
+    formulation_category: Optional[str] = None
+    answer: str
+    citations: list[Citation] = Field(default_factory=list)
+    keywords: list[str] = Field(default_factory=list)
+    created_at: str
+    updated_at: str
+    source_escalation_id: Optional[str] = None
+
+
+class EscalationAnswerRequest(BaseModel):
+    answer: str
+    citations: list[Citation] = Field(default_factory=list)
+    publish_faq: bool = True
+
+
+class FaqCreateRequest(BaseModel):
+    question: str
+    answer: str
+    jurisdiction: Jurisdiction = Jurisdiction.india
+    formulation_category: Optional[str] = None
+    citations: list[Citation] = Field(default_factory=list)
 
 
 # --------------------------------------------------------------------------- #

@@ -215,4 +215,28 @@ export const matters = {
   draftUrl: (id, draftId) => `${BASE_URL}/matters/${id}/drafts/${draftId}`,
 };
 
+// --------------------------------------------------------------------------- //
+// Facilitator queue + reviewed FAQ (S5)
+// --------------------------------------------------------------------------- //
+export const facilitator = {
+  listEscalations: (status, opts) =>
+    reqJson(
+      `/escalations${status ? `?status=${encodeURIComponent(status)}` : ""}`,
+      opts,
+    ),
+  answerEscalation: (id, payload, opts) =>
+    reqJson(`/escalations/${id}/answer`, {
+      method: "POST",
+      body: payload,
+      ...opts,
+    }),
+  dismissEscalation: (id, opts) =>
+    reqJson(`/escalations/${id}/dismiss`, { method: "POST", ...opts }),
+  listFaq: (opts) => reqJson("/faq", opts),
+  createFaq: (payload, opts) =>
+    reqJson("/faq", { method: "POST", body: payload, ...opts }),
+  deleteFaq: (id, opts) =>
+    reqJson(`/faq/${id}`, { method: "DELETE", ...opts }),
+};
+
 export { BASE_URL };

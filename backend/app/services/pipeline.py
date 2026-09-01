@@ -19,13 +19,40 @@ from app.schemas import (
     RetrievalInfo,
     SelfConfidence,
 )
-from app.services import abs_helper, confidence, generation, query_cache, safety
+from app.services import (
+    abs_helper,
+    confidence,
+    escalations,
+    faq,
+    generation,
+    query_cache,
+    safety,
+)
 from app.services.jurisdiction import mismatch_note
 
 logger = get_logger(__name__)
 
 
+def _response_from_faq(entry, req: QueryRequest) -> QueryResponse:
+    return QueryResponse(
+        answer=entry.answer,
+        citations=entry.citations,
+        confidence=Confidence(
+            retrieval_score=1.0,
+            self_confidence=SelfConfidence.high,
+            status=AnswerStatus.answered,
+        ),
+        jurisdiction_note=mismatch_note(req.query, req.jurisdiction.value),
+        from_faq=True,
+    )
+
+
 def run_query(req: QueryRequest, *, use_cache: bool = True) -> QueryResponse:
+    faq_hit = faq.match(req.query, req.jurisdiction.value)
+    if faq_hit is not None:
+        logger.info("serving reviewed FAQ %s for %r", faq_hit.id, req.query)
+        return _response_from_faq(faq_hit, req)
+
     if use_cache:
         hit = query_cache.get(req)
         if hit is not None:
@@ -34,6 +61,8 @@ def run_query(req: QueryRequest, *, use_cache: bool = True) -> QueryResponse:
 
     resp = _run_query_uncached(req)
     query_cache.put(req, resp)
+    if resp.confidence.status == AnswerStatus.escalate:
+        escalations.record_from_query(req, resp)
     return resp
 
 

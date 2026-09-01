@@ -44,6 +44,14 @@
   line-height: 1.6;
   color: var(--ink-900);
 }
+.reviewedNote {
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--accent-700);
+}
 .escalateNote {
   margin-top: var(--s-4);
   padding-top: var(--s-4);

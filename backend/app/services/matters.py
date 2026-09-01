@@ -122,6 +122,7 @@ def ask(matter_id: str, req: MatterQuestionRequest) -> tuple[Matter, MatterQuest
         jurisdiction=Jurisdiction(jurisdiction),
         formulation_category=category,
         context=product_context or None,
+        matter_id=matter_id,
     )
     result = pipeline.run_query(query_req)
 

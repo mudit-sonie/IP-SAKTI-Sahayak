@@ -122,15 +122,20 @@ export default function Result() {
           <div className={styles.main}>
             <Card tone={escalated ? "warn" : "default"}>
               <CardHeader
-                eyebrow={escalated ? "Escalated" : "Source-cited guidance"}
-                title={
+                eyebrow={
                   escalated
-                    ? "Routed to a human facilitator"
-                    : "Answer"
+                    ? "Escalated"
+                    : data.from_faq
+                      ? "Human-reviewed answer"
+                      : "Source-cited guidance"
+                }
+                title={
+                  escalated ? "Routed to a human facilitator" : "Answer"
                 }
                 aside={
                   <span className={styles.badges}>
                     {data.cached && <Badge tone="neutral">cached</Badge>}
+                    {data.from_faq && <Badge tone="accent">reviewed</Badge>}
                     <Badge tone={escalated ? "warn" : "accent"} variant="solid">
                       {escalated ? "Escalated" : "Answered"}
                     </Badge>
@@ -151,6 +156,13 @@ export default function Result() {
                   Retrieval support or model confidence was below threshold, so
                   the assistant did not guess. A human IP facilitator can take
                   this from here.
+                </p>
+              )}
+              {data.from_faq && (
+                <p className={styles.reviewedNote}>
+                  This answer was written and reviewed by a human IP facilitator,
+                  not generated. It is served ahead of the model for this
+                  question.
                 </p>
               )}
               {outsideCorpus && (
