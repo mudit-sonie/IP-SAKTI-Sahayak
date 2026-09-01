@@ -11,12 +11,12 @@ is a feature, not an error.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from app.core.logging import get_logger
 from app.llm.gemini_client import GeminiUnavailable, get_gemini_client
 from app.retrieval import RetrievedChunk
-from app.schemas import Citation, SelfConfidence
+from app.schemas import Citation, Claim, SelfConfidence
 
 logger = get_logger(__name__)
 
@@ -32,6 +32,11 @@ SYSTEM_INSTRUCTION = (
     "(\"[n] <source>, Section <section>\"). Use the header's section value, not a "
     "sub-clause you inferred. If you cannot ground the answer in any passage, return "
     "an empty citations list and self_confidence \"low\".\n"
+    "INLINE MARKERS: in \"answer\", place a bracketed marker like [1] or [2][3] "
+    "immediately after each sentence, naming the passage number(s) that support "
+    "that specific sentence. The marker number is the passage's [n] from the "
+    "context block. Every substantive sentence must carry at least one marker; "
+    "purely transitional sentences may omit them.\n"
     "Set self_confidence \"high\" when at least one passage directly and "
     "unambiguously answers the question; \"medium\" when passages support a "
     "partial or qualified answer; \"low\" only when no passage is on point. Do "
@@ -52,6 +57,7 @@ class Generation:
     answer: str
     citations: list[Citation]
     self_confidence: SelfConfidence
+    claims: list[Claim] = field(default_factory=list)
 
 
 def _context_block(chunks: list[RetrievedChunk]) -> str:
@@ -118,7 +124,85 @@ def generate(
     if not citations and answer != ESCALATE_ANSWER and self_conf != SelfConfidence.low:
         citations = _recover_citations(answer, chunks)
 
-    return Generation(answer=answer, citations=citations, self_confidence=self_conf)
+    answer, claims = _resolve_inline_claims(answer, citations, chunks)
+
+    return Generation(
+        answer=answer,
+        citations=citations,
+        self_confidence=self_conf,
+        claims=claims,
+    )
+
+
+_MARKER_RE = re.compile(r"\[\s*(\d+(?:\s*[,;]\s*\d+)*)\s*\]")
+
+
+def _resolve_inline_claims(
+    answer: str,
+    citations: list[Citation],
+    chunks: list[RetrievedChunk],
+) -> tuple[str, list[Claim]]:
+    """Rewrite the model's inline passage markers to citation numbers and split
+    the answer into per-claim segments.
+
+    The model numbers markers by context-passage position ([1] = first passage).
+    We remap each to the 1-based position of that passage's Citation, appending a
+    Citation for any relied-upon passage the model left out of its list (it was
+    still retrieved, so it is legitimately citable)."""
+    if not answer or ESCALATE_ANSWER in answer:
+        return answer, []
+
+    chunkid_to_final: dict[str, int] = {}
+    for i, c in enumerate(citations, 1):
+        if c.excerpt_ref:
+            chunkid_to_final.setdefault(c.excerpt_ref, i)
+
+    def _final_index(passage_no: int) -> int | None:
+        if not (1 <= passage_no <= len(chunks)):
+            return None
+        chunk = chunks[passage_no - 1].chunk
+        hit = chunkid_to_final.get(chunk.chunk_id)
+        if hit is not None:
+            return hit
+        citations.append(Citation(
+            source=chunk.source,
+            section=chunk.section,
+            excerpt_ref=chunk.chunk_id,
+            source_url=chunk.metadata.get("source_url"),
+        ))
+        idx = len(citations)
+        chunkid_to_final[chunk.chunk_id] = idx
+        return idx
+
+    def _remap(match: re.Match) -> str:
+        nums = [int(n) for n in re.split(r"[,;]", match.group(1))]
+        resolved = sorted({fi for n in nums if (fi := _final_index(n)) is not None})
+        return "".join(f"[{i}]" for i in resolved)
+
+    rewritten = _MARKER_RE.sub(_remap, answer).strip()
+
+    claims: list[Claim] = []
+    for sentence in _split_sentences(rewritten):
+        refs = sorted({int(n) for m in _MARKER_RE.finditer(sentence)
+                       for n in re.split(r"[,;]", m.group(1))})
+        claims.append(Claim(text=sentence, citations=refs))
+    # No inline markers at all -> not a per-claim answer; let the UI fall back.
+    if not any(cl.citations for cl in claims):
+        return rewritten, []
+    return rewritten, claims
+
+
+def _split_sentences(text: str) -> list[str]:
+    parts: list[str] = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        for piece in re.split(r"(?<=[.!?\]])\s+(?=[A-Z0-9(])", line):
+            piece = piece.strip()
+            if piece:
+                parts.append(piece)
+    return parts
 
 
 def _recover_citations(answer: str, chunks: list[RetrievedChunk]) -> list[Citation]:

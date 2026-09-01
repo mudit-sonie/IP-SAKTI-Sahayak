@@ -80,6 +80,18 @@ class Citation(BaseModel):
     source_url: Optional[str] = None
 
 
+class Claim(BaseModel):
+    """One factual statement from the answer plus the passages that back it.
+
+    `citations` holds 1-based indices into the response's `citations[]` array
+    (the same `[n]` markers rendered inline in `text`). A claim with an empty
+    list is narrative connective tissue, not a grounded assertion.
+    """
+
+    text: str
+    citations: list[int] = Field(default_factory=list)
+
+
 # --------------------------------------------------------------------------- #
 # /chunk/{chunk_id} — fetch the exact statute passage behind a citation
 # --------------------------------------------------------------------------- #
@@ -114,6 +126,9 @@ class RetrievalInfo(BaseModel):
 class QueryResponse(BaseModel):
     answer: str
     citations: list[Citation] = Field(default_factory=list)
+    # Per-claim breakdown of `answer` with inline `[n]` markers into `citations`.
+    # Empty when generation produced no marker-tagged claims (e.g. escalate).
+    claims: list[Claim] = Field(default_factory=list)
     confidence: Confidence
     abs_flag: bool = False
     abs_note: Optional[str] = None
@@ -207,6 +222,7 @@ class MatterQuestion(BaseModel):
     self_confidence: SelfConfidence = SelfConfidence.low
     retrieval_score: float = 0.0
     citations: list[Citation] = Field(default_factory=list)
+    claims: list[Claim] = Field(default_factory=list)
     abs_flag: bool = False
 
 

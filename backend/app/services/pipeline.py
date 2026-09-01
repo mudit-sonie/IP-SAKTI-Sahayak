@@ -105,6 +105,7 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
     return QueryResponse(
         answer=answer,
         citations=citations,
+        claims=gen.claims,
         confidence=conf,
         abs_flag=abs_result.triggered,
         abs_note=abs_note,

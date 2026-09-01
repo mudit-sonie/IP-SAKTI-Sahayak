@@ -9,6 +9,7 @@ import StepIndicator from "../components/StepIndicator";
 import Icon from "../components/Icon";
 import ConfidenceMeter from "../components/ConfidenceMeter";
 import CitationCard from "../components/CitationCard";
+import ClaimList from "../components/ClaimList";
 import PassageDrawer from "../components/PassageDrawer";
 import FeedbackWidget from "../components/FeedbackWidget";
 import RetrievalDetails from "../components/RetrievalDetails";
@@ -132,7 +133,15 @@ export default function Result() {
                   </span>
                 }
               />
-              <p className={styles.answer}>{data.answer}</p>
+              {!escalated && data.claims?.length ? (
+                <ClaimList
+                  claims={data.claims}
+                  citations={data.citations}
+                  onCite={setViewing}
+                />
+              ) : (
+                <p className={styles.answer}>{data.answer}</p>
+              )}
               {escalated && (
                 <p className={styles.escalateNote}>
                   Retrieval support or model confidence was below threshold, so

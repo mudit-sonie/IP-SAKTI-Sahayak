@@ -45,8 +45,11 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       `/classify?matter=<id>` writes the classification back.
 
 ### Grounding moat (near-term)
-- [ ] **S2 — per-claim citations**: generation returns `claims[]` with inline
-      `[n]` markers; Result renders footnote markers linked to passages.
+- [x] **S2 — per-claim citations**: generation returns `claims[]` (`text` +
+      `citations[]` indices) with inline `[n]` markers in `answer`; markers
+      resolve to retrieved passages (a relied-upon passage the model omits from
+      its citation list is appended, since it was still retrieved); Result
+      renders footnote markers linked to the passage drawer.
 - [ ] **S3 — conflict surfacing**: when retrieved passages from different
       instruments give divergent positions, return both under `conflicts[]`.
 - [ ] **S4 — corpus coverage map**: `/corpus` endpoint (sources, sections,
