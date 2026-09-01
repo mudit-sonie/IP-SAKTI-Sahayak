@@ -63,29 +63,29 @@ SOURCES: list[Source] = [
     Source(
         "patents_act_1970", "The Patents Act, 1970",
         "THE PATENTS ACT, 1970.txt", "act", "India", "Act", "India Code",
-        "https://www.indiacode.nic.in/handle/123456789/1392", "1970",
+        "https://ipindia.gov.in/acts/patent-act-1970?utm_source", "1970",
     ),
     Source(
         "trade_marks_act_1999", "The Trade Marks Act, 1999",
         "Trade Marks Act, 1999.txt", "act", "India", "Act", "India Code",
-        "https://www.indiacode.nic.in/handle/123456789/1993", "1999",
+        "https://ipindia.gov.in/tm-act-1999?utm_source", "1999",
     ),
     Source(
         "biological_diversity_act_2002", "The Biological Diversity Act, 2002",
         "THE BIOLOGICAL DIVERSITY ACT, 2002.txt", "act", "India", "Act", "India Code",
-        "https://www.indiacode.nic.in/handle/123456789/2046", "2002",
+        "https://moef.gov.in/?utm_source", "2002",
     ),
     Source(
         "drugs_and_cosmetics_act_1940", "The Drugs and Cosmetics Act, 1940",
         "THE DRUGS AND COSMETICS ACT, 1940 (23 of 1940)1.txt", "act", "India", "Act",
-        "India Code", "https://www.indiacode.nic.in/handle/123456789/2318", "1940",
+        "India Code", "https://cdsco.gov.in/opencms/opencms/en/Acts-and-rules/Drugs-and-Cosmetics-Act/?utm_source", "1940",
     ),
     Source(
         "drugs_and_magic_remedies_act_1954",
         "The Drugs and Magic Remedies (Objectionable Advertisements) Act, 1954",
         "Drugs and Magic Remedies (Objectionable Advertisement) Act, 1954.txt", "act",
         "India", "Act", "India Code",
-        "https://www.indiacode.nic.in/handle/123456789/1391", "1954",
+        "https://www.indiacode.nic.in/indiacode/handle/123456789/1412?view_type=browse&utm_source", "1954",
     ),
     Source(
         "patents_rules_2003",
@@ -99,13 +99,13 @@ SOURCES: list[Source] = [
         "gi_goods_act_1999",
         "The Geographical Indications of Goods (Registration and Protection) Act, 1999",
         "__gi_md__", "gi_md", "India", "Act", "India Code",
-        "https://www.indiacode.nic.in/handle/123456789/1955", "1999",
+        "https://ipindia.gov.in/acts/patent-rules-2003?utm_source", "1999",
     ),
     Source(
         "trips_agreement", "TRIPS Agreement (as amended by the 2005 Protocol)",
         "TRIPS Agreement — 2017 Amended Version (Official WTO).txt", "articles",
         "international", "Treaty", "WTO",
-        "https://www.wto.org/english/docs_e/legal_e/31bis_trips_e.htm", "1994",
+        "https://www.wto.org/english/docs_e/legal_e/31bis_trips_01_e.htm?utm_source", "1994",
     ),
     Source(
         "cbd_1992", "Convention on Biological Diversity, 1992",
