@@ -92,6 +92,21 @@ class Claim(BaseModel):
     citations: list[int] = Field(default_factory=list)
 
 
+class ConflictPosition(BaseModel):
+    """One side of a divergence between instruments."""
+
+    summary: str
+    citations: list[int] = Field(default_factory=list)  # 1-based into `citations[]`
+
+
+class Conflict(BaseModel):
+    """Two or more retrieved instruments taking divergent positions on one point.
+    Surfaced instead of silently picking a winner."""
+
+    topic: str
+    positions: list[ConflictPosition] = Field(default_factory=list)
+
+
 # --------------------------------------------------------------------------- #
 # /chunk/{chunk_id} — fetch the exact statute passage behind a citation
 # --------------------------------------------------------------------------- #
@@ -129,6 +144,8 @@ class QueryResponse(BaseModel):
     # Per-claim breakdown of `answer` with inline `[n]` markers into `citations`.
     # Empty when generation produced no marker-tagged claims (e.g. escalate).
     claims: list[Claim] = Field(default_factory=list)
+    # Divergent positions across retrieved instruments, when generation found any.
+    conflicts: list[Conflict] = Field(default_factory=list)
     confidence: Confidence
     abs_flag: bool = False
     abs_note: Optional[str] = None
@@ -223,6 +240,7 @@ class MatterQuestion(BaseModel):
     retrieval_score: float = 0.0
     citations: list[Citation] = Field(default_factory=list)
     claims: list[Claim] = Field(default_factory=list)
+    conflicts: list[Conflict] = Field(default_factory=list)
     abs_flag: bool = False
 
 

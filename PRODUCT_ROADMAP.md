@@ -50,8 +50,9 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       resolve to retrieved passages (a relied-upon passage the model omits from
       its citation list is appended, since it was still retrieved); Result
       renders footnote markers linked to the passage drawer.
-- [ ] **S3 — conflict surfacing**: when retrieved passages from different
-      instruments give divergent positions, return both under `conflicts[]`.
+- [x] **S3 — conflict surfacing**: generation returns `conflicts[] {topic,
+      positions[] {summary, citations[]}}`; kept only when >=2 positions cite
+      >=2 distinct instruments; a "Divergent positions" card on Result.
 - [ ] **S4 — corpus coverage map**: `/corpus` endpoint (sources, sections,
       `as_of`, known gaps); a Coverage screen; "outside our corpus" banner.
 - [ ] **S5 — facilitator queue + reviewed FAQ**: escalations persist to a queue;

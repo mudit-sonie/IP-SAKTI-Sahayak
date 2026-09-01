@@ -16,7 +16,13 @@ from dataclasses import dataclass, field
 from app.core.logging import get_logger
 from app.llm.gemini_client import GeminiUnavailable, get_gemini_client
 from app.retrieval import RetrievedChunk
-from app.schemas import Citation, Claim, SelfConfidence
+from app.schemas import (
+    Citation,
+    Claim,
+    Conflict,
+    ConflictPosition,
+    SelfConfidence,
+)
 
 logger = get_logger(__name__)
 
@@ -41,8 +47,16 @@ SYSTEM_INSTRUCTION = (
     "unambiguously answers the question; \"medium\" when passages support a "
     "partial or qualified answer; \"low\" only when no passage is on point. Do "
     "not under-rate a clear, well-supported answer.\n"
+    "CONFLICTS: if two or more passages from DIFFERENT instruments take divergent "
+    "positions on the same point, add an entry to \"conflicts\": "
+    '{"topic": short phrase, "positions": [{"summary": one sentence, '
+    '"passages": [n, ...]}, ...]}. Each position\'s passages are the [n] numbers '
+    "backing it. Only report a genuine divergence between instruments, not a "
+    "mere difference in detail; omit \"conflicts\" or leave it empty otherwise.\n"
     "Respond as JSON: "
     '{"answer": string, "citations": [{"source": string, "section": string}], '
+    '"conflicts": [{"topic": string, "positions": [{"summary": string, '
+    '"passages": [int]}]}], '
     '"self_confidence": "high" | "medium" | "low"}.'
 )
 
@@ -58,6 +72,7 @@ class Generation:
     citations: list[Citation]
     self_confidence: SelfConfidence
     claims: list[Claim] = field(default_factory=list)
+    conflicts: list[Conflict] = field(default_factory=list)
 
 
 def _context_block(chunks: list[RetrievedChunk]) -> str:
@@ -124,59 +139,105 @@ def generate(
     if not citations and answer != ESCALATE_ANSWER and self_conf != SelfConfidence.low:
         citations = _recover_citations(answer, chunks)
 
-    answer, claims = _resolve_inline_claims(answer, citations, chunks)
+    resolver = _PassageResolver(citations, chunks)
+    answer, claims = _resolve_inline_claims(answer, resolver)
+    conflicts = _parse_conflicts(data.get("conflicts"), resolver)
 
     return Generation(
         answer=answer,
         citations=citations,
         self_confidence=self_conf,
         claims=claims,
+        conflicts=conflicts,
     )
 
 
 _MARKER_RE = re.compile(r"\[\s*(\d+(?:\s*[,;]\s*\d+)*)\s*\]")
 
 
-def _resolve_inline_claims(
-    answer: str,
-    citations: list[Citation],
-    chunks: list[RetrievedChunk],
-) -> tuple[str, list[Claim]]:
-    """Rewrite the model's inline passage markers to citation numbers and split
-    the answer into per-claim segments.
+class _PassageResolver:
+    """Maps a model context-passage number ([1] = first passage) to the 1-based
+    position of that passage's Citation, appending a Citation for any relied-upon
+    passage the model omitted (it was still retrieved, so it is citable)."""
 
-    The model numbers markers by context-passage position ([1] = first passage).
-    We remap each to the 1-based position of that passage's Citation, appending a
-    Citation for any relied-upon passage the model left out of its list (it was
-    still retrieved, so it is legitimately citable)."""
-    if not answer or ESCALATE_ANSWER in answer:
-        return answer, []
+    def __init__(self, citations: list[Citation], chunks: list[RetrievedChunk]):
+        self.citations = citations
+        self.chunks = chunks
+        self._by_chunk: dict[str, int] = {}
+        for i, c in enumerate(citations, 1):
+            if c.excerpt_ref:
+                self._by_chunk.setdefault(c.excerpt_ref, i)
 
-    chunkid_to_final: dict[str, int] = {}
-    for i, c in enumerate(citations, 1):
-        if c.excerpt_ref:
-            chunkid_to_final.setdefault(c.excerpt_ref, i)
-
-    def _final_index(passage_no: int) -> int | None:
-        if not (1 <= passage_no <= len(chunks)):
+    def resolve(self, passage_no: int) -> int | None:
+        if not (1 <= passage_no <= len(self.chunks)):
             return None
-        chunk = chunks[passage_no - 1].chunk
-        hit = chunkid_to_final.get(chunk.chunk_id)
+        chunk = self.chunks[passage_no - 1].chunk
+        hit = self._by_chunk.get(chunk.chunk_id)
         if hit is not None:
             return hit
-        citations.append(Citation(
+        self.citations.append(Citation(
             source=chunk.source,
             section=chunk.section,
             excerpt_ref=chunk.chunk_id,
             source_url=chunk.metadata.get("source_url"),
         ))
-        idx = len(citations)
-        chunkid_to_final[chunk.chunk_id] = idx
+        idx = len(self.citations)
+        self._by_chunk[chunk.chunk_id] = idx
         return idx
+
+    def source_of(self, final_index: int) -> str | None:
+        if 1 <= final_index <= len(self.citations):
+            return self.citations[final_index - 1].source
+        return None
+
+
+def _parse_conflicts(raw: object, resolver: _PassageResolver) -> list[Conflict]:
+    """Keep only genuine cross-instrument divergences: >=2 positions, each with a
+    resolvable citation, and the positions cite >=2 distinct sources overall."""
+    if not isinstance(raw, list):
+        return []
+    out: list[Conflict] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        topic = str(item.get("topic") or "").strip()
+        raw_positions = item.get("positions")
+        if not topic or not isinstance(raw_positions, list):
+            continue
+        positions: list[ConflictPosition] = []
+        sources: set[str] = set()
+        for pos in raw_positions:
+            if not isinstance(pos, dict):
+                continue
+            summary = str(pos.get("summary") or "").strip()
+            nums = pos.get("passages") or pos.get("citations") or []
+            if not summary or not isinstance(nums, list):
+                continue
+            refs = sorted({
+                r for n in nums
+                if isinstance(n, int) and (r := resolver.resolve(n)) is not None
+            })
+            if not refs:
+                continue
+            positions.append(ConflictPosition(summary=summary, citations=refs))
+            sources.update(s for r in refs if (s := resolver.source_of(r)))
+        if len(positions) >= 2 and len(sources) >= 2:
+            out.append(Conflict(topic=topic, positions=positions))
+    return out
+
+
+def _resolve_inline_claims(
+    answer: str,
+    resolver: _PassageResolver,
+) -> tuple[str, list[Claim]]:
+    """Rewrite the model's inline passage markers to citation numbers and split
+    the answer into per-claim segments."""
+    if not answer or ESCALATE_ANSWER in answer:
+        return answer, []
 
     def _remap(match: re.Match) -> str:
         nums = [int(n) for n in re.split(r"[,;]", match.group(1))]
-        resolved = sorted({fi for n in nums if (fi := _final_index(n)) is not None})
+        resolved = sorted({fi for n in nums if (fi := resolver.resolve(n)) is not None})
         return "".join(f"[{i}]" for i in resolved)
 
     rewritten = _MARKER_RE.sub(_remap, answer).strip()
