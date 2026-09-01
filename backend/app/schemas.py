@@ -240,6 +240,21 @@ class RetrievalInfo(BaseModel):
     top_sections: list[str] = Field(default_factory=list)
 
 
+class AnalyticsSummary(BaseModel):
+    """Aggregate usage counters (S16) — no query text, no PII."""
+
+    generated_at: str
+    total_queries: int = 0
+    by_status: dict[str, int] = Field(default_factory=dict)
+    by_jurisdiction: dict[str, int] = Field(default_factory=dict)
+    by_category: dict[str, int] = Field(default_factory=dict)
+    top_sources: dict[str, int] = Field(default_factory=dict)
+    abs_flag_rate: float = 0.0
+    from_faq_rate: float = 0.0
+    escalation_rate: float = 0.0
+    by_day: dict[str, int] = Field(default_factory=dict)
+
+
 class LanguageOption(BaseModel):
     code: str
     name: str

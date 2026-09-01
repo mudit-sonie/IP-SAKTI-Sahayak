@@ -21,6 +21,7 @@ from app.schemas import (
 )
 from app.services import (
     abs_helper,
+    analytics,
     caselaw,
     confidence,
     escalations,
@@ -52,16 +53,20 @@ def run_query(req: QueryRequest, *, use_cache: bool = True) -> QueryResponse:
     faq_hit = faq.match(req.query, req.jurisdiction.value)
     if faq_hit is not None:
         logger.info("serving reviewed FAQ %s for %r", faq_hit.id, req.query)
-        return _response_from_faq(faq_hit, req)
+        resp = _response_from_faq(faq_hit, req)
+        analytics.record(req, resp)
+        return resp
 
     if use_cache:
         hit = query_cache.get(req)
         if hit is not None:
             logger.info("query cache hit: %r", req.query)
+            analytics.record(req, hit)
             return hit
 
     resp = _run_query_uncached(req)
     query_cache.put(req, resp)
+    analytics.record(req, resp)
     if resp.confidence.status == AnswerStatus.escalate:
         escalations.record_from_query(req, resp)
     return resp

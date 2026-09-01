@@ -9,6 +9,7 @@ import Coverage from "./pages/Coverage";
 import Compare from "./pages/Compare";
 import Fees from "./pages/Fees";
 import Facilitator from "./pages/Facilitator";
+import Analytics from "./pages/Analytics";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/compare" element={<Compare />} />
         <Route path="/fees" element={<Fees />} />
         <Route path="/facilitator" element={<Facilitator />} />
+        <Route path="/analytics" element={<Analytics />} />
       </Routes>
     </BrowserRouter>
   );

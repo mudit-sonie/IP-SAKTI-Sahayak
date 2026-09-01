@@ -41,6 +41,9 @@ export default function AppShell({ context, width = "narrow", children }) {
           <Link to="/facilitator" className={styles.navLink}>
             {t(lang, "nav.facilitator")}
           </Link>
+          <Link to="/analytics" className={styles.navLink}>
+            {t(lang, "nav.analytics")}
+          </Link>
         </div>
 
         <div className={styles.right}>

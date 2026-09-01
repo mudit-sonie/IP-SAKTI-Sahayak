@@ -96,6 +96,10 @@ class Settings(BaseSettings):
     # Facilitator queue + reviewed FAQ (S5). When escalations_enabled, every
     # escalate response is persisted for a human to answer; a published FAQ
     # answer is served ahead of the model on a matching question.
+    # Anonymized usage analytics (S16). Aggregate counters only — no query text,
+    # no PII. Persisted to data/analytics.json.
+    analytics_enabled: bool = Field(default=True, alias="ANALYTICS_ENABLED")
+
     escalations_enabled: bool = Field(default=True, alias="ESCALATIONS_ENABLED")
     faq_enabled: bool = Field(default=True, alias="FAQ_ENABLED")
     # Min token-overlap (Jaccard) for a FAQ entry to short-circuit a query.

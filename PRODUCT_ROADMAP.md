@@ -126,8 +126,11 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       honest English fallback when unavailable. Frontend: `i18n/` string catalog
       (en + hi, rest fall back), `useUiLang` hook, language selector in the
       shell, auto-translated answer on Result with a "Show English" toggle.
-- [ ] **S16 — anonymized analytics**: aggregate question/topic counts to a
-      `/analytics` summary (no PII); a lightweight dashboard.
+- [x] **S16 — anonymized analytics**: `services/analytics.py` keeps aggregate
+      counters (status / jurisdiction / category / most-cited instruments / per
+      day / ABS+FAQ+escalation rates) in `data/analytics.json` — no query text,
+      no user id. `GET /analytics`; recorded on every query in the pipeline. A
+      lightweight Analytics dashboard (stat tiles + CSS bar lists) + nav link.
 - [ ] **S20 — matter documents as context**: user attaches their own documents
       to a matter; read for context, never cited. Separate retrieval lane +
       per-matter Chroma namespace. Full spec under "Deep context" below.

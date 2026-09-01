@@ -98,6 +98,13 @@ export async function getCorpus({ signal } = {}) {
   return res.json();
 }
 
+// GET /analytics -> aggregate counters (S16, no PII)
+export async function getAnalytics({ signal } = {}) {
+  const res = await fetch(`${BASE_URL}/analytics`, { signal });
+  if (!res.ok) throw new ApiError(`Could not load analytics (${res.status})`);
+  return res.json();
+}
+
 // POST /translate -> { lang, text, translated }  (S15)
 export function translate({ text, lang }, opts) {
   return postJson("/translate", { text, lang }, opts);

@@ -16,6 +16,7 @@ from app.schemas import (
     AbsCheckRequest,
     AbsCheckResponse,
     ChunkResponse,
+    AnalyticsSummary,
     ClassifyRequest,
     ClassifyResponse,
     CompareRequest,
@@ -131,6 +132,14 @@ def estimate_fees(req: FeeEstimateRequest) -> FeeEstimateResponse:
         return fees.estimate(req)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+
+
+@router.get("/analytics", response_model=AnalyticsSummary)
+def get_analytics() -> AnalyticsSummary:
+    """Anonymized aggregate usage counters (S16). No query text, no PII."""
+    from app.services import analytics
+
+    return analytics.summary()
 
 
 @router.get("/languages", response_model=list[LanguageOption])
