@@ -56,6 +56,16 @@ export default function Matter() {
     return () => ac.abort();
   }, [load]);
 
+  // Poll while a document is still being extracted / embedded (S20).
+  const processing = (matter?.documents || []).some(
+    (d) => d.status === "processing",
+  );
+  useEffect(() => {
+    if (!processing) return;
+    const t = setInterval(() => load(), 2500);
+    return () => clearInterval(t);
+  }, [processing, load]);
+
   useEffect(() => {
     const ac = new AbortController();
     mattersApi
@@ -116,8 +126,8 @@ export default function Matter() {
     mattersApi.deleteDeadline(id, dlId),
   );
 
-  async function uploadDoc(payload) {
-    setMatter(await mattersApi.uploadDocument(id, payload));
+  async function uploadDoc(file) {
+    setMatter(await mattersApi.uploadDocument(id, file));
   }
   async function deleteDoc(docId) {
     try {

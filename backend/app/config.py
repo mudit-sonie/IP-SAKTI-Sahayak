@@ -86,7 +86,7 @@ class Settings(BaseSettings):
     # documents to a matter; read for generation context, never cited. Binary
     # (PDF/DOCX) extraction is a follow-up — text (.txt/.md) only for now.
     matter_docs_enabled: bool = Field(default=True, alias="MATTER_DOCS_ENABLED")
-    matter_docs_max_kb: int = Field(default=512, alias="MATTER_DOCS_MAX_KB")
+    matter_docs_max_mb: int = Field(default=8, alias="MATTER_DOCS_MAX_MB")
     # TKDL prior-art cross-check (S12, scaffold). The Traditional Knowledge
     # Digital Library is access-controlled; no public connector exists. Until a
     # deployment wires one, tkdl_check always reports "not connected" and never

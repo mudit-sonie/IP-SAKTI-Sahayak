@@ -103,6 +103,7 @@ def update(matter_id: str, req: MatterUpdateRequest) -> Matter:
 
 
 def delete(matter_id: str) -> bool:
+    docs_svc.drop_matter(matter_id)
     return get_matter_repo().delete(matter_id)
 
 
@@ -386,16 +387,27 @@ def delete_deadline(matter_id: str, deadline_id: str) -> Matter:
         return matter
 
 
-def add_document(matter_id: str, filename: str, text: str):
+def add_document(matter_id: str, filename: str, data: bytes):
     matter = get_matter_repo().get(matter_id)
     if matter is None:
         raise KeyError(matter_id)
-    doc = docs_svc.create(matter_id, filename.strip() or "document.txt", text)
+    max_mb = get_settings().matter_docs_max_mb
+    if len(data) > max_mb * 1024 * 1024:
+        raise ValueError(
+            f"File is {len(data) / 1_048_576:.1f} MB — over the {max_mb} MB limit."
+        )
+    doc, _should_process = docs_svc.register(
+        matter_id, (filename or "document").strip(), data
+    )
     with get_matter_repo().mutate(matter_id) as m:
         m.documents.append(doc)
         _audit(m, "document.added", f"{doc.filename} → {doc.status}")
         saved = m
     return saved, doc
+
+
+def process_document(matter_id: str, doc_id: str) -> None:
+    docs_svc.process(matter_id, doc_id)
 
 
 def get_document(matter_id: str, doc_id: str):

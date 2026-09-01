@@ -495,6 +495,7 @@ class MatterDocument(BaseModel):
     uploaded_at: str
     status: str = "processing"  # processing | ready | failed
     chunk_count: int = 0
+    page_count: Optional[int] = None
     error: Optional[str] = None
 
 
@@ -504,11 +505,6 @@ class DocSnippet(BaseModel):
     doc_id: str
     filename: str
     locator: str
-    text: str
-
-
-class DocumentCreateRequest(BaseModel):
-    filename: str
     text: str
 
 

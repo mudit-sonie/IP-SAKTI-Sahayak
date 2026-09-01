@@ -1,6 +1,8 @@
 """Matter documents as context (roadmap S20)."""
 from __future__ import annotations
 
+import io
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -37,38 +39,47 @@ DOC = (
 )
 
 
-def test_upload_ready_and_chunked(client):
-    mid = _matter(client)
-    m = client.post(
+def _upload(client, mid, name, data: bytes, mime="text/plain"):
+    return client.post(
         f"/matters/{mid}/documents",
-        json={"filename": "draft-claims.txt", "text": DOC},
-    ).json()
-    assert len(m["documents"]) == 1
-    doc = m["documents"][0]
+        files={"file": (name, io.BytesIO(data), mime)},
+    )
+
+
+def test_txt_upload_processes_to_ready(client):
+    mid = _matter(client)
+    r = _upload(client, mid, "draft-claims.txt", DOC.encode())
+    assert r.status_code == 201
+    assert r.json()["documents"][0]["status"] == "processing"
+
+    # background processing has completed by the time the request returns
+    doc = client.get(f"/matters/{mid}").json()["documents"][0]
     assert doc["status"] == "ready"
     assert doc["chunk_count"] >= 1
 
     detail = client.get(f"/matters/{mid}/documents/{doc['id']}").json()
     assert "Withania somnifera" in detail["text"]
-    assert detail["chunks"]
 
 
-def test_non_text_file_fails_cleanly(client):
+def test_unsupported_type_fails_cleanly(client):
     mid = _matter(client)
-    m = client.post(
-        f"/matters/{mid}/documents",
-        json={"filename": "scan.pdf", "text": "%PDF-1.4 ..."},
-    ).json()
-    assert m["documents"][0]["status"] == "failed"
-    assert "plain-text" in m["documents"][0]["error"]
+    # rejected synchronously at register() — no background task scheduled
+    doc = _upload(client, mid, "photo.png", b"\x89PNG...").json()["documents"][0]
+    assert doc["status"] == "failed"
+    assert "Unsupported file type" in doc["error"]
 
 
-def test_doc_context_feeds_generation_and_freezes_on_question(client, monkeypatch):
+def test_oversize_rejected(client, monkeypatch):
+    monkeypatch.setenv("MATTER_DOCS_MAX_MB", "1")
+    get_settings.cache_clear()
     mid = _matter(client)
-    client.post(
-        f"/matters/{mid}/documents",
-        json={"filename": "draft-claims.txt", "text": DOC},
-    )
+    r = _upload(client, mid, "big.txt", b"x" * (1_100_000))
+    assert r.status_code == 422
+
+
+def test_doc_context_feeds_generation_and_freezes(client, monkeypatch):
+    mid = _matter(client)
+    _upload(client, mid, "draft-claims.txt", DOC.encode())
 
     captured = {}
 
@@ -84,23 +95,18 @@ def test_doc_context_feeds_generation_and_freezes_on_question(client, monkeypatc
 
     res = client.post(
         f"/matters/{mid}/questions",
-        json={"query": "Is the spray-drying step enough to avoid the section 3 exclusions?"},
+        json={"query": "Does the spray-drying step avoid the section 3 exclusions?"},
     ).json()
 
-    # the matter-doc snippet reached generation as background
     assert captured.get("doc_context")
     assert any("spray-drying" in s for s in captured["doc_context"])
-    # and is frozen onto the question record
     assert res["question"]["doc_context"]
     assert res["result"]["doc_context"]
 
 
 def test_delete_document(client):
     mid = _matter(client)
-    m = client.post(
-        f"/matters/{mid}/documents", json={"filename": "d.txt", "text": DOC}
-    ).json()
-    did = m["documents"][0]["id"]
+    did = _upload(client, mid, "d.txt", DOC.encode()).json()["documents"][0]["id"]
     m = client.request("DELETE", f"/matters/{mid}/documents/{did}").json()
     assert m["documents"] == []
     assert client.get(f"/matters/{mid}/documents/{did}").status_code == 404

@@ -72,6 +72,12 @@ class VectorIndex:
     def ready(self) -> bool:
         return self._collection is not None and self._embedder is not None
 
+    @property
+    def embedder(self):
+        """The loaded SentenceTransformer, or None. Shared with per-matter
+        document collections (S20) so we don't load the model twice."""
+        return self._embedder
+
     def search(self, query: str, top_k: int) -> list[tuple[Chunk, float]]:
         if not self.ready:
             return []

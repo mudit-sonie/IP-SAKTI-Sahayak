@@ -202,13 +202,24 @@ export const matters = {
       body: { status },
       ...opts,
     }),
-  // Matter documents as context (S20)
-  uploadDocument: (id, payload, opts) =>
-    reqJson(`/matters/${id}/documents`, {
+  // Matter documents as context (S20) — multipart file upload
+  uploadDocument: async (id, file, { signal } = {}) => {
+    const form = new FormData();
+    form.append("file", file, file.name);
+    const res = await fetch(`${BASE_URL}/matters/${id}/documents`, {
       method: "POST",
-      body: payload,
-      ...opts,
-    }),
+      body: form,
+      signal,
+    });
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      throw new ApiError(
+        `Upload failed (${res.status})${detail ? `: ${detail.slice(0, 200)}` : ""}`,
+        { status: res.status },
+      );
+    }
+    return res.json();
+  },
   getDocument: (id, docId, opts) =>
     reqJson(`/matters/${id}/documents/${docId}`, opts),
   deleteDocument: (id, docId, opts) =>

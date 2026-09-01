@@ -45,6 +45,10 @@
   color: var(--danger-600, crimson);
   font-size: var(--fs-xs);
 }
+.muted {
+  color: var(--ink-400);
+  font-style: italic;
+}
 .list {
   list-style: none;
   margin: 0;

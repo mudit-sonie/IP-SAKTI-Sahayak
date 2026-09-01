@@ -62,6 +62,11 @@ class HybridRetriever:
         """Every loaded chunk — for corpus introspection (coverage map)."""
         return list(self._all_chunks)
 
+    @property
+    def embedder(self):
+        """The shared SentenceTransformer (or None), for the S20 doc lane."""
+        return self._vector.embedder
+
     def get_chunk(self, chunk_id: str) -> Chunk | None:
         return self._by_id.get(chunk_id)
 

@@ -9,7 +9,7 @@
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, BackgroundTasks, File, HTTPException, UploadFile
 from fastapi.responses import PlainTextResponse
 
 from app.config import get_settings
@@ -19,7 +19,6 @@ from app.schemas import (
     DeadlineCreateRequest,
     DeadlineDeriveRequest,
     DeadlineDoneRequest,
-    DocumentCreateRequest,
     DraftCreateRequest,
     MatterDocumentDetail,
     Matter,
@@ -184,14 +183,25 @@ def delete_deadline(matter_id: str, deadline_id: str) -> Matter:
 
 
 @router.post("/{matter_id}/documents", response_model=Matter, status_code=201)
-def add_document(matter_id: str, req: DocumentCreateRequest) -> Matter:
+async def add_document(
+    matter_id: str,
+    background: BackgroundTasks,
+    file: UploadFile = File(...),
+) -> Matter:
     _require_enabled()
     if not get_settings().matter_docs_enabled:
         raise HTTPException(status_code=404, detail="matter documents are disabled")
+    data = await file.read()
     try:
-        matter, _doc = matters.add_document(matter_id, req.filename, req.text)
+        matter, doc = matters.add_document(
+            matter_id, file.filename or "document", data
+        )
     except KeyError:
         raise HTTPException(status_code=404, detail="matter not found")
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    if doc.status == "processing":
+        background.add_task(matters.process_document, matter_id, doc.id)
     return matter
 
 
