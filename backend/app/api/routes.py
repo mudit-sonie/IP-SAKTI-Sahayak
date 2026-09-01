@@ -18,12 +18,13 @@ from app.schemas import (
     ChunkResponse,
     ClassifyRequest,
     ClassifyResponse,
+    CorpusCoverage,
     FeedbackRequest,
     FeedbackResponse,
     QueryRequest,
     QueryResponse,
 )
-from app.services import abs_helper, feedback, pipeline
+from app.services import abs_helper, coverage, feedback, pipeline
 from app.services.classifier import classify
 
 router = APIRouter()
@@ -70,6 +71,13 @@ def get_chunk(chunk_id: str) -> ChunkResponse:
         page_start=meta.get("page_start"),
         page_end=meta.get("page_end"),
     )
+
+
+@router.get("/corpus", response_model=CorpusCoverage)
+def get_corpus() -> CorpusCoverage:
+    """Coverage map: which instruments/sections the assistant answers from, plus
+    known gaps. Backs the Coverage screen and the 'outside our corpus' banner."""
+    return coverage.build_coverage()
 
 
 @router.post("/feedback", response_model=FeedbackResponse)

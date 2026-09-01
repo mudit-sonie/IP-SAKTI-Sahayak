@@ -84,6 +84,20 @@ export function query(
   );
 }
 
+// GET /corpus -> CorpusCoverage { generated_at, corpus_loaded, chunk_count,
+//   source_count, jurisdictions, sources[{source, jurisdiction, document_type,
+//   organization, source_url, year, chunk_count, section_count, sections[], thin}],
+//   known_gaps[] }
+export async function getCorpus({ signal } = {}) {
+  const res = await fetch(`${BASE_URL}/corpus`, { signal });
+  if (!res.ok) {
+    throw new ApiError(`Could not load corpus coverage (${res.status})`, {
+      status: res.status,
+    });
+  }
+  return res.json();
+}
+
 // POST /feedback -> { ok: true }
 export function sendFeedback(payload, opts) {
   return postJson("/feedback", payload, opts);

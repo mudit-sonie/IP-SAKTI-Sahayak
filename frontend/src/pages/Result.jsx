@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { query as runQuery } from "../api/client";
 import AppShell from "../components/AppShell";
 import Button from "../components/Button";
@@ -55,6 +55,8 @@ export default function Result() {
   }, [question, jurisdiction, formulationCategory]);
 
   const escalated = data?.confidence?.status === "escalate";
+  const outsideCorpus =
+    escalated && !(data?.retrieval?.top_sections?.length);
 
   return (
     <AppShell context={{ jurisdiction, formulationLabel }} width="wide">
@@ -148,6 +150,14 @@ export default function Result() {
                   Retrieval support or model confidence was below threshold, so
                   the assistant did not guess. A human IP facilitator can take
                   this from here.
+                </p>
+              )}
+              {outsideCorpus && (
+                <p className={styles.escalateNote}>
+                  No passage in the corpus was on point — this question may fall
+                  outside what we cover. See the{" "}
+                  <Link to="/coverage">coverage map</Link> for the instruments
+                  the assistant can answer from.
                 </p>
               )}
               <FeedbackWidget

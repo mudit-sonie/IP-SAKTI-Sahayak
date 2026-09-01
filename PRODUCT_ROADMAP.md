@@ -53,8 +53,11 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
 - [x] **S3 — conflict surfacing**: generation returns `conflicts[] {topic,
       positions[] {summary, citations[]}}`; kept only when >=2 positions cite
       >=2 distinct instruments; a "Divergent positions" card on Result.
-- [ ] **S4 — corpus coverage map**: `/corpus` endpoint (sources, sections,
-      `as_of`, known gaps); a Coverage screen; "outside our corpus" banner.
+- [x] **S4 — corpus coverage map**: `GET /corpus` (per-source chunk/section
+      counts, metadata, thin-coverage flag, configured + derived known gaps);
+      `services/coverage.py`; a Coverage screen + nav link; "outside our corpus"
+      note on Result when an escalation retrieved nothing on point. `as_of`
+      lands with S6.
 - [ ] **S5 — facilitator queue + reviewed FAQ**: escalations persist to a queue;
       a facilitator view answers them; reviewed answers land in `faq/` and are
       retrieved ahead of the model on matching questions.

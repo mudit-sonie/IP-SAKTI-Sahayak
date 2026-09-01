@@ -40,6 +40,28 @@ class Settings(BaseSettings):
     )
     hybrid_bm25_weight: float = Field(default=0.5, alias="HYBRID_BM25_WEIGHT")
 
+    # --- Corpus coverage (S4) ---
+    # Known gaps surfaced on the Coverage screen. These are areas users will ask
+    # about that today's corpus cannot answer — be honest about them up front.
+    # Pipe-separated so commas can appear inside an item.
+    corpus_known_gaps: str = Field(
+        default=(
+            "CBD / Nagoya Protocol full text not yet ingested — international ABS "
+            "answers lean on TRIPS and the Indian Biological Diversity Act only|"
+            "No case law / judicial interpretation in the corpus (S14)|"
+            "No state-level ASU&H licensing rules (S13)|"
+            "Amendment history and in-force dates not tracked — provisions are "
+            "treated as current (S6)|"
+            "TKDL prior-art database not connected (S12)|"
+            "English source text only; no regional-language statutes (S15)"
+        ),
+        alias="CORPUS_KNOWN_GAPS",
+    )
+    # A source with fewer than this many chunks is flagged as thin coverage.
+    corpus_thin_source_threshold: int = Field(
+        default=5, alias="CORPUS_THIN_SOURCE_THRESHOLD"
+    )
+
     # --- Query cache ---
     # On-disk cache of /query responses, keyed by (query, jurisdiction, category).
     # Lets a demo run gold questions for free and survive Gemini's daily quota.
@@ -67,6 +89,10 @@ class Settings(BaseSettings):
     @property
     def gemini_key_list(self) -> list[str]:
         return [k.strip() for k in self.gemini_api_keys.split(",") if k.strip()]
+
+    @property
+    def corpus_known_gaps_list(self) -> list[str]:
+        return [g.strip() for g in self.corpus_known_gaps.split("|") if g.strip()]
 
     @property
     def cors_origin_list(self) -> list[str]:

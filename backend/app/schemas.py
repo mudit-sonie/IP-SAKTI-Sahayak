@@ -122,6 +122,33 @@ class ChunkResponse(BaseModel):
     page_end: Optional[int] = None
 
 
+# --------------------------------------------------------------------------- #
+# /corpus — coverage map (what the assistant can and cannot answer from) (S4)
+# --------------------------------------------------------------------------- #
+class CorpusSource(BaseModel):
+    source: str
+    source_id: Optional[str] = None
+    jurisdiction: Optional[str] = None
+    document_type: Optional[str] = None
+    organization: Optional[str] = None
+    source_url: Optional[str] = None
+    year: Optional[int] = None
+    chunk_count: int = 0
+    section_count: int = 0
+    sections: list[str] = Field(default_factory=list)
+    thin: bool = False  # fewer chunks than the thin-coverage threshold
+
+
+class CorpusCoverage(BaseModel):
+    generated_at: str
+    corpus_loaded: bool
+    chunk_count: int = 0
+    source_count: int = 0
+    jurisdictions: dict[str, int] = Field(default_factory=dict)
+    sources: list[CorpusSource] = Field(default_factory=list)
+    known_gaps: list[str] = Field(default_factory=list)
+
+
 class Confidence(BaseModel):
     retrieval_score: float = 0.0
     self_confidence: SelfConfidence = SelfConfidence.low
