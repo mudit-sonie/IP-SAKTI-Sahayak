@@ -34,6 +34,7 @@ from app.schemas import (
 from app.services import checklist as checklist_svc
 from app.services import deadlines as deadlines_svc
 from app.services import drafts as drafts_svc
+from app.services import matter_docs as docs_svc
 from app.services import pipeline
 from app.services import tkdl as tkdl_svc
 from app.store.repos import get_matter_repo, new_id
@@ -146,6 +147,7 @@ def ask(matter_id: str, req: MatterQuestionRequest) -> tuple[Matter, MatterQuest
         claims=result.claims,
         conflicts=result.conflicts,
         case_notes=result.case_notes,
+        doc_context=result.doc_context,
         abs_flag=result.abs_flag,
     )
 
@@ -382,6 +384,36 @@ def delete_deadline(matter_id: str, deadline_id: str) -> Matter:
             raise KeyError(deadline_id)
         _audit(matter, "deadline.deleted", deadline_id)
         return matter
+
+
+def add_document(matter_id: str, filename: str, text: str):
+    matter = get_matter_repo().get(matter_id)
+    if matter is None:
+        raise KeyError(matter_id)
+    doc = docs_svc.create(matter_id, filename.strip() or "document.txt", text)
+    with get_matter_repo().mutate(matter_id) as m:
+        m.documents.append(doc)
+        _audit(m, "document.added", f"{doc.filename} → {doc.status}")
+        saved = m
+    return saved, doc
+
+
+def get_document(matter_id: str, doc_id: str):
+    d = docs_svc.detail(matter_id, doc_id)
+    if d is None:
+        raise KeyError(doc_id)
+    return d
+
+
+def delete_document(matter_id: str, doc_id: str) -> Matter:
+    with get_matter_repo().mutate(matter_id) as m:
+        ref = next((d for d in m.documents if d.id == doc_id), None)
+        if ref is None:
+            raise KeyError(doc_id)
+        m.documents = [d for d in m.documents if d.id != doc_id]
+        _audit(m, "document.deleted", ref.filename)
+        docs_svc.delete(matter_id, doc_id)
+        return m
 
 
 def run_tkdl_check(matter_id: str) -> Matter:

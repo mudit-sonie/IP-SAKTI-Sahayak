@@ -82,6 +82,11 @@ class Settings(BaseSettings):
     # written atomically. No DB by design: the app must run on any laptop.
     data_dir: str = Field(default="./data", alias="DATA_DIR")
     matters_enabled: bool = Field(default=True, alias="MATTERS_ENABLED")
+    # Matter documents as context (S20). The user attaches their own text
+    # documents to a matter; read for generation context, never cited. Binary
+    # (PDF/DOCX) extraction is a follow-up — text (.txt/.md) only for now.
+    matter_docs_enabled: bool = Field(default=True, alias="MATTER_DOCS_ENABLED")
+    matter_docs_max_kb: int = Field(default=512, alias="MATTER_DOCS_MAX_KB")
     # TKDL prior-art cross-check (S12, scaffold). The Traditional Knowledge
     # Digital Library is access-controlled; no public connector exists. Until a
     # deployment wires one, tkdl_check always reports "not connected" and never

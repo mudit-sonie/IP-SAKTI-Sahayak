@@ -164,6 +164,32 @@
   color: var(--ink-800);
   max-width: 64ch;
 }
+.docStrip {
+  margin-top: var(--s-3);
+  padding: var(--s-3);
+  border-left: 2px dashed var(--rule);
+  background: var(--surface-sunken);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+.docStripHead {
+  margin: 0 0 var(--s-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-500);
+}
+.docSnip {
+  margin: 0 0 var(--s-2);
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+  color: var(--ink-600);
+}
+.docLoc {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-400);
+  margin-bottom: 2px;
+}
 .cites {
   display: flex;
   flex-direction: column;

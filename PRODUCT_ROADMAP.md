@@ -131,9 +131,15 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       day / ABS+FAQ+escalation rates) in `data/analytics.json` — no query text,
       no user id. `GET /analytics`; recorded on every query in the pipeline. A
       lightweight Analytics dashboard (stat tiles + CSS bar lists) + nav link.
-- [ ] **S20 — matter documents as context**: user attaches their own documents
-      to a matter; read for context, never cited. Separate retrieval lane +
-      per-matter Chroma namespace. Full spec under "Deep context" below.
+- [x] **S20 — matter documents as context**: the user attaches their own
+      text documents (.txt / .md) to a matter; `services/matter_docs.py` chunks
+      + stores them (gitignored, never logged), and a term-overlap retrieval
+      lane injects the top snippets into generation as background — never a
+      citation. `QueryResponse.doc_context` + frozen onto `MatterQuestion`.
+      `POST/GET/DELETE /matters/{id}/documents[/{doc_id}]`. Attachments tab +
+      "grounded partly in your documents" strip on an answer. Binary (PDF/DOCX)
+      extraction and a per-matter Chroma namespace are the follow-up (needs
+      `python-multipart` + a PDF reader).
 
 ### Trust & safety (non-negotiable before public)
 - [x] **S17 — FTO / infringement always-escalate**: `services/safety.py` forces
@@ -146,7 +152,9 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       Activity tab.
 
 ### Deep context
-- [ ] **S20 — matter documents as context**: the user attaches their own
+- [x] **S20 — matter documents as context** *(text uploads shipped; binary
+      extraction + per-matter Chroma namespace deferred — see the slice entry
+      above and "Risks" below)*: the user attaches their own
       documents to a matter (draft patent claims, product dossier, label
       artwork text, lab report, prior NBA correspondence). The assistant reads
       them to understand *what is being asked about* — it never cites them.

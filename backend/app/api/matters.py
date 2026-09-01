@@ -19,7 +19,9 @@ from app.schemas import (
     DeadlineCreateRequest,
     DeadlineDeriveRequest,
     DeadlineDoneRequest,
+    DocumentCreateRequest,
     DraftCreateRequest,
+    MatterDocumentDetail,
     Matter,
     MatterCreateRequest,
     MatterQuestionRequest,
@@ -179,6 +181,38 @@ def delete_deadline(matter_id: str, deadline_id: str) -> Matter:
         return matters.delete_deadline(matter_id, deadline_id)
     except KeyError:
         raise HTTPException(status_code=404, detail="matter or deadline not found")
+
+
+@router.post("/{matter_id}/documents", response_model=Matter, status_code=201)
+def add_document(matter_id: str, req: DocumentCreateRequest) -> Matter:
+    _require_enabled()
+    if not get_settings().matter_docs_enabled:
+        raise HTTPException(status_code=404, detail="matter documents are disabled")
+    try:
+        matter, _doc = matters.add_document(matter_id, req.filename, req.text)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter not found")
+    return matter
+
+
+@router.get(
+    "/{matter_id}/documents/{doc_id}", response_model=MatterDocumentDetail
+)
+def get_document(matter_id: str, doc_id: str) -> MatterDocumentDetail:
+    _require_enabled()
+    try:
+        return matters.get_document(matter_id, doc_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="document not found")
+
+
+@router.delete("/{matter_id}/documents/{doc_id}", response_model=Matter)
+def delete_document(matter_id: str, doc_id: str) -> Matter:
+    _require_enabled()
+    try:
+        return matters.delete_document(matter_id, doc_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter or document not found")
 
 
 @router.post("/{matter_id}/tkdl-check", response_model=Matter)

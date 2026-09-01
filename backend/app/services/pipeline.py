@@ -8,6 +8,7 @@
 """
 from __future__ import annotations
 
+from app.config import get_settings
 from app.core.logging import get_logger
 from app.retrieval import get_retriever
 from app.retrieval.expansion import expand_query
@@ -50,6 +51,11 @@ def _response_from_faq(entry, req: QueryRequest) -> QueryResponse:
 
 
 def run_query(req: QueryRequest, *, use_cache: bool = True) -> QueryResponse:
+    # Matter questions carry per-matter document context, so they bypass the
+    # (query, jurisdiction, category)-keyed cache.
+    if req.matter_id:
+        use_cache = False
+
     faq_hit = faq.match(req.query, req.jurisdiction.value)
     if faq_hit is not None:
         logger.info("serving reviewed FAQ %s for %r", faq_hit.id, req.query)
@@ -88,6 +94,13 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
     chunks = [rc for rc in retrieved if not rc.chunk.is_case][:6]
     notes = caselaw.case_notes(case_hits)
 
+    # S20: passages from the user's own matter documents — background only.
+    doc_snips = []
+    if req.matter_id and get_settings().matter_docs_enabled:
+        from app.services import matter_docs
+
+        doc_snips = matter_docs.snippets(req.matter_id, req.query, k=3)
+
     pool_n, pool_sources = retriever.jurisdiction_scope(req.jurisdiction.value)
     retrieval_info = RetrievalInfo(
         jurisdiction=req.jurisdiction.value,
@@ -116,9 +129,14 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
             jurisdiction_note=mismatch_note(req.query, req.jurisdiction.value),
             retrieval=retrieval_info,
             case_notes=notes,
+            doc_context=doc_snips,
         )
 
-    gen = generation.generate(req.query, chunks, context=req.context)
+    gen = generation.generate(
+        req.query, chunks,
+        context=req.context,
+        doc_context=[s.text for s in doc_snips] or None,
+    )
     conf = confidence.score(
         top_score, gen.self_confidence, has_citations=bool(gen.citations)
     )
@@ -149,6 +167,7 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
         claims=gen.claims,
         conflicts=gen.conflicts,
         case_notes=notes,
+        doc_context=doc_snips,
         confidence=conf,
         abs_flag=abs_result.triggered,
         abs_note=abs_note,

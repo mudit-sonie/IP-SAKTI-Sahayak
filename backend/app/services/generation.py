@@ -95,6 +95,7 @@ def generate(
     chunks: list[RetrievedChunk],
     *,
     context: str | None = None,
+    doc_context: list[str] | None = None,
 ) -> Generation:
     if not chunks:
         return _escalation()
@@ -110,6 +111,13 @@ def generate(
             "Background on the product this question is about (supplied by the "
             "user; NOT a source of law — the legal answer must still come only "
             f"from the numbered passages):\n{context}\n\n"
+        )
+    if doc_context:
+        joined = "\n".join(f"- {s}" for s in doc_context)
+        background += (
+            "From the user's own documents (background to understand the "
+            "question — NOT a source of law, never cite these):\n"
+            f"{joined}\n\n"
         )
 
     prompt = (

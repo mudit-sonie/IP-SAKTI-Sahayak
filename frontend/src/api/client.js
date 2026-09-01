@@ -202,6 +202,17 @@ export const matters = {
       body: { status },
       ...opts,
     }),
+  // Matter documents as context (S20)
+  uploadDocument: (id, payload, opts) =>
+    reqJson(`/matters/${id}/documents`, {
+      method: "POST",
+      body: payload,
+      ...opts,
+    }),
+  getDocument: (id, docId, opts) =>
+    reqJson(`/matters/${id}/documents/${docId}`, opts),
+  deleteDocument: (id, docId, opts) =>
+    reqJson(`/matters/${id}/documents/${docId}`, { method: "DELETE", ...opts }),
   // TKDL / prior-art cross-check (S12)
   tkdlCheck: (id, opts) =>
     reqJson(`/matters/${id}/tkdl-check`, { method: "POST", ...opts }),

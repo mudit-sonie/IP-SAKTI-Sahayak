@@ -9,6 +9,7 @@ import CitationCard from "../components/CitationCard";
 import Checklist from "../components/Checklist";
 import Drafts from "../components/Drafts";
 import Deadlines from "../components/Deadlines";
+import MatterDocuments from "../components/MatterDocuments";
 import ConfidenceMeter from "../components/ConfidenceMeter";
 import PassageDrawer from "../components/PassageDrawer";
 import TextArea from "../components/TextArea";
@@ -114,6 +115,17 @@ export default function Matter() {
   const deleteDeadline = runDeadline((dlId) =>
     mattersApi.deleteDeadline(id, dlId),
   );
+
+  async function uploadDoc(payload) {
+    setMatter(await mattersApi.uploadDocument(id, payload));
+  }
+  async function deleteDoc(docId) {
+    try {
+      setMatter(await mattersApi.deleteDocument(id, docId));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
 
   async function runTkdl() {
     try {
@@ -298,7 +310,17 @@ export default function Matter() {
               className={tab === "documents" ? styles.tabOn : styles.tab}
               onClick={() => setTab("documents")}
             >
-              Documents <span className="mono">{matter.drafts.length}</span>
+              Drafts <span className="mono">{matter.drafts.length}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "attachments"}
+              className={tab === "attachments" ? styles.tabOn : styles.tab}
+              onClick={() => setTab("attachments")}
+            >
+              Attachments{" "}
+              <span className="mono">{matter.documents?.length || 0}</span>
             </button>
             <button
               type="button"
@@ -336,6 +358,14 @@ export default function Matter() {
               onToggle={toggleDeadline}
               onDelete={deleteDeadline}
               onView={setViewing}
+            />
+          )}
+
+          {tab === "attachments" && (
+            <MatterDocuments
+              documents={matter.documents || []}
+              onUpload={uploadDoc}
+              onDelete={deleteDoc}
             />
           )}
 
@@ -405,6 +435,19 @@ export default function Matter() {
                   </span>
                 </div>
                 <p className={styles.a}>{q.answer}</p>
+                {q.doc_context?.length > 0 && (
+                  <div className={styles.docStrip}>
+                    <p className={styles.docStripHead}>
+                      Grounded partly in your documents (background, not cited)
+                    </p>
+                    {q.doc_context.map((s, di) => (
+                      <p key={di} className={styles.docSnip}>
+                        <span className={styles.docLoc}>{s.locator}</span>
+                        {s.text}
+                      </p>
+                    ))}
+                  </div>
+                )}
                 <a
                   className={styles.export}
                   href={`${BASE_URL}/matters/${id}/questions/${q.id}/export`}

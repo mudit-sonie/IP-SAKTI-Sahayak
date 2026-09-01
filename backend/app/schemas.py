@@ -288,6 +288,8 @@ class QueryResponse(BaseModel):
     # Judicial decisions retrieved alongside the statute text (S14). Empty until
     # case law is ingested (document_type == "case").
     case_notes: list[CaseNote] = Field(default_factory=list)
+    # Passages from the user's own matter documents the answer leaned on (S20).
+    doc_context: list[DocSnippet] = Field(default_factory=list)
     confidence: Confidence
     abs_flag: bool = False
     abs_note: Optional[str] = None
@@ -407,6 +409,7 @@ class MatterQuestion(BaseModel):
     claims: list[Claim] = Field(default_factory=list)
     conflicts: list[Conflict] = Field(default_factory=list)
     case_notes: list[CaseNote] = Field(default_factory=list)
+    doc_context: list[DocSnippet] = Field(default_factory=list)
     abs_flag: bool = False
 
 
@@ -476,8 +479,43 @@ class Matter(BaseModel):
     # (re)derive statutory deadlines.
     anchor_dates: dict[str, str] = Field(default_factory=dict)
     drafts: list[DraftRef] = Field(default_factory=list)
+    documents: list[MatterDocument] = Field(default_factory=list)  # S20
     tkdl: Optional[TkdlResult] = None  # last TKDL / prior-art cross-check (S12)
     audit: list[AuditEntry] = Field(default_factory=list)
+
+
+class MatterDocument(BaseModel):
+    """A user's own document attached to a matter (S20). Read for context, never
+    cited — `citations[]` stays corpus-only."""
+
+    id: str
+    filename: str
+    media_type: str = "text/plain"
+    bytes: int = 0
+    uploaded_at: str
+    status: str = "processing"  # processing | ready | failed
+    chunk_count: int = 0
+    error: Optional[str] = None
+
+
+class DocSnippet(BaseModel):
+    """A passage from a matter document that an answer leaned on (S20)."""
+
+    doc_id: str
+    filename: str
+    locator: str
+    text: str
+
+
+class DocumentCreateRequest(BaseModel):
+    filename: str
+    text: str
+
+
+class MatterDocumentDetail(BaseModel):
+    document: MatterDocument
+    text: str
+    chunks: list[str] = Field(default_factory=list)
 
 
 class TkdlReference(BaseModel):
