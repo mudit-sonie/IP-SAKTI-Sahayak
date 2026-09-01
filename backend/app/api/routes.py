@@ -26,6 +26,8 @@ from app.schemas import (
     FeeEstimateResponse,
     FeesResponse,
     Jurisdiction,
+    StateAuthority,
+    StateRulesResponse,
     FeedbackRequest,
     FeedbackResponse,
     QueryRequest,
@@ -126,6 +128,24 @@ def estimate_fees(req: FeeEstimateRequest) -> FeeEstimateResponse:
         return fees.estimate(req)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+
+
+@router.get("/state-rules", response_model=StateRulesResponse)
+def get_state_rules() -> StateRulesResponse:
+    """ASU&H drug licensing authorities by state (S13 scaffold)."""
+    from app.services import state_rules
+
+    return state_rules.list_authorities()
+
+
+@router.get("/state-rules/{state_key}", response_model=StateAuthority)
+def get_state_rule(state_key: str) -> StateAuthority:
+    from app.services import state_rules
+
+    a = state_rules.get_authority(state_key)
+    if a is None:
+        raise HTTPException(status_code=404, detail="unknown state key")
+    return a
 
 
 @router.get("/draft-kinds", response_model=list[DraftKindInfo])

@@ -89,6 +89,10 @@ class Settings(BaseSettings):
     tkdl_enabled: bool = Field(default=False, alias="TKDL_ENABLED")
     tkdl_api_url: str = Field(default="", alias="TKDL_API_URL")
 
+    # State-level ASU&H rules (S13, scaffold). Optional per-state overlay of extra
+    # rule notes: data/state_rules/<state_key>.json. Absent by default.
+    state_rules_dir: str = Field(default="", alias="STATE_RULES_DIR")
+
     # Facilitator queue + reviewed FAQ (S5). When escalations_enabled, every
     # escalate response is persisted for a human to answer; a published FAQ
     # answer is served ahead of the model on a matching question.

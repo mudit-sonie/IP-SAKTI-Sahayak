@@ -98,6 +98,14 @@ export async function getCorpus({ signal } = {}) {
   return res.json();
 }
 
+// GET /state-rules -> { as_of, note, authorities: [{ key, state, authority,
+//   portal_url, note }] }
+export async function getStateRules({ signal } = {}) {
+  const res = await fetch(`${BASE_URL}/state-rules`, { signal });
+  if (!res.ok) throw new ApiError(`Could not load state rules (${res.status})`);
+  return res.json();
+}
+
 // GET /fees -> { disclaimer, schedules: [{ track, title, as_of, source, source_url,
 //   entities[], items[], renewal_bands[], notes[] }] }
 export async function getFees({ signal } = {}) {

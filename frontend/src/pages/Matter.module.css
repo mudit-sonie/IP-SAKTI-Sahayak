@@ -241,6 +241,36 @@
   line-height: 1.7;
   color: var(--ink-700);
 }
+.stateSelect {
+  width: 100%;
+  font: inherit;
+  font-size: var(--fs-sm);
+  padding: 8px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-900);
+}
+.stateAuth {
+  margin-top: var(--s-2);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stateAuthName {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--ink-700);
+  line-height: 1.5;
+}
+.stateAuthLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent-700);
+}
 .tkdl {
   display: flex;
   flex-direction: column;

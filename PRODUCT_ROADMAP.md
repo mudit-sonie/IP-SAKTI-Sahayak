@@ -110,8 +110,11 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       TKDL is NDA-only, no public API); `TKDL_ENABLED` / `TKDL_API_URL` hook,
       never fabricates prior art. `POST /matters/{id}/tkdl-check`; `Matter.tkdl`;
       a TKDL slot on the Matter rail.
-- [ ] **S13 — state-level rules**: jurisdiction gains an optional `state`; ASU&H
-      licensing authority table; ingestion hook for state rules.
+- [x] **S13 — state-level rules**: `Matter.state`; `services/state_rules.py`
+      directory of state ASU&H Licensing Authorities (`GET /state-rules[/{key}]`);
+      the licensing checklist item names the matter's authority + portal;
+      `STATE_RULES_DIR` overlay hook for per-state rule notes. State picker +
+      authority card on the Matter rail.
 - [ ] **S14 — case-law layer**: `document_type: "case"` support in corpus +
       retrieval; a "How courts have applied this" block.
 - [ ] **S15 — multi-language**: i18n scaffold (frontend string catalog + a

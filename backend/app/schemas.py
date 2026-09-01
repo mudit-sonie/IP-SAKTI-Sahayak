@@ -417,6 +417,9 @@ class Matter(BaseModel):
     classification_rationale: list[str] = Field(default_factory=list)
     profile: MatterProfile = Field(default_factory=MatterProfile)
     abs_status: AbsStatus = AbsStatus.unknown
+    # Optional Indian state — drives the ASU&H licensing authority and (later)
+    # state-specific rules. Free-form key matched against the state-rules table.
+    state: Optional[str] = None
     notes: Optional[str] = None
     questions: list[MatterQuestion] = Field(default_factory=list)
     checklist: list[ChecklistItem] = Field(default_factory=list)
@@ -451,6 +454,22 @@ class TkdlResult(BaseModel):
     references: list[TkdlReference] = Field(default_factory=list)
 
 
+class StateAuthority(BaseModel):
+    """ASU&H drug licensing authority for an Indian state (S13)."""
+
+    key: str
+    state: str
+    authority: str
+    portal_url: Optional[str] = None
+    note: Optional[str] = None
+
+
+class StateRulesResponse(BaseModel):
+    as_of: str
+    note: str
+    authorities: list[StateAuthority] = Field(default_factory=list)
+
+
 class MatterSummary(BaseModel):
     id: str
     title: str
@@ -469,6 +488,7 @@ class MatterCreateRequest(BaseModel):
     formulation_label: Optional[str] = None
     classification_rationale: list[str] = Field(default_factory=list)
     profile: Optional[MatterProfile] = None
+    state: Optional[str] = None
     notes: Optional[str] = None
 
 
@@ -479,6 +499,7 @@ class MatterUpdateRequest(BaseModel):
     formulation_label: Optional[str] = None
     classification_rationale: Optional[list[str]] = None
     profile: Optional[MatterProfile] = None
+    state: Optional[str] = None
     notes: Optional[str] = None
 
 

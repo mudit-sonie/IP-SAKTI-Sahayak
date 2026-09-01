@@ -63,6 +63,7 @@ def create(req: MatterCreateRequest) -> Matter:
         formulation_label=req.formulation_label,
         classification_rationale=req.classification_rationale,
         profile=req.profile or MatterProfile(),
+        state=req.state,
         notes=req.notes,
     )
     _audit(matter, "matter.created", matter.title)
@@ -78,15 +79,19 @@ def update(matter_id: str, req: MatterUpdateRequest) -> Matter:
     repo = get_matter_repo()
     with repo.mutate(matter_id) as matter:
         before_cat = matter.formulation_category
+        before_state = matter.state
         for field in ("title", "jurisdiction", "formulation_category",
                       "formulation_label", "classification_rationale",
-                      "profile", "notes"):
+                      "profile", "state", "notes"):
             val = getattr(req, field)
             if val is not None:
                 setattr(matter, field, val)
         _audit(matter, "matter.updated")
-        # A new / changed classification changes which checklist rules apply.
-        if matter.formulation_category and matter.formulation_category != before_cat:
+        # A new classification, or a new state (S13), changes the checklist.
+        if matter.formulation_category and (
+            matter.formulation_category != before_cat
+            or matter.state != before_state
+        ):
             matter.checklist = checklist_svc.generate(matter)
             _audit(
                 matter,

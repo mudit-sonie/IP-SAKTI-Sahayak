@@ -193,11 +193,23 @@ def generate(matter: Matter) -> list[ChecklistItem]:
             continue
 
         kept = prior.get(rule.key)
+        detail = rule.detail
+        # S13: point the state ASU licensing item at the actual authority
+        if rule.key == "asu_manufacturing_licence" and matter.state:
+            from app.services import state_rules
+
+            auth = state_rules.get_authority(matter.state)
+            if auth is not None:
+                detail = f"{detail} State Licensing Authority: {auth.authority}."
+                if auth.portal_url:
+                    detail += f" ({auth.portal_url})"
+                if auth.note:
+                    detail += f" {auth.note}"
         items.append(
             ChecklistItem(
                 id=kept.id if kept else new_id("c_"),
                 title=rule.title,
-                detail=rule.detail,
+                detail=detail,
                 group=rule.group,
                 status=kept.status if kept else ChecklistStatus.todo,
                 citations=_ground(rule.probe, jurisdiction),

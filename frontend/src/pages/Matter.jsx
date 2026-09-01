@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { matters as mattersApi, BASE_URL } from "../api/client";
+import { matters as mattersApi, getStateRules, BASE_URL } from "../api/client";
 import AppShell from "../components/AppShell";
 import Button from "../components/Button";
 import Badge from "../components/Badge";
@@ -33,6 +33,7 @@ export default function Matter() {
   const [checklistBusy, setChecklistBusy] = useState(false);
   const [draftKinds, setDraftKinds] = useState([]);
   const [draftBusy, setDraftBusy] = useState(false);
+  const [stateRules, setStateRules] = useState(null);
 
   const load = useCallback(
     (signal) =>
@@ -60,8 +61,19 @@ export default function Matter() {
       .draftKinds({ signal: ac.signal })
       .then(setDraftKinds)
       .catch(() => {});
+    getStateRules({ signal: ac.signal })
+      .then(setStateRules)
+      .catch(() => {});
     return () => ac.abort();
   }, []);
+
+  async function setMatterState(state) {
+    try {
+      setMatter(await mattersApi.update(id, { state: state || null }));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
 
   async function generateDraft(kind) {
     setDraftBusy(true);
@@ -443,6 +455,43 @@ export default function Matter() {
             ) : (
               <p className={styles.railMuted}>Ask a question to see this.</p>
             )}
+          </section>
+
+          <section className={styles.railBlock}>
+            <h2 className={styles.railTitle}>State &amp; ASU&amp;H licensing</h2>
+            <select
+              className={styles.stateSelect}
+              value={matter.state || ""}
+              onChange={(e) => setMatterState(e.target.value)}
+              disabled={!stateRules}
+            >
+              <option value="">Select state (optional)…</option>
+              {stateRules?.authorities.map((a) => (
+                <option key={a.key} value={a.key}>
+                  {a.state}
+                </option>
+              ))}
+            </select>
+            {matter.state &&
+              stateRules?.authorities
+                .filter((a) => a.key === matter.state)
+                .map((a) => (
+                  <div key={a.key} className={styles.stateAuth}>
+                    <p className={styles.stateAuthName}>{a.authority}</p>
+                    {a.portal_url && (
+                      <a
+                        href={a.portal_url}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className={styles.stateAuthLink}
+                      >
+                        Licensing portal{" "}
+                        <Icon name="external" size={11} />
+                      </a>
+                    )}
+                    <p className={styles.tkdlNote}>{stateRules.note}</p>
+                  </div>
+                ))}
           </section>
 
           <section className={styles.railBlock}>
