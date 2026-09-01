@@ -119,3 +119,12 @@ cd frontend && npm run build && npm run lint
 - `corpus/` folder names must not contain `:` (macOS artifact, fixed in `2a42196`).
 - Don't `git add -A` from a stale branch — it can mass-delete `corpus/`
   (see [`CLAUDE.md`](CLAUDE.md)).
+
+## 👥 Team & Contributors
+
+- **Mudit Sonie**
+- **Anuj Paroha**
+- **Avishi Poddar**
+- **Dewashish Lambore**
+- **Kavish Nag**
+- **Poorvi Dhall**
