@@ -61,6 +61,13 @@ class Settings(BaseSettings):
     corpus_thin_source_threshold: int = Field(
         default=5, alias="CORPUS_THIN_SOURCE_THRESHOLD"
     )
+    # --- Amendment awareness (S6, scaffold) ---
+    # Optional overlay of currency dates + per-provision amendment notes, merged
+    # onto chunk metadata at load. Absent by default — amendment history is not
+    # in the corpus yet; this is the curation hook. See the .example file.
+    amendment_overlay_path: str = Field(
+        default="./data/amendments.json", alias="AMENDMENT_OVERLAY_PATH"
+    )
 
     # --- Query cache ---
     # On-disk cache of /query responses, keyed by (query, jurisdiction, category).

@@ -78,6 +78,11 @@ class Citation(BaseModel):
     section: str
     excerpt_ref: Optional[str] = None
     source_url: Optional[str] = None
+    # Amendment awareness (S6): currency date of the passage text, and an
+    # amending instrument known to affect this provision (both optional — only
+    # set when the amendment overlay is curated).
+    as_of: Optional[str] = None
+    amended_by: Optional[str] = None
 
 
 class Claim(BaseModel):
@@ -120,6 +125,9 @@ class ChunkResponse(BaseModel):
     jurisdiction: Optional[str] = None
     page_start: Optional[int] = None
     page_end: Optional[int] = None
+    as_of: Optional[str] = None
+    amended_by: Optional[str] = None
+    in_force: Optional[bool] = None
 
 
 # --------------------------------------------------------------------------- #
@@ -133,6 +141,7 @@ class CorpusSource(BaseModel):
     organization: Optional[str] = None
     source_url: Optional[str] = None
     year: Optional[int] = None
+    as_of: Optional[str] = None
     chunk_count: int = 0
     section_count: int = 0
     sections: list[str] = Field(default_factory=list)

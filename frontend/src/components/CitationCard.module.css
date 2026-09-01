@@ -49,6 +49,24 @@
   font-size: var(--fs-sm);
   color: var(--ink-500);
 }
+.currency {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--s-2);
+  font-size: var(--fs-xs);
+}
+.amended {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--warn-700, #9a6700);
+  font-weight: 600;
+}
+.asOf {
+  color: var(--ink-500);
+  font-family: var(--font-mono);
+}
 .links {
   display: flex;
   flex-wrap: wrap;

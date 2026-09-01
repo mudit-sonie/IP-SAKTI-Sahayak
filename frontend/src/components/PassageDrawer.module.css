@@ -78,6 +78,14 @@
 .muted {
   color: var(--ink-500);
 }
+.currency {
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--warn-700, #9a6700);
+}
 
 .foot {
   display: flex;

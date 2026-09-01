@@ -61,9 +61,15 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
 - [ ] **S5 — facilitator queue + reviewed FAQ**: escalations persist to a queue;
       a facilitator view answers them; reviewed answers land in `faq/` and are
       retrieved ahead of the model on matching questions.
-- [ ] **S6 — amendment awareness (scaffold)**: `as_of` / `amended_by` /
-      `in_force` optional metadata on `Chunk`; ingestion hook; Citation carries
-      `as_of`; Result shows "as of <date>" and a stale-provision warning.
+- [x] **S6 — amendment awareness (scaffold)**: `as_of` / `amended_by` /
+      `in_force` + `is_stale` on `Chunk`, merged from a curated overlay
+      (`data/amendments.json`, `AMENDMENT_OVERLAY_PATH`) at corpus load — the
+      ingestion hook, since amendment history isn't in the corpus. `Citation`
+      and `ChunkResponse` carry `as_of` / `amended_by`; `/corpus` sources carry
+      `as_of`. Result shows a "cited provision may have been amended" card + the
+      passage drawer and export note it. Shipped overlay flags Biological
+      Diversity Act ss.6/7/40 (BD Amendment Act, 2023) and Patents Rules 2003
+      currency.
 
 ### Workflow layer (retention)
 - [x] **S7 — compliance checklist**: rule-driven generator keyed on category +

@@ -155,6 +155,19 @@ def generate(
 _MARKER_RE = re.compile(r"\[\s*(\d+(?:\s*[,;]\s*\d+)*)\s*\]")
 
 
+def _citation_for(chunk, *, section: str | None = None) -> Citation:
+    """Build a Citation from a retrieved chunk, carrying through amendment
+    metadata (as_of / amended_by) from the overlay when present."""
+    return Citation(
+        source=chunk.source,
+        section=chunk.section if section is None else section,
+        excerpt_ref=chunk.chunk_id,
+        source_url=chunk.metadata.get("source_url"),
+        as_of=chunk.metadata.get("as_of") or None,
+        amended_by=chunk.metadata.get("amended_by") or None,
+    )
+
+
 class _PassageResolver:
     """Maps a model context-passage number ([1] = first passage) to the 1-based
     position of that passage's Citation, appending a Citation for any relied-upon
@@ -175,12 +188,7 @@ class _PassageResolver:
         hit = self._by_chunk.get(chunk.chunk_id)
         if hit is not None:
             return hit
-        self.citations.append(Citation(
-            source=chunk.source,
-            section=chunk.section,
-            excerpt_ref=chunk.chunk_id,
-            source_url=chunk.metadata.get("source_url"),
-        ))
+        self.citations.append(_citation_for(chunk))
         idx = len(self.citations)
         self._by_chunk[chunk.chunk_id] = idx
         return idx
@@ -275,12 +283,7 @@ def _recover_citations(answer: str, chunks: list[RetrievedChunk]) -> list[Citati
     seen: set[tuple[str, str]] = set()
 
     def _cite(chunk) -> Citation:
-        return Citation(
-            source=chunk.source,
-            section=chunk.section,
-            excerpt_ref=chunk.chunk_id,
-            source_url=chunk.metadata.get("source_url"),
-        )
+        return _citation_for(chunk)
 
     for rc in chunks:
         sec = rc.chunk.section
@@ -340,10 +343,8 @@ def _coerce_citations(
         if key in seen:
             continue
         seen.add(key)
-        out.append(Citation(
-            source=source,
-            section=resolved_section,
-            excerpt_ref=hit.chunk.chunk_id if hit is not None else None,
-            source_url=(hit.chunk.metadata.get("source_url") if hit is not None else None),
-        ))
+        if hit is not None:
+            out.append(_citation_for(hit.chunk, section=resolved_section))
+        else:
+            out.append(Citation(source=source, section=resolved_section))
     return out

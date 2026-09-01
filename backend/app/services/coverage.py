@@ -43,6 +43,7 @@ def _build_source(name: str, chunks: list[Chunk], thin_threshold: int) -> Corpus
         organization=first.get("source_organization"),
         source_url=first.get("source_url"),
         year=year,
+        as_of=next((c.as_of for c in chunks if c.as_of), None),
         chunk_count=len(chunks),
         section_count=len(sections),
         sections=sections,

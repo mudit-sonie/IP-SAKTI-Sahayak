@@ -211,6 +211,13 @@ def export_question_markdown(matter_id: str, question_id: str) -> tuple[str, str
         for c in q.citations:
             url = f" — {c.source_url}" if c.source_url else ""
             lines.append(f"- {c.source}, Section {c.section}{url}")
+            if c.as_of:
+                lines.append(f"  - source text as of {c.as_of}")
+            if c.amended_by:
+                lines.append(
+                    f"  - ⚠ may have been amended by {c.amended_by}; verify "
+                    f"against the official source"
+                )
     else:
         lines.append("_No passage met the citation bar._")
     lines += [

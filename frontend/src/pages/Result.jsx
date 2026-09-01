@@ -57,6 +57,7 @@ export default function Result() {
   const escalated = data?.confidence?.status === "escalate";
   const outsideCorpus =
     escalated && !(data?.retrieval?.top_sections?.length);
+  const staleCitations = (data?.citations || []).filter((c) => c.amended_by);
 
   return (
     <AppShell context={{ jurisdiction, formulationLabel }} width="wide">
@@ -170,6 +171,26 @@ export default function Result() {
                 }}
               />
             </Card>
+
+            {staleCitations.length > 0 && (
+              <Card tone="warn">
+                <CardHeader
+                  eyebrow="Check currency"
+                  title="A cited provision may have been amended"
+                />
+                <ul className={styles.staleList}>
+                  {staleCitations.map((c, i) => (
+                    <li key={i}>
+                      <strong>
+                        {c.source} §{c.section}
+                      </strong>{" "}
+                      — may be affected by {c.amended_by}. The corpus does not yet
+                      carry the amended text; verify against the official source.
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
 
             {!escalated && data.conflicts?.length > 0 && (
               <Card tone="warn">

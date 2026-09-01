@@ -45,6 +45,8 @@ export default function PassageDrawer({ citation, onClose }) {
       ? citation.section
       : `Section ${citation.section}`);
   const url = chunk?.source_url || citation.source_url;
+  const asOf = chunk?.as_of || citation.as_of;
+  const amendedBy = chunk?.amended_by || citation.amended_by;
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -70,6 +72,18 @@ export default function PassageDrawer({ citation, onClose }) {
             <p className={styles.muted}>Couldn&apos;t load this passage.</p>
           )}
           {chunk && <p className={styles.text}>{chunk.text}</p>}
+          {(asOf || amendedBy) && (
+            <p className={styles.currency}>
+              {amendedBy && (
+                <>
+                  <Icon name="alert" size={12} /> This provision may have been
+                  amended by {amendedBy}. The text above is the pre-amendment
+                  version in our corpus.{" "}
+                </>
+              )}
+              {asOf && <>Source text as of {asOf}.</>}
+            </p>
+          )}
         </div>
 
         <footer className={styles.foot}>

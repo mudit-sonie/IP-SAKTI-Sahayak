@@ -70,6 +70,9 @@ def get_chunk(chunk_id: str) -> ChunkResponse:
         jurisdiction=meta.get("jurisdiction"),
         page_start=meta.get("page_start"),
         page_end=meta.get("page_end"),
+        as_of=meta.get("as_of") or None,
+        amended_by=meta.get("amended_by") or None,
+        in_force=meta.get("in_force") if isinstance(meta.get("in_force"), bool) else None,
     )
 
 

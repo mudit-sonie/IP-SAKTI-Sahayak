@@ -72,6 +72,7 @@ export default function Coverage() {
                 />
                 <div className={styles.meta}>
                   {s.organization && <span>{s.organization}</span>}
+                  {s.as_of && <span>text as of {s.as_of}</span>}
                   {s.source_url && (
                     <a
                       href={s.source_url}

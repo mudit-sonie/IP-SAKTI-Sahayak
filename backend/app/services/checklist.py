@@ -167,6 +167,8 @@ def _ground(probe: str | None, jurisdiction: str) -> list[Citation]:
             section=c.section,
             excerpt_ref=c.chunk_id,
             source_url=c.metadata.get("source_url"),
+            as_of=c.metadata.get("as_of") or None,
+            amended_by=c.metadata.get("amended_by") or None,
         )
     ]
 
