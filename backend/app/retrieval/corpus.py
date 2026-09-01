@@ -68,6 +68,16 @@ class Chunk:
     def is_stale(self) -> bool:
         return bool(self.amended_by) or self.in_force is False
 
+    @property
+    def document_type(self) -> str:
+        return str(self.metadata.get("document_type", ""))
+
+    @property
+    def is_case(self) -> bool:
+        """A judicial decision (S14). Retrieved for context but never a primary
+        citation — courts apply the law, they are not the law's text."""
+        return self.document_type.lower() == "case"
+
 
 def _coerce(raw: dict[str, Any]) -> Chunk | None:
     text = (raw.get("text") or "").strip()

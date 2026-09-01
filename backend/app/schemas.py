@@ -254,6 +254,9 @@ class QueryResponse(BaseModel):
     claims: list[Claim] = Field(default_factory=list)
     # Divergent positions across retrieved instruments, when generation found any.
     conflicts: list[Conflict] = Field(default_factory=list)
+    # Judicial decisions retrieved alongside the statute text (S14). Empty until
+    # case law is ingested (document_type == "case").
+    case_notes: list[CaseNote] = Field(default_factory=list)
     confidence: Confidence
     abs_flag: bool = False
     abs_note: Optional[str] = None
@@ -262,6 +265,19 @@ class QueryResponse(BaseModel):
     retrieval: Optional[RetrievalInfo] = None
     # True when this answer came from a human-reviewed FAQ entry, not the model.
     from_faq: bool = False
+
+
+class CaseNote(BaseModel):
+    """A retrieved judicial decision, shown under "How courts have applied this"
+    — context only, never a primary citation (S14)."""
+
+    case_name: str
+    citation: Optional[str] = None
+    court: Optional[str] = None
+    year: Optional[int] = None
+    excerpt: str
+    chunk_id: Optional[str] = None
+    source_url: Optional[str] = None
 
 
 class CompareResponse(BaseModel):
@@ -359,6 +375,7 @@ class MatterQuestion(BaseModel):
     citations: list[Citation] = Field(default_factory=list)
     claims: list[Claim] = Field(default_factory=list)
     conflicts: list[Conflict] = Field(default_factory=list)
+    case_notes: list[CaseNote] = Field(default_factory=list)
     abs_flag: bool = False
 
 

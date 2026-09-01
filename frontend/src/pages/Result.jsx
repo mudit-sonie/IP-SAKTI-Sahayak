@@ -11,6 +11,7 @@ import ConfidenceMeter from "../components/ConfidenceMeter";
 import CitationCard from "../components/CitationCard";
 import ClaimList from "../components/ClaimList";
 import ConflictList from "../components/ConflictList";
+import CaseNotes from "../components/CaseNotes";
 import PassageDrawer from "../components/PassageDrawer";
 import FeedbackWidget from "../components/FeedbackWidget";
 import RetrievalDetails from "../components/RetrievalDetails";
@@ -201,6 +202,16 @@ export default function Result() {
                     </li>
                   ))}
                 </ul>
+              </Card>
+            )}
+
+            {data.case_notes?.length > 0 && (
+              <Card tone="muted">
+                <CardHeader
+                  eyebrow="Case law"
+                  title="How courts have applied this"
+                />
+                <CaseNotes notes={data.case_notes} />
               </Card>
             )}
 

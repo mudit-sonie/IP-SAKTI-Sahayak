@@ -111,6 +111,26 @@ Example:
 }
 ```
 
+### Judicial decisions (case law — roadmap S14)
+
+Cases are ingested with `document_type: "case"`. They are retrieved alongside
+the statute text but are **never a primary citation** — a court applies the
+law, it is not the law's text. The backend surfaces them under a separate
+"How courts have applied this" block.
+
+```json
+{
+  "document_type": "case",
+  "source": "Novartis AG v. Union of India",
+  "citation": "(2013) 6 SCC 1",
+  "court": "Supreme Court of India",
+  "year": 2013,
+  "section": "3(d)",
+  "jurisdiction": "India",
+  "source_url": "https://main.sci.gov.in/"
+}
+```
+
 ---
 
 ## 🎯 Purpose of the Corpus

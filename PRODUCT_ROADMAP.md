@@ -115,8 +115,11 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       the licensing checklist item names the matter's authority + portal;
       `STATE_RULES_DIR` overlay hook for per-state rule notes. State picker +
       authority card on the Matter rail.
-- [ ] **S14 — case-law layer**: `document_type: "case"` support in corpus +
-      retrieval; a "How courts have applied this" block.
+- [x] **S14 — case-law layer**: `Chunk.is_case` (`document_type == "case"`);
+      the pipeline splits case hits out of the citable passages and returns
+      `case_notes[]` (`services/caselaw.py`); a "How courts have applied this"
+      block on Result. Corpus README documents the case metadata shape. Empty
+      until cases are ingested.
 - [ ] **S15 — multi-language**: i18n scaffold (frontend string catalog + a
       `lang` param that translates the *answer* post-generation, citations stay
       verbatim English source text).

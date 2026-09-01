@@ -145,6 +145,7 @@ def ask(matter_id: str, req: MatterQuestionRequest) -> tuple[Matter, MatterQuest
         citations=result.citations,
         claims=result.claims,
         conflicts=result.conflicts,
+        case_notes=result.case_notes,
         abs_flag=result.abs_flag,
     )
 

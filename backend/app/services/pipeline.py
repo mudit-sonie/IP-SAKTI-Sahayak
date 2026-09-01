@@ -21,6 +21,7 @@ from app.schemas import (
 )
 from app.services import (
     abs_helper,
+    caselaw,
     confidence,
     escalations,
     faq,
@@ -71,11 +72,16 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
     retrieval_query = expand_query(req.query)
     if retrieval_query != req.query:
         logger.info("query expanded for retrieval: %r", retrieval_query)
-    chunks, top_score = retriever.retrieve(
+    retrieved, top_score = retriever.retrieve(
         retrieval_query,
         jurisdiction=req.jurisdiction.value,
-        top_k=6,
+        top_k=8,
     )
+    # S14: judicial decisions are retrieved for context but never fed to
+    # generation as citable passages — they are shown separately.
+    case_hits = [rc for rc in retrieved if rc.chunk.is_case]
+    chunks = [rc for rc in retrieved if not rc.chunk.is_case][:6]
+    notes = caselaw.case_notes(case_hits)
 
     pool_n, pool_sources = retriever.jurisdiction_scope(req.jurisdiction.value)
     retrieval_info = RetrievalInfo(
@@ -104,6 +110,7 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
             ),
             jurisdiction_note=mismatch_note(req.query, req.jurisdiction.value),
             retrieval=retrieval_info,
+            case_notes=notes,
         )
 
     gen = generation.generate(req.query, chunks, context=req.context)
@@ -136,6 +143,7 @@ def _run_query_uncached(req: QueryRequest) -> QueryResponse:
         citations=citations,
         claims=gen.claims,
         conflicts=gen.conflicts,
+        case_notes=notes,
         confidence=conf,
         abs_flag=abs_result.triggered,
         abs_note=abs_note,
