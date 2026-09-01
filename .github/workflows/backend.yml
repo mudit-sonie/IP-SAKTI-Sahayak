@@ -18,7 +18,12 @@ jobs:
         with:
           python-version: "3.10"
           cache: pip
-      # Light deps only — CI has no Gemini key and no corpus, so the suite exercises
-      # the classifier tree and the escalate-path contract shapes.
-      - run: pip install fastapi pydantic pydantic-settings python-dotenv httpx pytest rank-bm25
+      # Light deps only — CI has no Gemini key, so the suite exercises the
+      # classifier tree, contract shapes, and the escalate / no-vector fallbacks.
+      # sentence-transformers + chromadb are intentionally omitted (the retriever
+      # degrades to BM25); python-multipart / pypdf / python-docx are needed for
+      # the matter-document routes to import and for S20's extraction tests.
+      - run: >
+          pip install fastapi pydantic pydantic-settings python-dotenv httpx
+          pytest rank-bm25 python-multipart pypdf python-docx
       - run: pytest
