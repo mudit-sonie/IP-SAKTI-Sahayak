@@ -80,7 +80,7 @@ SOURCES: list[Source] = [
     Source(
         "biological_diversity_act_2002", "The Biological Diversity Act, 2002",
         "THE BIOLOGICAL DIVERSITY ACT, 2002.txt", "act", "India", "Act", "India Code",
-        "https://moef.gov.in/?utm_source", "2002",
+        "https://www.indiacode.nic.in/handle/123456789/2046", "2002",
     ),
     Source(
         "drugs_and_cosmetics_act_1940", "The Drugs and Cosmetics Act, 1940",
@@ -106,7 +106,7 @@ SOURCES: list[Source] = [
         "gi_goods_act_1999",
         "The Geographical Indications of Goods (Registration and Protection) Act, 1999",
         "__gi_md__", "gi_md", "India", "Act", "India Code",
-        "https://ipindia.gov.in/acts/patent-rules-2003?utm_source", "1999",
+        "https://www.indiacode.nic.in/handle/123456789/1955", "1999",
     ),
     Source(
         "trips_agreement", "TRIPS Agreement (as amended by the 2005 Protocol)",
