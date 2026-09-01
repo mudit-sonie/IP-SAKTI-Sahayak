@@ -16,19 +16,19 @@ const SDGS = [
     n: 3,
     name: "Good Health & Well-being",
     color: "#4C9F38",
-    note: "Faster, safer market access for authentic Ayurveda formulations and traditional medicine.",
+    note: "Safer, faster market access for authentic Ayurveda medicine.",
   },
   {
     n: 9,
     name: "Industry, Innovation & Infrastructure",
     color: "#FD6925",
-    note: "Lowers the IP and regulatory barrier for Ayurveda startups and MSMEs to innovate and file.",
+    note: "Lowers the IP & regulatory barrier for Ayurveda startups and MSMEs.",
   },
   {
     n: 17,
     name: "Partnerships for the Goals",
     color: "#19486A",
-    note: "Connects practitioners, researchers and facilitators to the Ministry of AYUSH / AIIA knowledge base.",
+    note: "Links practitioners and facilitators to the AYUSH / AIIA knowledge base.",
   },
 ];
 
