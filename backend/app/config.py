@@ -118,7 +118,11 @@ class Settings(BaseSettings):
     # --- App ---
     app_env: str = Field(default="dev", alias="APP_ENV")
     cors_origins: str = Field(
-        default="http://localhost:5173,http://localhost:3000", alias="CORS_ORIGINS"
+        default=(
+            "http://localhost:5173,http://127.0.0.1:5173,"
+            "http://localhost:3000,http://127.0.0.1:3000"
+        ),
+        alias="CORS_ORIGINS",
     )
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
 
