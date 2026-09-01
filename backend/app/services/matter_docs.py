@@ -114,6 +114,9 @@ def register(matter_id: str, filename: str, data: bytes) -> tuple[MatterDocument
 
 def process(matter_id: str, doc_id: str) -> None:
     """Extract -> chunk -> embed. Updates the document's status on the matter."""
+    matter = get_matter_repo().get(matter_id)
+    ref = next((d for d in matter.documents if d.id == doc_id), None) if matter else None
+    display_name = ref.filename if ref else doc_id
     orig = next(
         (p for p in (_root(matter_id) / "orig").glob(f"{doc_id}.*")), None
     )
@@ -122,16 +125,18 @@ def process(matter_id: str, doc_id: str) -> None:
         error = "The uploaded file is missing."
     else:
         try:
-            text, media, page_count = doc_extract.extract(orig.name, orig.read_bytes())
+            text, media, page_count = doc_extract.extract(
+                display_name, orig.read_bytes()
+            )
             chunks = _chunk(text)
             _meta_path(matter_id, doc_id).write_text(
                 json.dumps({
-                    "id": doc_id, "matter_id": matter_id, "filename": orig.name,
+                    "id": doc_id, "matter_id": matter_id, "filename": display_name,
                     "text": text, "chunks": chunks, "uploaded_at": _now(),
                 }, ensure_ascii=False),
                 encoding="utf-8",
             )
-            doc_retriever.index_doc(matter_id, doc_id, orig.name, chunks)
+            doc_retriever.index_doc(matter_id, doc_id, display_name, chunks)
             status, error = "ready", None
         except doc_extract.ExtractionError as exc:
             error = str(exc)
