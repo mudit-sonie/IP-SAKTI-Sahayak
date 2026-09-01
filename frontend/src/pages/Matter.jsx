@@ -8,6 +8,7 @@ import Icon from "../components/Icon";
 import CitationCard from "../components/CitationCard";
 import Checklist from "../components/Checklist";
 import Drafts from "../components/Drafts";
+import Deadlines from "../components/Deadlines";
 import ConfidenceMeter from "../components/ConfidenceMeter";
 import PassageDrawer from "../components/PassageDrawer";
 import TextArea from "../components/TextArea";
@@ -81,6 +82,26 @@ export default function Matter() {
       setError(err.message);
     }
   }
+
+  const runDeadline = (fn) => async (...args) => {
+    try {
+      setMatter(await fn(...args));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+  const deriveDeadlines = runDeadline((anchor, date) =>
+    mattersApi.deriveDeadlines(id, anchor, date),
+  );
+  const addDeadline = runDeadline((payload) =>
+    mattersApi.addDeadline(id, payload),
+  );
+  const toggleDeadline = runDeadline((dlId, done) =>
+    mattersApi.setDeadlineDone(id, dlId, done),
+  );
+  const deleteDeadline = runDeadline((dlId) =>
+    mattersApi.deleteDeadline(id, dlId),
+  );
 
   async function ask(e) {
     e.preventDefault();
@@ -241,6 +262,18 @@ export default function Matter() {
             <button
               type="button"
               role="tab"
+              aria-selected={tab === "deadlines"}
+              className={tab === "deadlines" ? styles.tabOn : styles.tab}
+              onClick={() => setTab("deadlines")}
+            >
+              Deadlines{" "}
+              <span className="mono">
+                {matter.deadlines.filter((d) => !d.done).length}
+              </span>
+            </button>
+            <button
+              type="button"
+              role="tab"
               aria-selected={tab === "documents"}
               className={tab === "documents" ? styles.tabOn : styles.tab}
               onClick={() => setTab("documents")}
@@ -272,6 +305,18 @@ export default function Matter() {
                 </li>
               ))}
             </ol>
+          )}
+
+          {tab === "deadlines" && (
+            <Deadlines
+              deadlines={matter.deadlines}
+              anchorDates={matter.anchor_dates || {}}
+              onDerive={deriveDeadlines}
+              onAdd={addDeadline}
+              onToggle={toggleDeadline}
+              onDelete={deleteDeadline}
+              onView={setViewing}
+            />
           )}
 
           {tab === "documents" && (

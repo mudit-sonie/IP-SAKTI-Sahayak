@@ -1,0 +1,129 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+.tools {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.tool {
+  padding: var(--s-4);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.toolLabel {
+  margin: 0 0 var(--s-3);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-900);
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  align-items: center;
+}
+.select,
+.input {
+  font: inherit;
+  font-size: var(--fs-sm);
+  padding: 6px 8px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-900);
+}
+.input {
+  flex: 1;
+  min-width: 140px;
+}
+.hint {
+  margin: var(--s-2) 0 0;
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+}
+.empty {
+  font-size: var(--fs-sm);
+  color: var(--ink-500);
+}
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.item {
+  display: flex;
+  gap: var(--s-3);
+  padding: var(--s-3);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+}
+.done {
+  opacity: 0.55;
+}
+.done .title {
+  text-decoration: line-through;
+}
+.check {
+  flex: none;
+  padding-top: 2px;
+}
+.body {
+  flex: 1;
+  min-width: 0;
+}
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+}
+.title {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--ink-900);
+}
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+}
+.detail {
+  margin: var(--s-2) 0 0;
+  font-size: var(--fs-xs);
+  line-height: 1.55;
+  color: var(--ink-500);
+}
+.cites {
+  margin-top: var(--s-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.remove {
+  flex: none;
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--ink-500);
+  cursor: pointer;
+  padding: 2px;
+}
+.remove:hover {
+  color: var(--danger-600, crimson);
+}
+.disclaimer {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+  font-style: italic;
+}

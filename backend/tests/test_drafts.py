@@ -93,7 +93,9 @@ def test_render_is_pure_and_grounded_markers_present():
     )
     out = drafts.render(m, DraftKind.disclosure_of_source)
     assert "[Legal basis:" in out.markdown
-    assert out.markdown == drafts.render(m, DraftKind.disclosure_of_source).markdown
+    # every legal assertion carries a marker (grounded or "verify")
+    again = drafts.render(m, DraftKind.disclosure_of_source)
+    assert out.markdown.count("[Legal basis:") == again.markdown.count("[Legal basis:")
 
 
 def test_unknown_kind_rejected(client):

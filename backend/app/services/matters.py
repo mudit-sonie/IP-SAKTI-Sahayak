@@ -16,6 +16,9 @@ from app.schemas import (
     ChecklistItem,
     ChecklistItemCreateRequest,
     ChecklistStatus,
+    Deadline,
+    DeadlineAnchor,
+    DeadlineCreateRequest,
     DraftKind,
     DraftRef,
     Jurisdiction,
@@ -29,6 +32,7 @@ from app.schemas import (
     QueryResponse,
 )
 from app.services import checklist as checklist_svc
+from app.services import deadlines as deadlines_svc
 from app.services import drafts as drafts_svc
 from app.services import pipeline
 from app.store.repos import get_matter_repo, new_id
@@ -293,6 +297,83 @@ def delete_draft(matter_id: str, draft_id: str) -> Matter:
         if ref.rel_path:
             (_drafts_root() / ref.rel_path).unlink(missing_ok=True)
         return m
+
+
+# --------------------------------------------------------------------------- #
+# Deadlines (S9)
+# --------------------------------------------------------------------------- #
+def derive_deadlines(
+    matter_id: str, anchor: DeadlineAnchor, anchor_date: str
+) -> Matter:
+    try:
+        parsed = deadlines_svc.parse_date(anchor_date)
+    except ValueError as exc:
+        raise ValueError(f"anchor_date must be an ISO date (YYYY-MM-DD): {exc}")
+
+    with get_matter_repo().mutate(matter_id) as matter:
+        # keep the user's done-state for rules we are about to recompute
+        done_by_rule = {
+            d.source_rule: d.done
+            for d in matter.deadlines
+            if d.kind == "derived" and d.anchor == anchor.value and d.source_rule
+        }
+        fresh = deadlines_svc.derive(
+            anchor, parsed, matter.jurisdiction.value, done_by_rule=done_by_rule
+        )
+        matter.anchor_dates[anchor.value] = parsed.isoformat()
+        matter.deadlines = [
+            d for d in matter.deadlines
+            if not (d.kind == "derived" and d.anchor == anchor.value)
+        ] + fresh
+        _audit(
+            matter,
+            "deadlines.derived",
+            f"{deadlines_svc.anchor_label(anchor)} → {len(fresh)} deadline(s)",
+        )
+        return matter
+
+
+def add_deadline(matter_id: str, req: DeadlineCreateRequest) -> Matter:
+    try:
+        deadlines_svc.parse_date(req.due_date)
+    except ValueError:
+        raise ValueError("due_date must be an ISO date (YYYY-MM-DD)")
+    with get_matter_repo().mutate(matter_id) as matter:
+        matter.deadlines.append(
+            Deadline(
+                id=new_id("dl_"),
+                title=req.title.strip(),
+                due_date=req.due_date,
+                kind="manual",
+                detail=req.detail,
+            )
+        )
+        _audit(matter, "deadline.added", req.title[:60])
+        return matter
+
+
+def set_deadline_done(matter_id: str, deadline_id: str, done: bool) -> Matter:
+    with get_matter_repo().mutate(matter_id) as matter:
+        for d in matter.deadlines:
+            if d.id == deadline_id:
+                d.done = done
+                _audit(
+                    matter,
+                    "deadline.updated",
+                    f"{d.title[:60]} → {'done' if done else 'open'}",
+                )
+                return matter
+        raise KeyError(deadline_id)
+
+
+def delete_deadline(matter_id: str, deadline_id: str) -> Matter:
+    with get_matter_repo().mutate(matter_id) as matter:
+        before = len(matter.deadlines)
+        matter.deadlines = [d for d in matter.deadlines if d.id != deadline_id]
+        if len(matter.deadlines) == before:
+            raise KeyError(deadline_id)
+        _audit(matter, "deadline.deleted", deadline_id)
+        return matter
 
 
 def add_checklist_item(

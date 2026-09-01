@@ -162,6 +162,30 @@ export const matters = {
       body: { status },
       ...opts,
     }),
+  // Deadlines (S9)
+  deriveDeadlines: (id, anchor, anchorDate, opts) =>
+    reqJson(`/matters/${id}/deadlines/derive`, {
+      method: "POST",
+      body: { anchor, anchor_date: anchorDate },
+      ...opts,
+    }),
+  addDeadline: (id, payload, opts) =>
+    reqJson(`/matters/${id}/deadlines`, {
+      method: "POST",
+      body: payload,
+      ...opts,
+    }),
+  setDeadlineDone: (id, deadlineId, done, opts) =>
+    reqJson(`/matters/${id}/deadlines/${deadlineId}`, {
+      method: "PATCH",
+      body: { done },
+      ...opts,
+    }),
+  deleteDeadline: (id, deadlineId, opts) =>
+    reqJson(`/matters/${id}/deadlines/${deadlineId}`, {
+      method: "DELETE",
+      ...opts,
+    }),
   // Document drafts (S8)
   draftKinds: (opts) => reqJson("/draft-kinds", opts),
   createDraft: (id, kind, opts) =>

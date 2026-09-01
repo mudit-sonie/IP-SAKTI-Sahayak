@@ -290,6 +290,13 @@ class ChecklistItem(BaseModel):
     source_rule: Optional[str] = None  # which generator rule produced this
 
 
+class DeadlineAnchor(str, Enum):
+    patent_filing = "patent_filing"
+    patent_priority = "patent_priority"
+    tm_application = "tm_application"
+    gi_application = "gi_application"
+
+
 class Deadline(BaseModel):
     id: str
     title: str
@@ -297,6 +304,9 @@ class Deadline(BaseModel):
     kind: str = "manual"  # "manual" | "derived"
     detail: Optional[str] = None
     done: bool = False
+    source_rule: Optional[str] = None  # derived-rule key, when kind == "derived"
+    anchor: Optional[str] = None  # DeadlineAnchor value the derivation used
+    citations: list[Citation] = Field(default_factory=list)
 
 
 class DraftRef(BaseModel):
@@ -329,6 +339,9 @@ class Matter(BaseModel):
     questions: list[MatterQuestion] = Field(default_factory=list)
     checklist: list[ChecklistItem] = Field(default_factory=list)
     deadlines: list[Deadline] = Field(default_factory=list)
+    # Anchor dates the user has supplied (DeadlineAnchor -> ISO date), used to
+    # (re)derive statutory deadlines.
+    anchor_dates: dict[str, str] = Field(default_factory=dict)
     drafts: list[DraftRef] = Field(default_factory=list)
     audit: list[AuditEntry] = Field(default_factory=list)
 
@@ -406,3 +419,21 @@ class DraftKindInfo(BaseModel):
 
 class DraftCreateRequest(BaseModel):
     kind: DraftKind
+
+
+# --------------------------------------------------------------------------- #
+# Deadlines (S9)
+# --------------------------------------------------------------------------- #
+class DeadlineDeriveRequest(BaseModel):
+    anchor: DeadlineAnchor
+    anchor_date: str  # ISO date (YYYY-MM-DD)
+
+
+class DeadlineCreateRequest(BaseModel):
+    title: str
+    due_date: str
+    detail: Optional[str] = None
+
+
+class DeadlineDoneRequest(BaseModel):
+    done: bool

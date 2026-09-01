@@ -83,8 +83,13 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       /matters/{id}/drafts[/{draft_id}]`, `GET /draft-kinds`; md persisted under
       `data/drafts/<matter>/`, re-rendered if the file is lost. Documents tab on
       the Matter screen.
-- [ ] **S9 — deadlines**: derived (renewal schedules, filing windows) + manual;
-      on the Matter screen; simple due-soon flagging.
+- [x] **S9 — deadlines**: `services/deadlines.py` — from one anchor date the
+      user supplies (patent filing / priority, TM / GI application) derive the
+      statutory windows (RFE, renewals, term, convention/PCT, TM exam reply),
+      each grounded where the corpus allows; plus manual entries. `POST
+      /matters/{id}/deadlines/derive`, `POST/PATCH/DELETE
+      /matters/{id}/deadlines[/{id}]`. Deadlines tab with overdue / due-soon
+      flagging; re-derivation preserves the done flag per rule.
 - [ ] **S10 — comparison mode**: run two jurisdictions for one question,
       rendered side by side.
 - [ ] **S11 — fee calculators**: patent fees by entity size, GI fees — a small

@@ -16,6 +16,9 @@ from app.config import get_settings
 from app.schemas import (
     ChecklistItemCreateRequest,
     ChecklistItemStatusRequest,
+    DeadlineCreateRequest,
+    DeadlineDeriveRequest,
+    DeadlineDoneRequest,
     DraftCreateRequest,
     Matter,
     MatterCreateRequest,
@@ -132,6 +135,50 @@ def delete_draft(matter_id: str, draft_id: str) -> Matter:
         return matters.delete_draft(matter_id, draft_id)
     except KeyError:
         raise HTTPException(status_code=404, detail="matter or draft not found")
+
+
+@router.post("/{matter_id}/deadlines/derive", response_model=Matter)
+def derive_deadlines(matter_id: str, req: DeadlineDeriveRequest) -> Matter:
+    _require_enabled()
+    try:
+        return matters.derive_deadlines(matter_id, req.anchor, req.anchor_date)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter not found")
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
+
+@router.post("/{matter_id}/deadlines", response_model=Matter, status_code=201)
+def add_deadline(matter_id: str, req: DeadlineCreateRequest) -> Matter:
+    _require_enabled()
+    if not req.title.strip():
+        raise HTTPException(status_code=422, detail="title must not be empty")
+    try:
+        return matters.add_deadline(matter_id, req)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter not found")
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
+
+@router.patch("/{matter_id}/deadlines/{deadline_id}", response_model=Matter)
+def set_deadline_done(
+    matter_id: str, deadline_id: str, req: DeadlineDoneRequest
+) -> Matter:
+    _require_enabled()
+    try:
+        return matters.set_deadline_done(matter_id, deadline_id, req.done)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter or deadline not found")
+
+
+@router.delete("/{matter_id}/deadlines/{deadline_id}", response_model=Matter)
+def delete_deadline(matter_id: str, deadline_id: str) -> Matter:
+    _require_enabled()
+    try:
+        return matters.delete_deadline(matter_id, deadline_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter or deadline not found")
 
 
 @router.post("/{matter_id}/checklist", response_model=Matter)
