@@ -35,6 +35,7 @@ from app.services import checklist as checklist_svc
 from app.services import deadlines as deadlines_svc
 from app.services import drafts as drafts_svc
 from app.services import pipeline
+from app.services import tkdl as tkdl_svc
 from app.store.repos import get_matter_repo, new_id
 
 logger = get_logger(__name__)
@@ -374,6 +375,17 @@ def delete_deadline(matter_id: str, deadline_id: str) -> Matter:
         if len(matter.deadlines) == before:
             raise KeyError(deadline_id)
         _audit(matter, "deadline.deleted", deadline_id)
+        return matter
+
+
+def run_tkdl_check(matter_id: str) -> Matter:
+    with get_matter_repo().mutate(matter_id) as matter:
+        matter.tkdl = tkdl_svc.check(matter)
+        _audit(
+            matter,
+            "tkdl.checked",
+            f"{matter.tkdl.status} ({len(matter.tkdl.search_terms)} terms)",
+        )
         return matter
 
 

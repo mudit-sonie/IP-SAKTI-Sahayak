@@ -182,6 +182,9 @@ export const matters = {
       body: { status },
       ...opts,
     }),
+  // TKDL / prior-art cross-check (S12)
+  tkdlCheck: (id, opts) =>
+    reqJson(`/matters/${id}/tkdl-check`, { method: "POST", ...opts }),
   // Deadlines (S9)
   deriveDeadlines: (id, anchor, anchorDate, opts) =>
     reqJson(`/matters/${id}/deadlines/derive`, {

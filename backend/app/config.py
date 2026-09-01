@@ -82,6 +82,13 @@ class Settings(BaseSettings):
     # written atomically. No DB by design: the app must run on any laptop.
     data_dir: str = Field(default="./data", alias="DATA_DIR")
     matters_enabled: bool = Field(default=True, alias="MATTERS_ENABLED")
+    # TKDL prior-art cross-check (S12, scaffold). The Traditional Knowledge
+    # Digital Library is access-controlled; no public connector exists. Until a
+    # deployment wires one, tkdl_check always reports "not connected" and never
+    # fabricates a hit.
+    tkdl_enabled: bool = Field(default=False, alias="TKDL_ENABLED")
+    tkdl_api_url: str = Field(default="", alias="TKDL_API_URL")
+
     # Facilitator queue + reviewed FAQ (S5). When escalations_enabled, every
     # escalate response is persisted for a human to answer; a published FAQ
     # answer is served ahead of the model on a matching question.

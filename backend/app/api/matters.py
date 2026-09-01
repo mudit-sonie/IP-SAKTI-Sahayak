@@ -181,6 +181,15 @@ def delete_deadline(matter_id: str, deadline_id: str) -> Matter:
         raise HTTPException(status_code=404, detail="matter or deadline not found")
 
 
+@router.post("/{matter_id}/tkdl-check", response_model=Matter)
+def run_tkdl_check(matter_id: str) -> Matter:
+    _require_enabled()
+    try:
+        return matters.run_tkdl_check(matter_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="matter not found")
+
+
 @router.post("/{matter_id}/checklist", response_model=Matter)
 def regenerate_checklist(matter_id: str) -> Matter:
     _require_enabled()

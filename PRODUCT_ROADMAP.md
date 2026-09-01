@@ -105,8 +105,11 @@ Each slice is a self-contained commit: schema + service + route + tests + UI.
       relied on (loud disclaimer in the UI).
 
 ### AYUSH-scale (scaffold now)
-- [ ] **S12 — TKDL / prior-art cross-check**: `tkdl_check` service with a clearly
-      marked data hook; UI slot on the Matter screen; honest "not connected yet".
+- [x] **S12 — TKDL / prior-art cross-check**: `services/tkdl.py` assembles the
+      search terms from the profile and reports `status: not_connected` (the
+      TKDL is NDA-only, no public API); `TKDL_ENABLED` / `TKDL_API_URL` hook,
+      never fabricates prior art. `POST /matters/{id}/tkdl-check`; `Matter.tkdl`;
+      a TKDL slot on the Matter rail.
 - [ ] **S13 — state-level rules**: jurisdiction gains an optional `state`; ASU&H
       licensing authority table; ingestion hook for state rules.
 - [ ] **S14 — case-law layer**: `document_type: "case"` support in corpus +

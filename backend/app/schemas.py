@@ -425,7 +425,30 @@ class Matter(BaseModel):
     # (re)derive statutory deadlines.
     anchor_dates: dict[str, str] = Field(default_factory=dict)
     drafts: list[DraftRef] = Field(default_factory=list)
+    tkdl: Optional[TkdlResult] = None  # last TKDL / prior-art cross-check (S12)
     audit: list[AuditEntry] = Field(default_factory=list)
+
+
+class TkdlReference(BaseModel):
+    title: str
+    source: Optional[str] = None
+    formulation_ref: Optional[str] = None
+    url: Optional[str] = None
+
+
+class TkdlResult(BaseModel):
+    """Outcome of a TKDL / prior-art cross-check (S12).
+
+    `status` is "not_connected" until a deployment wires a TKDL connector — the
+    library is access-controlled, so this is a scaffold that is honest about it
+    and never invents prior art.
+    """
+
+    status: str = "not_connected"  # not_connected | no_matches | matches
+    checked_at: str
+    search_terms: list[str] = Field(default_factory=list)
+    note: str = ""
+    references: list[TkdlReference] = Field(default_factory=list)
 
 
 class MatterSummary(BaseModel):

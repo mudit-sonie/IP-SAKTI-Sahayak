@@ -103,6 +103,14 @@ export default function Matter() {
     mattersApi.deleteDeadline(id, dlId),
   );
 
+  async function runTkdl() {
+    try {
+      setMatter(await mattersApi.tkdlCheck(id));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   async function ask(e) {
     e.preventDefault();
     const clean = query.trim();
@@ -434,6 +442,44 @@ export default function Matter() {
               />
             ) : (
               <p className={styles.railMuted}>Ask a question to see this.</p>
+            )}
+          </section>
+
+          <section className={styles.railBlock}>
+            <h2 className={styles.railTitle}>TKDL prior-art check</h2>
+            {matter.tkdl ? (
+              <div className={styles.tkdl}>
+                <Badge tone="neutral">
+                  {matter.tkdl.status === "not_connected"
+                    ? "Not connected"
+                    : matter.tkdl.status}
+                </Badge>
+                <p className={styles.tkdlNote}>{matter.tkdl.note}</p>
+                {matter.tkdl.search_terms.length > 0 && (
+                  <p className={styles.tkdlTerms}>
+                    Search terms:{" "}
+                    {matter.tkdl.search_terms.map((t) => (
+                      <span key={t} className={styles.tkdlTerm}>
+                        {t}
+                      </span>
+                    ))}
+                  </p>
+                )}
+                <Button size="sm" variant="ghost" onClick={runTkdl}>
+                  Re-run
+                </Button>
+              </div>
+            ) : (
+              <div className={styles.tkdl}>
+                <p className={styles.railMuted}>
+                  Cross-check the formulation against the Traditional Knowledge
+                  Digital Library. The TKDL is access-controlled — this assembles
+                  the search terms and is honest that no connector is wired.
+                </p>
+                <Button size="sm" variant="secondary" onClick={runTkdl}>
+                  Run TKDL check
+                </Button>
+              </div>
             )}
           </section>
 
