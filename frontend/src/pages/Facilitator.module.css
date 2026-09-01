@@ -1,0 +1,125 @@
+.error {
+  color: var(--danger-600, crimson);
+  font-size: var(--fs-sm);
+}
+.empty {
+  font-size: var(--fs-sm);
+  color: var(--ink-500);
+}
+.tabs {
+  display: flex;
+  gap: var(--s-2);
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: var(--s-4);
+}
+.tab,
+.tabOn {
+  font: inherit;
+  font-size: var(--fs-sm);
+  padding: var(--s-3) var(--s-3);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-500);
+  cursor: pointer;
+}
+.tabOn {
+  color: var(--ink-900);
+  border-bottom-color: var(--accent-500);
+  font-weight: 600;
+}
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.item,
+.faqItem {
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+.itemHead {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.q {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--ink-900);
+}
+.tags {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex: none;
+}
+.itemBody {
+  padding: 0 var(--s-4) var(--s-4);
+  border-top: 1px solid var(--rule);
+}
+.context {
+  margin: var(--s-3) 0 0;
+  font-size: var(--fs-xs);
+  line-height: 1.55;
+  color: var(--ink-600);
+}
+.meta {
+  margin: var(--s-2) 0 var(--s-3);
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+}
+.publish {
+  display: flex;
+  gap: var(--s-2);
+  align-items: flex-start;
+  margin: var(--s-3) 0;
+  font-size: var(--fs-xs);
+  color: var(--ink-600);
+  line-height: 1.5;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+}
+.dismiss {
+  font: inherit;
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.dismiss:hover {
+  color: var(--danger-600, crimson);
+}
+.faqHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-4);
+}
+.faqAnswer {
+  margin: 0;
+  padding: 0 var(--s-4) var(--s-4);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--ink-800);
+}

@@ -84,9 +84,204 @@ export function query(
   );
 }
 
+// GET /corpus -> CorpusCoverage { generated_at, corpus_loaded, chunk_count,
+//   source_count, jurisdictions, sources[{source, jurisdiction, document_type,
+//   organization, source_url, year, chunk_count, section_count, sections[], thin}],
+//   known_gaps[] }
+export async function getCorpus({ signal } = {}) {
+  const res = await fetch(`${BASE_URL}/corpus`, { signal });
+  if (!res.ok) {
+    throw new ApiError(`Could not load corpus coverage (${res.status})`, {
+      status: res.status,
+    });
+  }
+  return res.json();
+}
+
+// GET /analytics -> aggregate counters (S16, no PII)
+export async function getAnalytics({ signal } = {}) {
+  const res = await fetch(`${BASE_URL}/analytics`, { signal });
+  if (!res.ok) throw new ApiError(`Could not load analytics (${res.status})`);
+  return res.json();
+}
+
+// POST /translate -> { lang, text, translated }  (S15)
+export function translate({ text, lang }, opts) {
+  return postJson("/translate", { text, lang }, opts);
+}
+
+// GET /state-rules -> { as_of, note, authorities: [{ key, state, authority,
+//   portal_url, note }] }
+export async function getStateRules({ signal } = {}) {
+  const res = await fetch(`${BASE_URL}/state-rules`, { signal });
+  if (!res.ok) throw new ApiError(`Could not load state rules (${res.status})`);
+  return res.json();
+}
+
+// GET /fees -> { disclaimer, schedules: [{ track, title, as_of, source, source_url,
+//   entities[], items[], renewal_bands[], notes[] }] }
+export async function getFees({ signal } = {}) {
+  const res = await fetch(`${BASE_URL}/fees`, { signal });
+  if (!res.ok) throw new ApiError(`Could not load fee schedules (${res.status})`);
+  return res.json();
+}
+
+// POST /compare -> { query, india: QueryResponse, international: QueryResponse }
+export function compare(
+  { query: q, formulationCategory = null, context = null },
+  opts,
+) {
+  return postJson(
+    "/compare",
+    { query: q, formulation_category: formulationCategory, context },
+    opts,
+  );
+}
+
 // POST /feedback -> { ok: true }
 export function sendFeedback(payload, opts) {
   return postJson("/feedback", payload, opts);
 }
+
+// --------------------------------------------------------------------------- //
+// Matters — the persistent workspace (see PRODUCT_ROADMAP.md)
+// --------------------------------------------------------------------------- //
+async function reqJson(path, { method = "GET", body, signal } = {}) {
+  let res;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      method,
+      headers: body ? { "Content-Type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+      signal,
+    });
+  } catch (err) {
+    if (err.name === "AbortError") throw err;
+    throw new ApiError(
+      `Could not reach the IP-SAKTI backend at ${BASE_URL}. Is it running?`,
+      { cause: err },
+    );
+  }
+  if (res.status === 204) return null;
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new ApiError(
+      `Backend returned ${res.status}${detail ? `: ${detail.slice(0, 300)}` : ""}`,
+      { status: res.status },
+    );
+  }
+  return res.json();
+}
+
+export const matters = {
+  list: (opts) => reqJson("/matters", opts),
+  get: (id, opts) => reqJson(`/matters/${id}`, opts),
+  create: (payload, opts) =>
+    reqJson("/matters", { method: "POST", body: payload, ...opts }),
+  update: (id, payload, opts) =>
+    reqJson(`/matters/${id}`, { method: "PATCH", body: payload, ...opts }),
+  remove: (id, opts) =>
+    reqJson(`/matters/${id}`, { method: "DELETE", ...opts }),
+  ask: (id, payload, opts) =>
+    reqJson(`/matters/${id}/questions`, {
+      method: "POST",
+      body: payload,
+      ...opts,
+    }),
+  regenerateChecklist: (id, opts) =>
+    reqJson(`/matters/${id}/checklist`, { method: "POST", ...opts }),
+  addChecklistItem: (id, payload, opts) =>
+    reqJson(`/matters/${id}/checklist/items`, {
+      method: "POST",
+      body: payload,
+      ...opts,
+    }),
+  setChecklistStatus: (id, itemId, status, opts) =>
+    reqJson(`/matters/${id}/checklist/${itemId}`, {
+      method: "PATCH",
+      body: { status },
+      ...opts,
+    }),
+  // Matter documents as context (S20) — multipart file upload
+  uploadDocument: async (id, file, { signal } = {}) => {
+    const form = new FormData();
+    form.append("file", file, file.name);
+    const res = await fetch(`${BASE_URL}/matters/${id}/documents`, {
+      method: "POST",
+      body: form,
+      signal,
+    });
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      throw new ApiError(
+        `Upload failed (${res.status})${detail ? `: ${detail.slice(0, 200)}` : ""}`,
+        { status: res.status },
+      );
+    }
+    return res.json();
+  },
+  getDocument: (id, docId, opts) =>
+    reqJson(`/matters/${id}/documents/${docId}`, opts),
+  deleteDocument: (id, docId, opts) =>
+    reqJson(`/matters/${id}/documents/${docId}`, { method: "DELETE", ...opts }),
+  // TKDL / prior-art cross-check (S12)
+  tkdlCheck: (id, opts) =>
+    reqJson(`/matters/${id}/tkdl-check`, { method: "POST", ...opts }),
+  // Deadlines (S9)
+  deriveDeadlines: (id, anchor, anchorDate, opts) =>
+    reqJson(`/matters/${id}/deadlines/derive`, {
+      method: "POST",
+      body: { anchor, anchor_date: anchorDate },
+      ...opts,
+    }),
+  addDeadline: (id, payload, opts) =>
+    reqJson(`/matters/${id}/deadlines`, {
+      method: "POST",
+      body: payload,
+      ...opts,
+    }),
+  setDeadlineDone: (id, deadlineId, done, opts) =>
+    reqJson(`/matters/${id}/deadlines/${deadlineId}`, {
+      method: "PATCH",
+      body: { done },
+      ...opts,
+    }),
+  deleteDeadline: (id, deadlineId, opts) =>
+    reqJson(`/matters/${id}/deadlines/${deadlineId}`, {
+      method: "DELETE",
+      ...opts,
+    }),
+  // Document drafts (S8)
+  draftKinds: (opts) => reqJson("/draft-kinds", opts),
+  createDraft: (id, kind, opts) =>
+    reqJson(`/matters/${id}/drafts`, { method: "POST", body: { kind }, ...opts }),
+  deleteDraft: (id, draftId, opts) =>
+    reqJson(`/matters/${id}/drafts/${draftId}`, { method: "DELETE", ...opts }),
+  draftUrl: (id, draftId) => `${BASE_URL}/matters/${id}/drafts/${draftId}`,
+};
+
+// --------------------------------------------------------------------------- //
+// Facilitator queue + reviewed FAQ (S5)
+// --------------------------------------------------------------------------- //
+export const facilitator = {
+  listEscalations: (status, opts) =>
+    reqJson(
+      `/escalations${status ? `?status=${encodeURIComponent(status)}` : ""}`,
+      opts,
+    ),
+  answerEscalation: (id, payload, opts) =>
+    reqJson(`/escalations/${id}/answer`, {
+      method: "POST",
+      body: payload,
+      ...opts,
+    }),
+  dismissEscalation: (id, opts) =>
+    reqJson(`/escalations/${id}/dismiss`, { method: "POST", ...opts }),
+  listFaq: (opts) => reqJson("/faq", opts),
+  createFaq: (payload, opts) =>
+    reqJson("/faq", { method: "POST", body: payload, ...opts }),
+  deleteFaq: (id, opts) =>
+    reqJson(`/faq/${id}`, { method: "DELETE", ...opts }),
+};
 
 export { BASE_URL };

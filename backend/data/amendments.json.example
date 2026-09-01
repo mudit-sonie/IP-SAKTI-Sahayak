@@ -1,0 +1,23 @@
+{
+  "_schema": "Amendment-awareness overlay (roadmap S6). Optional. Path set by AMENDMENT_OVERLAY_PATH (default ./data/amendments.json). Merged onto chunk metadata at corpus load — see app/retrieval/corpus.py. All fields optional; omit what you cannot verify.",
+
+  "<source_id>": {
+    "as_of": "YYYY-MM-DD  — date the ingested source text is current as of (source level)",
+    "provisions": {
+      "<section>": {
+        "amended_by": "Title of the amending instrument, e.g. 'The Patents (Amendment) Act, 2005'",
+        "in_force": true,
+        "as_of": "YYYY-MM-DD  — overrides the source-level as_of for this provision only"
+      }
+    }
+  },
+
+  "biological_diversity_act_2002": {
+    "provisions": {
+      "6": {
+        "amended_by": "The Biological Diversity (Amendment) Act, 2023",
+        "in_force": true
+      }
+    }
+  }
+}

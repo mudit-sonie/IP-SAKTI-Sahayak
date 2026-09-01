@@ -1,0 +1,128 @@
+.error {
+  color: var(--danger-600, crimson);
+  font-size: var(--fs-sm);
+}
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--s-5);
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  font-size: var(--fs-sm);
+  color: var(--ink-600);
+}
+.field select {
+  font: inherit;
+  padding: 8px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-900);
+}
+.items {
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  padding: var(--s-4);
+  margin: 0;
+}
+.items legend {
+  padding: 0 var(--s-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-500);
+}
+.item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--s-3);
+  align-items: baseline;
+  padding: var(--s-2) 0;
+  font-size: var(--fs-sm);
+  color: var(--ink-900);
+}
+.itemLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.note {
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+  font-style: italic;
+}
+.itemAmt {
+  font-family: var(--font-mono);
+  color: var(--ink-600);
+}
+.renewal {
+  border-top: 1px solid var(--rule);
+  margin-top: var(--s-2);
+  padding-top: var(--s-2);
+}
+.years {
+  display: flex;
+  gap: var(--s-4);
+  padding: var(--s-2) 0 0 26px;
+}
+.years label {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+  gap: 4px;
+}
+.years input {
+  width: 64px;
+  font: inherit;
+  padding: 4px 6px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-900);
+}
+.summary {
+  position: sticky;
+  top: var(--s-4);
+}
+.meta {
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+  line-height: 1.5;
+  margin: 0 0 var(--s-3);
+}
+.notes {
+  margin: 0 0 var(--s-3);
+  padding-left: var(--s-4);
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+  line-height: 1.5;
+}
+.disclaimer {
+  margin: 0;
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-xs);
+  font-style: italic;
+  color: var(--ink-500);
+}

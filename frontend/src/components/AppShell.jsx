@@ -3,6 +3,8 @@ import styles from "./AppShell.module.css";
 import Badge from "./Badge";
 import Icon from "./Icon";
 import ThemeToggle from "./ThemeToggle";
+import { LANGS, t } from "../i18n/strings";
+import { useUiLang, setUiLang } from "../i18n/useUiLang";
 
 const cx = (...c) => c.filter(Boolean).join(" ");
 
@@ -19,12 +21,30 @@ const JurisdictionChip = ({ value }) => (
  * chip row. `width` = "narrow" (default) | "wide".
  */
 export default function AppShell({ context, width = "narrow", children }) {
+  const lang = useUiLang();
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
-        <Link to="/" className={styles.brand}>
-          IP&#8209;SAKTI <span>Sahayak</span>
-        </Link>
+        <div className={styles.left}>
+          <Link to="/" className={styles.brand}>
+            IP&#8209;SAKTI <span>Sahayak</span>
+          </Link>
+          <Link to="/matters" className={styles.navLink}>
+            {t(lang, "nav.matters")}
+          </Link>
+          <Link to="/coverage" className={styles.navLink}>
+            {t(lang, "nav.coverage")}
+          </Link>
+          <Link to="/fees" className={styles.navLink}>
+            {t(lang, "nav.fees")}
+          </Link>
+          <Link to="/facilitator" className={styles.navLink}>
+            {t(lang, "nav.facilitator")}
+          </Link>
+          <Link to="/analytics" className={styles.navLink}>
+            {t(lang, "nav.analytics")}
+          </Link>
+        </div>
 
         <div className={styles.right}>
           {context ? (
@@ -35,8 +55,20 @@ export default function AppShell({ context, width = "narrow", children }) {
               )}
             </div>
           ) : (
-            <span className={styles.tagline}>Ayurveda · IPR · Regulatory</span>
+            <span className={styles.tagline}>{t(lang, "app.tagline")}</span>
           )}
+          <select
+            className={styles.langSelect}
+            value={lang}
+            onChange={(e) => setUiLang(e.target.value)}
+            aria-label="Language"
+          >
+            {LANGS.map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.name}
+              </option>
+            ))}
+          </select>
           <ThemeToggle />
         </div>
       </header>

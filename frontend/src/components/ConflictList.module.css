@@ -1,0 +1,57 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+.conflict {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.topic {
+  margin: 0;
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  color: var(--ink-900);
+}
+.positions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.position {
+  padding-left: var(--s-3);
+  border-left: 2px solid var(--accent-500);
+}
+.summary {
+  display: block;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--ink-900);
+}
+.markers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: 4px;
+}
+.marker {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent-700);
+  background: var(--accent-50);
+  border: 1px solid var(--accent-500);
+  border-radius: var(--r-sm);
+  padding: 2px 6px;
+  cursor: pointer;
+}
+.marker:disabled {
+  color: var(--ink-500);
+  background: var(--surface-sunken);
+  border-color: var(--rule);
+  cursor: default;
+}

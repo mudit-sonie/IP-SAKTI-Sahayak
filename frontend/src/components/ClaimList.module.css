@@ -1,0 +1,46 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.claim {
+  margin: 0;
+  font-size: var(--fs-md);
+  line-height: 1.65;
+  color: var(--ink-900);
+}
+.unsourced {
+  color: var(--ink-500);
+}
+.marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  margin: 0 1px 0 2px;
+  transform: translateY(-4px);
+  border: 1px solid var(--accent-500);
+  border-radius: var(--r-sm);
+  background: var(--accent-50);
+  color: var(--accent-700);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+.marker:hover:not(:disabled) {
+  background: var(--accent-500);
+  color: var(--surface);
+}
+.marker:disabled {
+  border-color: var(--rule);
+  background: var(--surface-sunken);
+  color: var(--ink-500);
+  cursor: default;
+}

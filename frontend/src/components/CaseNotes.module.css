@@ -1,0 +1,50 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.item {
+  padding-left: var(--s-3);
+  border-left: 2px solid var(--ink-300, var(--rule));
+}
+.head {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2);
+}
+.name {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  font-style: italic;
+  color: var(--ink-900);
+}
+.cite {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+}
+.meta {
+  margin: 2px 0 0;
+  font-size: var(--fs-xs);
+  color: var(--ink-500);
+}
+.excerpt {
+  margin: var(--s-2) 0 0;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--ink-700);
+}
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--s-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent-700);
+}

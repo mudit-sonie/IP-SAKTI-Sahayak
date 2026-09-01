@@ -1,0 +1,139 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+}
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+.progress {
+  font-size: var(--fs-sm);
+  color: var(--ink-600);
+}
+.regen {
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  padding: 6px 12px;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-700);
+  cursor: pointer;
+}
+.regen:hover:not(:disabled) {
+  border-color: var(--accent-500);
+  color: var(--accent-700);
+}
+.regen:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.empty {
+  color: var(--ink-500);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.groupTitle {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+.item {
+  display: flex;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--rule);
+}
+.itemDone .title {
+  color: var(--ink-500);
+  text-decoration: line-through;
+}
+.itemNa {
+  opacity: 0.55;
+}
+
+.status {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  min-width: 92px;
+  padding: 4px 8px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-600);
+  cursor: pointer;
+}
+.status.todo {
+  color: var(--ink-500);
+}
+.status.in_progress {
+  border-color: var(--escalate-500);
+  color: var(--escalate-700);
+  background: var(--escalate-50);
+}
+.status.done {
+  border-color: var(--accent-600);
+  color: var(--accent-700);
+  background: var(--accent-50);
+}
+.status.not_applicable {
+  color: var(--ink-400);
+}
+
+.body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.title {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--ink-900);
+}
+.detail {
+  font-size: var(--fs-sm);
+  color: var(--ink-500);
+  line-height: 1.55;
+}
+.cite {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: var(--fs-xs);
+  color: var(--accent-700);
+  cursor: pointer;
+}
+.cite:hover {
+  text-decoration: underline;
+}

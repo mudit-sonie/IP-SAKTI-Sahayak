@@ -22,6 +22,11 @@ google-generativeai==0.7.2
 httpx==0.27.0
 orjson==3.10.7
 
+# Matter documents (S20) — multipart upload + text extraction
+python-multipart==0.0.9
+pypdf==4.3.1
+python-docx==1.1.2
+
 # Dev / test
 pytest==8.3.2
 pytest-asyncio==0.23.8

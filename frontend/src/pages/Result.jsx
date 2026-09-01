@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { query as runQuery } from "../api/client";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { query as runQuery, translate as runTranslate } from "../api/client";
+import { useUiLang } from "../i18n/useUiLang";
+import { LANGS } from "../i18n/strings";
 import AppShell from "../components/AppShell";
 import Button from "../components/Button";
 import Badge from "../components/Badge";
@@ -9,6 +11,9 @@ import StepIndicator from "../components/StepIndicator";
 import Icon from "../components/Icon";
 import ConfidenceMeter from "../components/ConfidenceMeter";
 import CitationCard from "../components/CitationCard";
+import ClaimList from "../components/ClaimList";
+import ConflictList from "../components/ConflictList";
+import CaseNotes from "../components/CaseNotes";
 import PassageDrawer from "../components/PassageDrawer";
 import FeedbackWidget from "../components/FeedbackWidget";
 import RetrievalDetails from "../components/RetrievalDetails";
@@ -29,6 +34,9 @@ export default function Result() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [viewing, setViewing] = useState(null); // citation whose passage is open
+  const uiLang = useUiLang();
+  const [xlate, setXlate] = useState(null); // { text } translated answer
+  const [showEnglish, setShowEnglish] = useState(false);
 
   useEffect(() => {
     if (!question) {
@@ -53,6 +61,25 @@ export default function Result() {
   }, [question, jurisdiction, formulationCategory]);
 
   const escalated = data?.confidence?.status === "escalate";
+
+  useEffect(() => {
+    setXlate(null);
+    setShowEnglish(false);
+    if (!data || escalated || uiLang === "en" || !data.answer) return;
+    const ac = new AbortController();
+    runTranslate({ text: data.answer, lang: uiLang }, { signal: ac.signal })
+      .then((res) => {
+        if (res.translated) setXlate({ text: res.text });
+      })
+      .catch(() => {});
+    return () => ac.abort();
+  }, [data, escalated, uiLang]);
+
+  const langName =
+    LANGS.find((l) => l.code === uiLang)?.name || uiLang;
+  const outsideCorpus =
+    escalated && !(data?.retrieval?.top_sections?.length);
+  const staleCitations = (data?.citations || []).filter((c) => c.amended_by);
 
   return (
     <AppShell context={{ jurisdiction, formulationLabel }} width="wide">
@@ -117,27 +144,79 @@ export default function Result() {
           <div className={styles.main}>
             <Card tone={escalated ? "warn" : "default"}>
               <CardHeader
-                eyebrow={escalated ? "Escalated" : "Source-cited guidance"}
-                title={
+                eyebrow={
                   escalated
-                    ? "Routed to a human facilitator"
-                    : "Answer"
+                    ? "Escalated"
+                    : data.from_faq
+                      ? "Human-reviewed answer"
+                      : "Source-cited guidance"
+                }
+                title={
+                  escalated ? "Routed to a human facilitator" : "Answer"
                 }
                 aside={
                   <span className={styles.badges}>
                     {data.cached && <Badge tone="neutral">cached</Badge>}
+                    {data.from_faq && <Badge tone="accent">reviewed</Badge>}
                     <Badge tone={escalated ? "warn" : "accent"} variant="solid">
                       {escalated ? "Escalated" : "Answered"}
                     </Badge>
                   </span>
                 }
               />
-              <p className={styles.answer}>{data.answer}</p>
+              {xlate && !showEnglish ? (
+                <>
+                  <p className={styles.answer}>{xlate.text}</p>
+                  <p className={styles.escalateNote}>
+                    Machine translation into {langName}. Citations and quoted law
+                    stay in English.{" "}
+                    <button
+                      type="button"
+                      className={styles.linkBtn}
+                      onClick={() => setShowEnglish(true)}
+                    >
+                      Show English
+                    </button>
+                  </p>
+                </>
+              ) : !escalated && data.claims?.length ? (
+                <ClaimList
+                  claims={data.claims}
+                  citations={data.citations}
+                  onCite={setViewing}
+                />
+              ) : (
+                <p className={styles.answer}>{data.answer}</p>
+              )}
+              {xlate && showEnglish && (
+                <button
+                  type="button"
+                  className={styles.linkBtn}
+                  onClick={() => setShowEnglish(false)}
+                >
+                  Show {langName} translation
+                </button>
+              )}
               {escalated && (
                 <p className={styles.escalateNote}>
                   Retrieval support or model confidence was below threshold, so
                   the assistant did not guess. A human IP facilitator can take
                   this from here.
+                </p>
+              )}
+              {data.from_faq && (
+                <p className={styles.reviewedNote}>
+                  This answer was written and reviewed by a human IP facilitator,
+                  not generated. It is served ahead of the model for this
+                  question.
+                </p>
+              )}
+              {outsideCorpus && (
+                <p className={styles.escalateNote}>
+                  No passage in the corpus was on point — this question may fall
+                  outside what we cover. See the{" "}
+                  <Link to="/coverage">coverage map</Link> for the instruments
+                  the assistant can answer from.
                 </p>
               )}
               <FeedbackWidget
@@ -150,6 +229,50 @@ export default function Result() {
                 }}
               />
             </Card>
+
+            {staleCitations.length > 0 && (
+              <Card tone="warn">
+                <CardHeader
+                  eyebrow="Check currency"
+                  title="A cited provision may have been amended"
+                />
+                <ul className={styles.staleList}>
+                  {staleCitations.map((c, i) => (
+                    <li key={i}>
+                      <strong>
+                        {c.source} §{c.section}
+                      </strong>{" "}
+                      — may be affected by {c.amended_by}. The corpus does not yet
+                      carry the amended text; verify against the official source.
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+
+            {data.case_notes?.length > 0 && (
+              <Card tone="muted">
+                <CardHeader
+                  eyebrow="Case law"
+                  title="How courts have applied this"
+                />
+                <CaseNotes notes={data.case_notes} />
+              </Card>
+            )}
+
+            {!escalated && data.conflicts?.length > 0 && (
+              <Card tone="warn">
+                <CardHeader
+                  eyebrow="Divergent positions"
+                  title="Instruments disagree on this point"
+                />
+                <ConflictList
+                  conflicts={data.conflicts}
+                  citations={data.citations}
+                  onCite={setViewing}
+                />
+              </Card>
+            )}
 
             <Card tone="muted">
               <CardHeader
@@ -209,13 +332,28 @@ export default function Result() {
         </div>
       )}
 
-      <Button
-        className={styles.newQuery}
-        variant="secondary"
-        onClick={() => navigate("/")}
-      >
-        Start a new query
-      </Button>
+      <div className={styles.footActions}>
+        {question && (
+          <Button
+            variant="secondary"
+            onClick={() =>
+              navigate("/compare", {
+                state: { query: question, formulationCategory },
+              })
+            }
+          >
+            <Icon name="globe" size={15} />
+            Compare India &amp; International
+          </Button>
+        )}
+        <Button
+          className={styles.newQuery}
+          variant="secondary"
+          onClick={() => navigate("/")}
+        >
+          Start a new query
+        </Button>
+      </div>
 
       <PassageDrawer citation={viewing} onClose={() => setViewing(null)} />
     </AppShell>

@@ -46,6 +46,12 @@ PROCESSING_VERSION = "ingest_corpus/1.0.0"
 # Fields that we cannot derive deterministically from the cleaned text
 # (page numbers) are left null rather than fabricated.
 # --------------------------------------------------------------------------- #
+# Amendment awareness (S6): ``as_of`` is the date the source text we ingested is
+# current as of, when we can verify it (e.g. stated on the document itself).
+# Per-provision amendment notes are NOT derived here — they live in the curated
+# overlay ``backend/data/amendments.json`` (see backend/app/retrieval/corpus.py),
+# which is merged onto chunk metadata at load time. That file is the hook; this
+# field just seeds a baseline currency date.
 @dataclass(frozen=True)
 class Source:
     source_id: str
@@ -57,6 +63,7 @@ class Source:
     source_organization: str
     source_url: str
     year: str
+    as_of: str = ""
 
 
 SOURCES: list[Source] = [
@@ -73,7 +80,7 @@ SOURCES: list[Source] = [
     Source(
         "biological_diversity_act_2002", "The Biological Diversity Act, 2002",
         "THE BIOLOGICAL DIVERSITY ACT, 2002.txt", "act", "India", "Act", "India Code",
-        "https://moef.gov.in/?utm_source", "2002",
+        "https://www.indiacode.nic.in/handle/123456789/2046", "2002",
     ),
     Source(
         "drugs_and_cosmetics_act_1940", "The Drugs and Cosmetics Act, 1940",
@@ -93,13 +100,13 @@ SOURCES: list[Source] = [
         "The Patents Rules, 2003 (incorporating all amendments till 15-03-2024).txt",
         "act", "India", "Rules", "IP India",
         "https://ipindia.gov.in/writereaddata/Portal/IPORule/1_70_1_The_Patents_Rules_2003_Updated_till_23_June_2017.pdf",
-        "2003",
+        "2003", "2024-03-15",
     ),
     Source(
         "gi_goods_act_1999",
         "The Geographical Indications of Goods (Registration and Protection) Act, 1999",
         "__gi_md__", "gi_md", "India", "Act", "India Code",
-        "https://ipindia.gov.in/acts/patent-rules-2003?utm_source", "1999",
+        "https://www.indiacode.nic.in/handle/123456789/1955", "1999",
     ),
     Source(
         "trips_agreement", "TRIPS Agreement (as amended by the 2005 Protocol)",
@@ -324,6 +331,7 @@ def parse_act(src: Source, raw: str, rep: DocReport) -> list[Chunk]:
                     "source_organization": src.source_organization,
                     "source_url": src.source_url,
                     "year": src.year,
+                    "as_of": src.as_of or None,
                     "chapter": chapter or None,
                     "section": section_label,
                     "citation": f"Section {section_label}",
@@ -412,7 +420,8 @@ def parse_gi_md(src: Source, raw: str, rep: DocReport) -> list[Chunk]:
                 "source": src.title, "source_id": src.source_id,
                 "document_type": src.document_type, "jurisdiction": src.jurisdiction,
                 "source_organization": src.source_organization, "source_url": src.source_url,
-                "year": src.year, "chapter": chapter or None, "section": cur_sec,
+                "year": src.year, "as_of": src.as_of or None,
+                "chapter": chapter or None, "section": cur_sec,
                 "citation": f"Section {cur_sec}", "page_start": None, "page_end": None,
                 "processing_version": PROCESSING_VERSION, "ocr_used": False,
                 "quality_status": "verified",
@@ -469,7 +478,8 @@ def parse_articles(src: Source, raw: str, rep: DocReport) -> list[Chunk]:
                 "source": src.title, "source_id": src.source_id,
                 "document_type": src.document_type, "jurisdiction": src.jurisdiction,
                 "source_organization": src.source_organization, "source_url": src.source_url,
-                "year": src.year, "part": part or None, "article": cur_art,
+                "year": src.year, "as_of": src.as_of or None,
+                "part": part or None, "article": cur_art,
                 "section": f"Article {cur_art}", "citation": f"Article {cur_art}",
                 "page_start": None, "page_end": None,
                 "processing_version": PROCESSING_VERSION, "ocr_used": False,

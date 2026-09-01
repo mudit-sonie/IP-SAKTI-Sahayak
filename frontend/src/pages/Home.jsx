@@ -11,6 +11,27 @@ const JURISDICTIONS = [
   { value: "international", label: "International", icon: "globe" },
 ];
 
+const SDGS = [
+  {
+    n: 3,
+    name: "Good Health & Well-being",
+    color: "#4C9F38",
+    note: "Safer, faster market access for authentic Ayurveda medicine.",
+  },
+  {
+    n: 9,
+    name: "Industry, Innovation & Infrastructure",
+    color: "#FD6925",
+    note: "Lowers the IP & regulatory barrier for Ayurveda startups and MSMEs.",
+  },
+  {
+    n: 17,
+    name: "Partnerships for the Goals",
+    color: "#19486A",
+    note: "Links practitioners and facilitators to the AYUSH / AIIA knowledge base.",
+  },
+];
+
 export default function Home() {
   const [jurisdiction, setJurisdiction] = useState("india");
   const navigate = useNavigate();
@@ -53,6 +74,31 @@ export default function Home() {
           <Icon name="arrowRight" size={16} />
         </Button>
       </div>
+
+      <section className={styles.sdg}>
+        <h2 className={styles.sdgTitle}>
+          Aligned with the UN Sustainable Development Goals
+        </h2>
+        <ul className={styles.sdgList}>
+          {SDGS.map((g) => (
+            <li key={g.n} className={styles.sdgItem}>
+              <span
+                className={styles.sdgBadge}
+                style={{ background: g.color }}
+                aria-hidden="true"
+              >
+                {g.n}
+              </span>
+              <span className={styles.sdgText}>
+                <span className={styles.sdgName}>
+                  SDG {g.n} · {g.name}
+                </span>
+                <span className={styles.sdgNote}>{g.note}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <p className={styles.disclaimer}>
         For educational and informational purposes only — not legal advice. Do
