@@ -80,7 +80,7 @@ def create_faq(req: FaqCreateRequest) -> FaqEntry:
     return svc.create_faq(req)
 
 
-@router.delete("/faq/{faq_id}", status_code=204)
-def delete_faq(faq_id: str) -> None:
+@router.delete("/faq/{faq_id}", status_code=204, response_model=None)
+def delete_faq(faq_id: str):
     if not svc.delete_faq(faq_id):
         raise HTTPException(status_code=404, detail="FAQ entry not found")

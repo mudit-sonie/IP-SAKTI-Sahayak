@@ -69,8 +69,8 @@ def update_matter(matter_id: str, req: MatterUpdateRequest) -> Matter:
         raise HTTPException(status_code=404, detail="matter not found")
 
 
-@router.delete("/{matter_id}", status_code=204)
-def delete_matter(matter_id: str) -> None:
+@router.delete("/{matter_id}", status_code=204, response_model=None)
+def delete_matter(matter_id: str):
     _require_enabled()
     if not matters.delete(matter_id):
         raise HTTPException(status_code=404, detail="matter not found")
