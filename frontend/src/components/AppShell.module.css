@@ -3,7 +3,68 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--paper);
+  background: transparent;
+  position: relative;
+}
+
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      42rem 42rem at clamp(12%, 24vw, 55%) clamp(-8%, 0, 6%),
+      color-mix(in srgb, var(--accent-500) 12%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      38rem 38rem at clamp(62%, 78vw, 94%) clamp(48%, 58vh, 74%),
+      color-mix(in srgb, var(--info-700, #2b5566) 9%, transparent),
+      transparent 60%
+    ),
+    var(--paper);
+}
+.ambient::before {
+  content: "";
+  position: absolute;
+  left: 6%;
+  top: -10%;
+  width: 20rem;
+  height: 20rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent-500) 14%, transparent);
+  filter: blur(70px);
+  animation: drift-a 24s var(--ease) infinite alternate;
+}
+.ambient::after {
+  content: "";
+  position: absolute;
+  right: 4%;
+  bottom: -4%;
+  width: 26rem;
+  height: 26rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--info-700, #2b5566) 11%, transparent);
+  filter: blur(90px);
+  animation: drift-b 30s var(--ease) infinite alternate;
+}
+@keyframes drift-a {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4rem, 2.5rem, 0) scale(1.2);
+  }
+}
+@keyframes drift-b {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.12);
+  }
+  to {
+    transform: translate3d(-4rem, -3rem, 0) scale(0.94);
+  }
 }
 
 .header {
@@ -17,7 +78,9 @@
   justify-content: space-between;
   gap: var(--s-4);
   flex-wrap: wrap;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
   border-bottom: 1px solid var(--rule);
 }
 
@@ -31,9 +94,17 @@
   font-size: var(--fs-sm);
   font-weight: 500;
   text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease);
 }
 .navLink:hover {
   color: var(--accent-700);
+}
+.navLinkActive {
+  color: var(--accent-700);
+  border-bottom-color: var(--accent-500);
 }
 
 .brand {
@@ -80,6 +151,8 @@
 
 .main {
   flex: 1;
+  position: relative;
+  z-index: 1;
   width: min(var(--page-max), 100%);
   margin: 0 auto;
   padding: clamp(var(--s-6), 6vw, var(--s-8)) var(--s-4) var(--s-8);
@@ -89,6 +162,8 @@
 }
 
 .footer {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;

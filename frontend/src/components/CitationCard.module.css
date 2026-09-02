@@ -10,14 +10,18 @@
   font: inherit;
 }
 .clickable {
+  position: relative;
   cursor: pointer;
   transition:
     border-color var(--dur-1) var(--ease),
-    background var(--dur-1) var(--ease);
+    transform var(--dur-1) var(--ease),
+    box-shadow var(--dur-1) var(--ease);
 }
 .clickable:hover {
   border-color: var(--accent-500);
-  background: var(--accent-50);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px
+    color-mix(in srgb, var(--accent-700) 13%, transparent);
 }
 .num {
   flex: none;
@@ -60,7 +64,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--warn-700, #9a6700);
+  color: var(--escalate-700);
   font-weight: 600;
 }
 .asOf {

@@ -39,18 +39,28 @@
   font: inherit;
   font-size: var(--fs-sm);
   cursor: pointer;
-  transition: color var(--dur-1) var(--ease);
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  transition: color var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
 }
 .example::before {
   content: "→";
+  flex: none;
   margin-right: var(--s-3);
   color: var(--ink-400);
+  transform: translateX(0);
+  transition: transform var(--dur-2) var(--ease),
+    color var(--dur-1) var(--ease);
 }
 .example:hover {
   color: var(--accent-700);
+  transform: translateX(var(--s-1));
 }
 .example:hover::before {
   color: var(--accent-500);
+  transform: translateX(var(--s-1));
 }
 
 .submit {

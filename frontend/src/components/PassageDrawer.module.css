@@ -84,7 +84,7 @@
   border-top: 1px solid var(--rule);
   font-size: var(--fs-sm);
   line-height: 1.6;
-  color: var(--warn-700, #9a6700);
+  color: var(--escalate-700);
 }
 
 .foot {

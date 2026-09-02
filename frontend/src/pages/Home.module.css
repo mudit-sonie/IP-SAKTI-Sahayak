@@ -1,5 +1,8 @@
 .hero {
+  position: relative;
   margin-bottom: var(--s-5);
+  padding-bottom: var(--s-5);
+  border-bottom: 1px solid var(--rule);
   animation: rise var(--dur-3) var(--ease);
 }
 .eyebrow {
@@ -16,16 +19,17 @@
 }
 .title {
   max-width: 22ch;
-  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-size: var(--fs-4xl);
   font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: -0.015em;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 .lede {
   margin-top: var(--s-4);
-  max-width: 58ch;
+  max-width: 55ch;
   font-size: var(--fs-md);
-  line-height: 1.55;
+  line-height: 1.6;
   color: var(--ink-600);
 }
 
@@ -73,21 +77,42 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--s-2);
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s-3);
+}
+.sdgItem {
+  position: relative;
+  display: flex;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  transition: border-color var(--dur-2) var(--ease),
+    transform var(--dur-2) var(--ease),
+    box-shadow var(--dur-2) var(--ease);
+}
+.sdgItem:hover {
+  border-color: var(--accent-500);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px
+    color-mix(in srgb, var(--accent-700) 14%, transparent);
+}
+.sdgFeatured {
+  grid-column: span 1;
+  background: var(--accent-50);
+  border-color: var(--accent-100);
+}
+.sdgFeatured .sdgName {
+  color: var(--accent-700);
 }
 @media (max-width: 720px) {
   .sdgList {
     grid-template-columns: 1fr;
   }
-}
-.sdgItem {
-  display: flex;
-  gap: var(--s-3);
-  padding: var(--s-3);
-  border: 1px solid var(--rule);
-  border-radius: var(--r-md);
-  background: var(--surface);
+  .sdgFeatured {
+    grid-column: span 1;
+  }
 }
 .sdgBadge {
   flex: none;

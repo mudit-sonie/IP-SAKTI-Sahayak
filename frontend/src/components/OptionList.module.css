@@ -4,6 +4,7 @@
   gap: var(--s-2);
 }
 .option {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--s-3);
@@ -17,10 +18,15 @@
   cursor: pointer;
   transition:
     border-color var(--dur-1) var(--ease),
-    background var(--dur-1) var(--ease);
+    background var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease),
+    box-shadow var(--dur-1) var(--ease);
 }
 .option:hover {
   border-color: var(--accent-500);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px
+    color-mix(in srgb, var(--accent-700) 12%, transparent);
 }
 .dot {
   flex: none;

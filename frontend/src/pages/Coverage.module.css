@@ -73,6 +73,6 @@
   line-height: 1.55;
 }
 .error {
-  color: var(--danger-600, crimson);
+  color: var(--flag-700);
   font-size: var(--fs-sm);
 }

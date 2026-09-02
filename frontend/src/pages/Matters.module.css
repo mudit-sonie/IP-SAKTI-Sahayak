@@ -56,13 +56,9 @@
   background: var(--surface);
   text-decoration: none;
   color: inherit;
-  transition:
-    border-color var(--dur-1) var(--ease),
-    background var(--dur-1) var(--ease);
 }
 a.card:hover {
   border-color: var(--accent-500);
-  background: var(--accent-50);
 }
 .cardTop {
   display: flex;

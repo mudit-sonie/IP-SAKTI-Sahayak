@@ -20,10 +20,15 @@
   cursor: pointer;
   transition:
     background var(--dur-1) var(--ease),
-    color var(--dur-1) var(--ease);
+    color var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
 }
 .opt:hover {
   color: var(--ink-900);
+  background: color-mix(in srgb, var(--accent-500) 9%, transparent);
+}
+.opt:active {
+  transform: scale(0.98);
 }
 .on {
   background: var(--surface);

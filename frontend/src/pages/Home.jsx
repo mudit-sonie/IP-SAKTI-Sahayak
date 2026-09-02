@@ -4,7 +4,10 @@ import AppShell from "../components/AppShell";
 import Button from "../components/Button";
 import SegmentedControl from "../components/SegmentedControl";
 import Icon from "../components/Icon";
+import useSpotlight from "../hooks/useSpotlight";
 import styles from "./Home.module.css";
+
+const cx = (...c) => c.filter(Boolean).join(" ");
 
 const JURISDICTIONS = [
   { value: "india", label: "India", icon: "india" },
@@ -17,20 +20,49 @@ const SDGS = [
     name: "Good Health & Well-being",
     color: "#4C9F38",
     note: "Safer, faster market access for authentic Ayurveda medicine.",
+    featured: false,
   },
   {
     n: 9,
     name: "Industry, Innovation & Infrastructure",
     color: "#FD6925",
     note: "Lowers the IP & regulatory barrier for Ayurveda startups and MSMEs.",
+    featured: true,
   },
   {
     n: 17,
     name: "Partnerships for the Goals",
     color: "#19486A",
     note: "Links practitioners and facilitators to the AYUSH / AIIA knowledge base.",
+    featured: false,
   },
 ];
+
+function SdgCard({ g }) {
+  const spotlight = useSpotlight();
+  return (
+    <li
+      ref={spotlight.ref}
+      onMouseMove={spotlight.onMouseMove}
+      onMouseLeave={spotlight.onMouseLeave}
+      className={cx(styles.sdgItem, g.featured && styles.sdgFeatured, "spotlight")}
+    >
+      <span
+        className={styles.sdgBadge}
+        style={{ background: g.color }}
+        aria-hidden="true"
+      >
+        {g.n}
+      </span>
+      <span className={styles.sdgText}>
+        <span className={styles.sdgName}>
+          SDG {g.n} · {g.name}
+        </span>
+        <span className={styles.sdgNote}>{g.note}</span>
+      </span>
+    </li>
+  );
+}
 
 export default function Home() {
   const [jurisdiction, setJurisdiction] = useState("india");
@@ -38,16 +70,16 @@ export default function Home() {
 
   return (
     <AppShell>
-      <div className={styles.hero}>
+      <div className={cx(styles.hero, "grain")}>
         <p className={styles.eyebrow}>Ayurveda · IP &amp; regulatory</p>
         <h1 className={styles.title}>
           Every answer traced to a statute, treaty, or rule.
         </h1>
         <p className={styles.lede}>
-          Source-cited guidance on intellectual property and regulatory questions
-          for Ayurveda practitioners, researchers, startups and MSMEs. When the
-          corpus can&apos;t support an answer, the assistant escalates to a human
-          rather than guess.
+          Source-cited guidance on intellectual property and regulatory
+          questions for Ayurveda practitioners, researchers, startups and
+          MSMEs. When the corpus can&apos;t support an answer, the assistant
+          escalates to a human rather than guess.
         </p>
       </div>
 
@@ -81,21 +113,7 @@ export default function Home() {
         </h2>
         <ul className={styles.sdgList}>
           {SDGS.map((g) => (
-            <li key={g.n} className={styles.sdgItem}>
-              <span
-                className={styles.sdgBadge}
-                style={{ background: g.color }}
-                aria-hidden="true"
-              >
-                {g.n}
-              </span>
-              <span className={styles.sdgText}>
-                <span className={styles.sdgName}>
-                  SDG {g.n} · {g.name}
-                </span>
-                <span className={styles.sdgNote}>{g.note}</span>
-              </span>
-            </li>
+            <SdgCard key={g.n} g={g} />
           ))}
         </ul>
       </section>
