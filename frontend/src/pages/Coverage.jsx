@@ -6,7 +6,70 @@ import Badge from "../components/Badge";
 import Card, { CardHeader } from "../components/Card";
 import Icon from "../components/Icon";
 import { SkeletonLine } from "../components/Skeleton";
+import useSpotlight from "../hooks/useSpotlight";
 import styles from "./Coverage.module.css";
+
+const cx = (...c) => c.filter(Boolean).join(" ");
+
+function SourceCard({ s, open, onToggle }) {
+  const spotlight = useSpotlight();
+  return (
+    <Card
+      tone={s.thin ? "warn" : "default"}
+      ref={spotlight.ref}
+      onMouseMove={spotlight.onMouseMove}
+      onMouseLeave={spotlight.onMouseLeave}
+      className={s.thin ? undefined : cx("spotlight", "lift")}
+    >
+      <CardHeader
+        eyebrow={[s.document_type, s.jurisdiction, s.year]
+          .filter(Boolean)
+          .join(" · ")}
+        title={s.source}
+        aside={
+          <span className={styles.counts}>
+            {s.thin && <Badge tone="warn">thin</Badge>}
+            <Badge tone="neutral">
+              <span className="mono">{s.section_count}</span> sections
+            </Badge>
+          </span>
+        }
+      />
+      <div className={styles.meta}>
+        {s.organization && <span>{s.organization}</span>}
+        {s.as_of && <span>text as of {s.as_of}</span>}
+        {s.source_url && (
+          <a
+            href={s.source_url}
+            target="_blank"
+            rel="noreferrer noopener"
+            className={styles.ext}
+          >
+            Official source <Icon name="external" size={12} />
+          </a>
+        )}
+        {s.sections.length > 0 && (
+          <button
+            type="button"
+            className={styles.toggle}
+            onClick={onToggle}
+          >
+            {open ? "Hide" : "Show"} sections
+          </button>
+        )}
+      </div>
+      {open && (
+        <p className={styles.sections}>
+          {s.sections.map((sec) => (
+            <span key={sec} className={styles.sec}>
+              {sec}
+            </span>
+          ))}
+        </p>
+      )}
+    </Card>
+  );
+}
 
 export default function Coverage() {
   const [data, setData] = useState(null);
@@ -55,56 +118,14 @@ export default function Coverage() {
 
           <div className={styles.list}>
             {data.sources.map((s) => (
-              <Card key={s.source} tone={s.thin ? "warn" : "default"}>
-                <CardHeader
-                  eyebrow={[s.document_type, s.jurisdiction, s.year]
-                    .filter(Boolean)
-                    .join(" · ")}
-                  title={s.source}
-                  aside={
-                    <span className={styles.counts}>
-                      {s.thin && <Badge tone="warn">thin</Badge>}
-                      <Badge tone="neutral">
-                        <span className="mono">{s.section_count}</span> sections
-                      </Badge>
-                    </span>
-                  }
-                />
-                <div className={styles.meta}>
-                  {s.organization && <span>{s.organization}</span>}
-                  {s.as_of && <span>text as of {s.as_of}</span>}
-                  {s.source_url && (
-                    <a
-                      href={s.source_url}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className={styles.ext}
-                    >
-                      Official source <Icon name="external" size={12} />
-                    </a>
-                  )}
-                  {s.sections.length > 0 && (
-                    <button
-                      type="button"
-                      className={styles.toggle}
-                      onClick={() =>
-                        setOpen(open === s.source ? null : s.source)
-                      }
-                    >
-                      {open === s.source ? "Hide" : "Show"} sections
-                    </button>
-                  )}
-                </div>
-                {open === s.source && (
-                  <p className={styles.sections}>
-                    {s.sections.map((sec) => (
-                      <span key={sec} className={styles.sec}>
-                        {sec}
-                      </span>
-                    ))}
-                  </p>
-                )}
-              </Card>
+              <SourceCard
+                key={s.source}
+                s={s}
+                open={open === s.source}
+                onToggle={() =>
+                  setOpen(open === s.source ? null : s.source)
+                }
+              />
             ))}
           </div>
 

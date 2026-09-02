@@ -1,4 +1,5 @@
 import Icon from "./Icon";
+import useSpotlight from "../hooks/useSpotlight";
 import styles from "./CitationCard.module.css";
 
 /** citation: { source, section, excerpt_ref, source_url, as_of, amended_by };
@@ -10,11 +11,15 @@ export default function CitationCard({ citation, index, onView }) {
     ? section
     : `Section ${section}`;
   const clickable = Boolean(excerpt_ref && onView);
+  const spotlight = useSpotlight();
 
   const Tag = clickable ? "button" : "article";
   return (
     <Tag
-      className={`${styles.card} ${clickable ? styles.clickable : ""}`}
+      ref={clickable ? spotlight.ref : undefined}
+      onMouseMove={clickable ? spotlight.onMouseMove : undefined}
+      onMouseLeave={clickable ? spotlight.onMouseLeave : undefined}
+      className={`${styles.card} ${clickable ? `${styles.clickable} spotlight` : ""}`}
       onClick={clickable ? onView : undefined}
       type={clickable ? "button" : undefined}
     >

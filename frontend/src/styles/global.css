@@ -5,6 +5,7 @@
 }
 html {
   -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 body {
   margin: 0;
@@ -91,4 +92,73 @@ img {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* ---- cursor-spotlight interactive card ---- */
+.spotlight {
+  position: relative;
+  overflow: hidden;
+}
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease);
+  background: radial-gradient(
+    22rem 22rem at var(--spot-x, 50%) var(--spot-y, 50%),
+    color-mix(in srgb, var(--accent-500) 16%, transparent),
+    transparent 60%
+  );
+  mix-blend-mode: normal;
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+/* ---- generic card hover lift (reuse via .lift) ---- */
+.lift {
+  transition:
+    transform var(--dur-2) var(--ease),
+    box-shadow var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease);
+}
+.lift:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-500);
+  box-shadow: 0 12px 32px
+    color-mix(in srgb, var(--accent-700) 14%, transparent);
+}
+
+/* ---- skip-to-content (accessibility) ---- */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--s-4);
+  z-index: 100;
+  padding: var(--s-2) var(--s-4);
+  background: var(--accent-700);
+  color: var(--on-accent);
+  font-family: var(--font-sans);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 var(--r-sm) var(--r-sm);
+  transition: top var(--dur-2) var(--ease);
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* ---- grain overlay utility ---- */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
 }

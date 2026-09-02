@@ -42,7 +42,7 @@
 }
 .err,
 .error {
-  color: var(--danger-600, crimson);
+  color: var(--flag-700);
   font-size: var(--fs-xs);
 }
 .muted {
@@ -93,5 +93,5 @@
   padding: 2px;
 }
 .remove:hover {
-  color: var(--danger-600, crimson);
+  color: var(--flag-700);
 }

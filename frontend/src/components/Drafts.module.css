@@ -39,7 +39,7 @@
 .note {
   margin: var(--s-2) 0 0;
   font-size: var(--fs-xs);
-  color: var(--warn-700, #9a6700);
+  color: var(--escalate-700);
 }
 .generated {
   border-top: 1px solid var(--rule);
@@ -105,5 +105,5 @@
   padding: 0;
 }
 .remove:hover {
-  color: var(--danger-600, crimson);
+  color: var(--flag-700);
 }

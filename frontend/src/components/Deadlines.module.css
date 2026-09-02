@@ -119,7 +119,7 @@
   padding: 2px;
 }
 .remove:hover {
-  color: var(--danger-600, crimson);
+  color: var(--flag-700);
 }
 .disclaimer {
   margin: 0;
