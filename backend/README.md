@@ -18,7 +18,7 @@ cd backend
 cp .env.example .env          # add GEMINI_API_KEYS (comma-separated)
 python -m venv .venv && . .venv/bin/activate     # Windows: .\.venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --host :: --port 8000
 ```
 
 Or just `./run.sh` (POSIX) / `.\run.ps1` (Windows).
