@@ -59,7 +59,7 @@ tool that finds and cites the exact provisions — not a paraphrase.
 
 ## Demo
 
-[![IP-SAKTI Sahayak demo](assets/ip-sakti-sahayak-citation-grounded-rag.gif)](assets/ip-sakti-sahayak-citation-grounded-rag.gif)
+[![IP-SAKTI Sahayak demo](assets/ip-sakti-sahayak-citation-grounded-rag%20(1).gif)](assets/ip-sakti-sahayak-citation-grounded-rag%20(1).gif)
 
 ---
 
