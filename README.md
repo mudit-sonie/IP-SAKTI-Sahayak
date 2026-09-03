@@ -57,9 +57,9 @@ tool that finds and cites the exact provisions — not a paraphrase.
 > **The core promise — no mocks on the core loop.** Every demoed answer must trace
 > to a real statute/treaty section in the corpus. If it can't, we escalate.
 
-## Demo
+## Sytem Architecture Workflow
 
-[![IP-SAKTI Sahayak](assets/ip-sakti-sahayak-citation-grounded-rag.gif)](assets/ip-sakti-sahayak-citation-grounded-rag.gif)
+[![IP-SAKTI Sahayak](assets/demo-loop.gif)](assets/demo-loop.gif)
 
 ---
 
