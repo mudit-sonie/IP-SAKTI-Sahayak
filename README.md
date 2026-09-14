@@ -39,9 +39,9 @@ touch four different legal worlds at once:
 - **Brands & origin** — the Trade Marks Act 1999 and the **Geographical Indications** Act 1999;
 - plus the **TRIPS Agreement** and international obligations that shape all of the above.
 
-Statutes sit in different ministries' portals, have different edition dates, and
+Statutes sit in different ministries portals, have different edition dates, and 
 are dense legal text. Researchers, startups, and lawful users need one grounded
-tool that finds and cites the exact provisions — not a paraphrase.
+tool that finds and cites the exact provisions, not a paraphrase.
 
 ## The solution
 
